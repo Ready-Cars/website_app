@@ -1,0 +1,174 @@
+<html><head>
+    <meta charset="utf-8"/>
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Work+Sans%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <title>Stitch Design</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style type="text/tailwindcss">
+        :root {
+            --primary-color: #1173d4;
+        }
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-slate-50" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden group/design-root">
+    <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center gap-4 text-slate-900">
+                <span class="material-symbols-outlined text-3xl text-[var(--primary-color)]"> directions_car </span>
+                <h2 class="text-slate-900 text-xl font-bold leading-tight tracking-tight">RentMyRide</h2>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex items-center gap-4">
+                    <button class="text-slate-600 hover:text-slate-900">
+                        <span class="material-symbols-outlined"> search </span>
+                    </button>
+                    <button class="text-slate-600 hover:text-slate-900">
+                        <span class="material-symbols-outlined"> filter_list </span>
+                    </button>
+                </div>
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB1nPcnS6vuolkB2wii1mYvkoPYs05kqvKcy8aI3MlllzJASueJhfxkmv1IeuN7Nk4q_aocZ4RXICuVHdk6oACwVOdH4XVhD7Q9fhxVQ-G63J3sl3HYwotqy4fUcEEbMtjlgyg1hclyIlgp3LqkadqhPuOnWI_iNjkmBBGHZtGrABq7Y6q_IZd4pylS6NSqGIyUSn6a4mfPnHaJQcX5C_F3NB3oKd5xX8GDdiPAn8lsr5J8cjjRNc48DnyZrzjLtt7RmoTZNTRN6yE8");'></div>
+            </div>
+        </header>
+        <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-slate-900 mb-2">Find Your Perfect Ride</h1>
+                    <p class="text-slate-500">Browse our selection of available cars for your next adventure.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                    <div class="relative flex-1">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"> search </span>
+                        <input class="form-input w-full rounded-md border-slate-300 pl-10 pr-4 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-[var(--primary-color)] focus:ring-[var(--primary-color)]" placeholder="Search by make, model, or location" type="text"/>
+                    </div>
+                    <div class="flex gap-2 sm:gap-4">
+                        <button class="flex items-center justify-center gap-x-2 rounded-md bg-white border border-slate-300 px-4 py-2.5 text-slate-700 hover:bg-slate-50 text-sm font-medium">
+                            <span>Make</span>
+                            <span class="material-symbols-outlined text-base"> expand_more </span>
+                        </button>
+                        <button class="flex items-center justify-center gap-x-2 rounded-md bg-white border border-slate-300 px-4 py-2.5 text-slate-700 hover:bg-slate-50 text-sm font-medium">
+                            <span>Price</span>
+                            <span class="material-symbols-outlined text-base"> expand_more </span>
+                        </button>
+                        <button class="flex items-center justify-center gap-x-2 rounded-md bg-white border border-slate-300 px-4 py-2.5 text-slate-700 hover:bg-slate-50 text-sm font-medium">
+                            <span>Availability</span>
+                            <span class="material-symbols-outlined text-base"> expand_more </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div class="flex flex-col rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white">
+                        <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuClyOiYUTyFt_axvfEkYFBkbG_Jjz8Yy1v7BDXUHw0OYYahFtIYkTkHClKxPGRcw3BjZ78sa8JCGvh8tEEDj02ddyfaYI6eqVI_JltlV_6edM1xOkJxMcPvFqtbSHxXf0ew8hJM2ombe1trKwyxWYlNT8qvHnVZf7iV0S0Q9MEHqylDh8AYfOkf-y_EMsOqjRsrv8onfmRnOJKYHMFRN3GTLmsonjwR8ql3CL3iNCl5_Sa7IDJxUoWZrRDdWWYdiv3UNV6VDnjNER3h");'></div>
+                        <div class="p-4 flex flex-col flex-1">
+                            <h3 class="text-slate-900 text-lg font-semibold leading-snug">2023 Sedan</h3>
+                            <p class="text-slate-500 text-sm mt-1 mb-4 flex-1">Spacious and comfortable for long drives</p>
+                            <div class="flex justify-between items-center">
+                                <p class="text-lg font-bold text-slate-900">$55<span class="text-sm font-normal text-slate-500">/day</span></p>
+                                <button class="bg-[var(--primary-color)] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-opacity-90">Rent Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white">
+                        <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB9RUj5fHDKIkamoC4NthcQ6U8XZi8WJTVU6Exg8luXx4OmgpjW2Nv-Y5P8kBFocevpYUbHVmM96JgHC4BH8Z8D7_SKF_JwjQOr-pUfVnr5wL_0BeU8xtXp6w110OS8ze3Mfckl_NOEhwdItHvs5LteAldBKke6RRslJtROwdBHz8r3_3fKtmhMJBmiTAhvNjcOSP-t2fyiZEqHFt5q6osUxiKubd4lO5BAavb7r8lu9MW_PSh-dEopaU6f0LsHP5QtM0C-295doyyE");'></div>
+                        <div class="p-4 flex flex-col flex-1">
+                            <h3 class="text-slate-900 text-lg font-semibold leading-snug">2022 SUV</h3>
+                            <p class="text-slate-500 text-sm mt-1 mb-4 flex-1">Perfect for family trips and off-road adventures</p>
+                            <div class="flex justify-between items-center">
+                                <p class="text-lg font-bold text-slate-900">$75<span class="text-sm font-normal text-slate-500">/day</span></p>
+                                <button class="bg-[var(--primary-color)] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-opacity-90">Rent Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white">
+                        <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAsnhzbs4ayrqqfcoURKqJ6WIPNzBh6FvOJySmXSvnJMXhr7sGu08Pz46yFlTMRIio4Gr8D9WA5PAMlVjhJ5YNmYBeQIFGMWv6vQofkvuoUBvfnhSVlhyIJMh9hI1bOoct03Dej1eb4BeQju13PSSUt6nms6Piv8OQiEseiLZWNJp_WPYd0tyCtVNMVPMSvQbAFSbQfhOVNWA85kkpuX8oX9N-5SVaQ9qvIyEFkdUW9ZT1Imipl7_Cffm3CITNY7YojMeQZaYKK_ql-");'></div>
+                        <div class="p-4 flex flex-col flex-1">
+                            <h3 class="text-slate-900 text-lg font-semibold leading-snug">2021 Compact</h3>
+                            <p class="text-slate-500 text-sm mt-1 mb-4 flex-1">Fuel-efficient and easy to park</p>
+                            <div class="flex justify-between items-center">
+                                <p class="text-lg font-bold text-slate-900">$40<span class="text-sm font-normal text-slate-500">/day</span></p>
+                                <button class="bg-[var(--primary-color)] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-opacity-90">Rent Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white">
+                        <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAxkwztUSQrL6B_QRgzrwGgFCHgPl__ALDX20arlY7AYrqCkXJL0K3i8E01R4Tszay2nRNN_KPDDn8zEd7-byCXh1ijof4Vz4Xi6Dt7-I1vA2qGSjZRkO17FqtMjBGa9ra-CB6eaJOQFbZdXIkDDkCx_IK2G5OUh8F9U59VKyMM7DaxIckbS-UAm5iRIgJgXRcQD3UO2IwEoL0_67E8529-7VKfHMyzNVecWlss8CEYYN0GVLHhLdu9rLaesrt_p0QzmQkcp2UeEUpi");'></div>
+                        <div class="p-4 flex flex-col flex-1">
+                            <h3 class="text-slate-900 text-lg font-semibold leading-snug">2023 Luxury Sedan</h3>
+                            <p class="text-slate-500 text-sm mt-1 mb-4 flex-1">Elegant and powerful for a premium experience</p>
+                            <div class="flex justify-between items-center">
+                                <p class="text-lg font-bold text-slate-900">$120<span class="text-sm font-normal text-slate-500">/day</span></p>
+                                <button class="bg-[var(--primary-color)] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-opacity-90">Rent Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white">
+                        <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDp4Na1L01L79BCEyMA6yCOnOv4LtA51fI_ICimguUTjUMnRvNNbSThAjfwJwOMwN31i0VCkAGWlkAzsByZkU79T997xDV16wdpPE7BguMmLBnFUBW0m32pwLY3UxaHsW_dSiLUcFJZHdjcLxtgbjmH3-HKPGUCojHF4h9QqbBY525jBz7SYNrah1s_8qyPc_Ptoh2EQAnQybKX87bJSk-Lr1YrfhYzwCPfvD7EHbcZJOOvlkF7JIXrcdg6ycL5IZ0mQaZhZSjWUIsX");'></div>
+                        <div class="p-4 flex flex-col flex-1">
+                            <h3 class="text-slate-900 text-lg font-semibold leading-snug">2022 Minivan</h3>
+                            <p class="text-slate-500 text-sm mt-1 mb-4 flex-1">Ideal for group travel with ample seating</p>
+                            <div class="flex justify-between items-center">
+                                <p class="text-lg font-bold text-slate-900">$85<span class="text-sm font-normal text-slate-500">/day</span></p>
+                                <button class="bg-[var(--primary-color)] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-opacity-90">Rent Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 bg-white">
+                        <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC6PF9rKo7ppjMYLnTDJ5Yfaw-FyS0zwYvRPipq_9jyVAB4HeY4KOik23Uq2rUtpp8upBjEEy92WkunZJuR71NGB0B3PVnJqq3l-Na81dSKOIRPQZBPhmd-amA8dE-XFXcZjv2AKJk0JK0ZnAeeUJJ4nZPfiFe-9qjQK6UKuRP_pngTT--Hx2ocDVM-T0LK92enn0s6i7TTaybI-XtB_vMdCywlwszakoEaEPGDHM27ewiiTxbgv7xGwRhx87pc5p4mg6wen7iVRCj9");'></div>
+                        <div class="p-4 flex flex-col flex-1">
+                            <h3 class="text-slate-900 text-lg font-semibold leading-snug">2021 Sports Car</h3>
+                            <p class="text-slate-500 text-sm mt-1 mb-4 flex-1">Exhilarating performance and sleek design</p>
+                            <div class="flex justify-between items-center">
+                                <p class="text-lg font-bold text-slate-900">$150<span class="text-sm font-normal text-slate-500">/day</span></p>
+                                <button class="bg-[var(--primary-color)] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-opacity-90">Rent Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center pt-8">
+                    <nav aria-label="Pagination">
+                        <ul class="flex items-center -space-x-px h-10 text-base">
+                            <li>
+                                <a class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-slate-500 bg-white border border-e-0 border-slate-300 rounded-s-lg hover:bg-slate-100 hover:text-slate-700" href="#">
+                                    <span class="sr-only">Previous</span>
+                                    <span class="material-symbols-outlined text-lg">chevron_left</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a aria-current="page" class="flex items-center justify-center px-4 h-10 text-white bg-[var(--primary-color)] border border-slate-300 hover:bg-opacity-90" href="#">1</a>
+                            </li>
+                            <li>
+                                <a class="flex items-center justify-center px-4 h-10 leading-tight text-slate-500 bg-white border border-slate-300 hover:bg-slate-100 hover:text-slate-700" href="#">2</a>
+                            </li>
+                            <li>
+                                <a class="flex items-center justify-center px-4 h-10 leading-tight text-slate-500 bg-white border border-slate-300 hover:bg-slate-100 hover:text-slate-700" href="#">3</a>
+                            </li>
+                            <li>
+                                <a class="flex items-center justify-center px-4 h-10 leading-tight text-slate-500 bg-white border border-slate-300 hover:bg-slate-100 hover:text-slate-700" href="#">4</a>
+                            </li>
+                            <li>
+                                <a class="flex items-center justify-center px-4 h-10 leading-tight text-slate-500 bg-white border border-slate-300 hover:bg-slate-100 hover:text-slate-700" href="#">5</a>
+                            </li>
+                            <li>
+                                <a class="flex items-center justify-center px-4 h-10 leading-tight text-slate-500 bg-white border border-slate-300 rounded-e-lg hover:bg-slate-100 hover:text-slate-700" href="#">
+                                    <span class="sr-only">Next</span>
+                                    <span class="material-symbols-outlined text-lg">chevron_right</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+</body></html>
