@@ -62,6 +62,7 @@
                                 <option value="{{ $s }}">{{ $s }} seats</option>
                             @endforeach
                         </select>
+{{--                        ww--}}
                         <select wire:model.live="sort" class="form-select rounded-md border-slate-300 focus:border-[#1173d4] focus:ring-[#1173d4]">
                             @foreach(($options['sorts'] ?? []) as $value => $label)
                                 <option value="{{ $value }}">{{ $label }}</option>
