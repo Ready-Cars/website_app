@@ -42,7 +42,7 @@ class Cars extends Component
     public string $fuel_type_field = '';
     public bool $featured_field = false;
     public string $location = '';
-    public array $images = [''];
+    public array $images = [];
 
     // Uploads
     public $primaryUpload = null; // \Livewire\Features\SupportFileUploads\TemporaryUploadedFile
@@ -63,7 +63,7 @@ class Cars extends Component
         'name' => 'required|string|max:255',
         'category_field' => 'nullable|string|max:255',
         'description' => 'nullable|string',
-        'image_url' => 'nullable|url|max:2048',
+        'image_url' => 'nullable|string|max:2048',
                 'primaryUpload' => 'nullable|image|max:2048',
                 'galleryUploads.*' => 'nullable|image|max:2048',
         'daily_price' => 'required|numeric|min:0',
@@ -72,7 +72,6 @@ class Cars extends Component
         'fuel_type_field' => 'nullable|string|max:64',
         'featured_field' => 'boolean',
         'location' => 'nullable|string|max:255',
-        'images.*' => 'nullable|url'
     ];
 
     public function mount(CarManagementService $service): void
@@ -135,7 +134,7 @@ class Cars extends Component
             'name' => $this->name,
             'category' => $this->category_field,
             'description' => $this->description,
-            'image_url' => $this->image_url,
+            'image_url' => ($this->image_url !== '') ? $this->image_url : null,
             'daily_price' => (float)$this->daily_price,
             'seats' => $this->seats_field !== '' ? (int)$this->seats_field : null,
             'transmission' => $this->transmission_field,
@@ -158,7 +157,7 @@ class Cars extends Component
         $this->fuel_type_field = (string)($car->fuel_type ?? '');
         $this->featured_field = (bool)($car->featured ?? false);
         $this->location = (string)($car->location ?? '');
-        $this->images = array_values((array)($car->images ?? [])) ?: [''];
+        $this->images = array_values((array)($car->images ?? []));
     }
 
     protected function resetForm(): void
@@ -174,7 +173,7 @@ class Cars extends Component
         $this->fuel_type_field = '';
         $this->featured_field = false;
         $this->location = '';
-        $this->images = [''];
+        $this->images = [];
     }
 
     public function openCreate(): void
@@ -203,14 +202,14 @@ class Cars extends Component
             if (is_array($this->galleryUploads)) {
                 foreach ($this->galleryUploads as $file) {
                     if ($file) {
-                        $path = $file->store('public/cars');
+                        $path = $file->store('cars', 'public');
                         $url = \Illuminate\Support\Facades\Storage::url($path);
                         $storedGallery[] = $url;
                     }
                 }
             }
             if ($this->primaryUpload) {
-                $path = $this->primaryUpload->store('public/cars');
+                $path = $this->primaryUpload->store('cars', 'public');
                 $data['image_url'] = \Illuminate\Support\Facades\Storage::url($path);
             }
             // Merge gallery uploads with any URL entries in images

@@ -334,13 +334,50 @@
                                 <textarea rows="3" class="form-textarea w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="description"></textarea>
                                 @error('description') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
+
+                            @if($editingId)
+                                @php
+                                    $adminGallery = array_values(array_filter(array_merge([
+                                        ($image_url ?? '') !== '' ? $image_url : null,
+                                    ], (array)($images ?? []))));
+                                    if (empty($adminGallery)) {
+                                        $adminGallery = ['https://via.placeholder.com/1280x720?text=No+Image'];
+                                    }
+                                @endphp
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Existing images</label>
+                                    <div class="rounded-lg overflow-hidden bg-white border border-slate-200">
+                                        <div class="relative">
+                                            <img id="admin-edit-main-image" src="{{ $adminGallery[0] }}" alt="Existing image" class="w-full aspect-video object-cover" />
+                                            @if(count($adminGallery) > 1)
+                                                <button type="button" class="absolute left-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 w-8 h-8" data-admin-gal-prev aria-label="Previous image">
+                                                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                                                </button>
+                                                <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 w-8 h-8" data-admin-gal-next aria-label="Next image">
+                                                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                                                </button>
+                                            @endif
+                                        </div>
+                                        @if(count($adminGallery) > 1)
+                                        <div class="p-2 border-t border-slate-200">
+                                            <div class="flex gap-2 overflow-x-auto" id="admin-edit-thumbs" aria-label="Existing image thumbnails">
+                                                @foreach($adminGallery as $i => $src)
+                                                    <button type="button" class="shrink-0 rounded-md overflow-hidden border {{ $i === 0 ? 'ring-2 ring-sky-600 border-sky-200' : 'border-slate-200' }}" data-admin-gal-thumb data-index="{{ $i }}" aria-label="Show image {{ $i + 1 }}">
+                                                        <img src="{{ $src }}" alt="Existing image {{ $i + 1 }}" class="w-16 h-12 object-cover" />
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+                                    <p class="mt-2 text-xs text-slate-500">These are the currently saved images for this car. Upload new images below to replace/add.</p>
+                                </div>
+                            @endif
+
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Primary image</label>
                                 <input type="file" class="block w-full text-sm" wire:model="primaryUpload" accept="image/*">
-                                <p class="text-xs text-slate-500 mt-1">Or specify URL:</p>
-                                <input type="url" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600 mt-1" wire:model.defer="image_url" placeholder="https://example.com/car.jpg">
                                 @error('primaryUpload') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                                @error('image_url') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Daily price (₦)</label>
@@ -385,20 +422,7 @@
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Additional images</label>
                                 <input type="file" class="block w-full text-sm" wire:model="galleryUploads" accept="image/*" multiple>
-                                <p class="text-xs text-slate-500 mt-1">Or provide image URLs below:</p>
-                                <div class="space-y-2 mt-1">
-                                    @foreach($images as $idx => $val)
-                                        <div class="flex gap-2">
-                                            <input type="url" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="images.{{ $idx }}" placeholder="https://...">
-                                            <button type="button" class="rounded-md h-10 px-3 border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50" wire:click="removeImageField({{ $idx }})" aria-label="Remove image">Remove</button>
-                                        </div>
-                                    @endforeach
-                                    <div>
-                                        <button type="button" class="rounded-md h-10 px-3 border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50" wire:click="addImageField">Add another URL</button>
-                                    </div>
-                                </div>
                                 @error('galleryUploads.*') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
-                                @error('images.*') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
                     </div>
@@ -497,5 +521,70 @@
   function initAll(){ document.querySelectorAll('[data-dropdown]').forEach(initDropdown); }
   if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initAll); } else { initAll(); }
   window.addEventListener('livewire:navigated', initAll);
+})();
+</script>
+
+
+<script>
+// Lightweight gallery for admin edit modal (robust init via Livewire events + MutationObserver)
+(function(){
+  function initAdminEditGallery(){
+    const main = document.getElementById('admin-edit-main-image');
+    if (!main) return;
+    if (main.__galInited) return; // prevent double-init on Livewire/DOM updates
+    main.__galInited = true;
+    const thumbs = document.getElementById('admin-edit-thumbs');
+    const prev = document.querySelector('[data-admin-gal-prev]');
+    const next = document.querySelector('[data-admin-gal-next]');
+    const imgs = thumbs ? Array.from(thumbs.querySelectorAll('[data-admin-gal-thumb] img')).map(img => img.getAttribute('src')) : [main.getAttribute('src')];
+    let idx = 0;
+    function setIndex(i){
+      if (!imgs.length) return;
+      idx = (i + imgs.length) % imgs.length;
+      main.src = imgs[idx];
+      if (thumbs){
+        thumbs.querySelectorAll('[data-admin-gal-thumb]').forEach((btn, j) => {
+          if (j === idx){ btn.classList.add('ring-2','ring-sky-600'); }
+          else { btn.classList.remove('ring-2','ring-sky-600'); }
+        });
+      }
+    }
+    if (thumbs){
+      thumbs.querySelectorAll('[data-admin-gal-thumb]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const i = parseInt(btn.getAttribute('data-index') || '0', 10) || 0;
+          setIndex(i);
+        });
+      });
+    }
+    if (prev) prev.addEventListener('click', () => setIndex(idx - 1));
+    if (next) next.addEventListener('click', () => setIndex(idx + 1));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' && prev) setIndex(idx - 1);
+      if (e.key === 'ArrowRight' && next) setIndex(idx + 1);
+    });
+  }
+
+  function tryInit(){
+    // Defer so Livewire DOM changes are in place
+    setTimeout(initAdminEditGallery, 0);
+  }
+
+  // 1) Traditional lifecycle hooks (may vary by Livewire version)
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryInit); else tryInit();
+  window.addEventListener('livewire:navigated', tryInit);
+  window.addEventListener('livewire:load', tryInit);
+  window.addEventListener('livewire:update', tryInit);
+
+  // 2) MutationObserver fallback to catch modal content insertion
+  const mo = new MutationObserver(() => {
+    const el = document.getElementById('admin-edit-main-image');
+    if (el && !el.__galInited) {
+      tryInit();
+    }
+  });
+  try {
+    mo.observe(document.documentElement || document.body, { childList: true, subtree: true });
+  } catch (e) { /* no-op */ }
 })();
 </script>

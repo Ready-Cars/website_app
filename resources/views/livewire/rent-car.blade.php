@@ -18,9 +18,39 @@
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                         <div class="lg:col-span-2 space-y-6">
-                            <!-- Car preview -->
+                            <!-- Car gallery slider -->
+                            @php
+                                $gallery = array_values(array_filter(array_merge([
+                                    $car->image_url ?? null,
+                                ], (array)($car->images ?? []))));
+                                if (empty($gallery)) {
+                                    $gallery = ['https://via.placeholder.com/1280x720?text=No+Image'];
+                                }
+                            @endphp
                             <div class="rounded-lg overflow-hidden bg-white shadow-sm border border-slate-200">
-                                <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="background-image: url('{{ $car->image_url }}');"></div>
+                                <div class="relative">
+                                    <img id="car-main-image" src="{{ $gallery[0] }}" alt="{{ $car->name }}" class="w-full aspect-video object-cover" />
+                                    @if(count($gallery) > 1)
+                                        <button type="button" class="absolute left-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 w-9 h-9" data-gal-prev aria-label="Previous image">
+                                            <span class="material-symbols-outlined">chevron_left</span>
+                                        </button>
+                                        <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 w-9 h-9" data-gal-next aria-label="Next image">
+                                            <span class="material-symbols-outlined">chevron_right</span>
+                                        </button>
+                                    @endif
+                                </div>
+
+                                @if(count($gallery) > 1)
+                                <div class="p-3 border-t border-slate-200">
+                                    <div class="flex gap-2 overflow-x-auto" id="car-thumbs" aria-label="Image thumbnails">
+                                        @foreach($gallery as $i => $src)
+                                            <button type="button" class="shrink-0 rounded-md overflow-hidden border {{ $i === 0 ? 'ring-2 ring-[#1173d4] border-[#1173d4]/20' : 'border-slate-200' }}" data-gal-thumb data-index="{{ $i }}" aria-label="Show image {{ $i + 1 }}">
+                                                <img src="{{ $src }}" alt="{{ $car->name }} thumbnail {{ $i + 1 }}" class="w-20 h-14 object-cover" />
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
                                 <div class="p-4">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -235,5 +265,47 @@
         // Success/cancel notifications
         window.addEventListener('rent-confirmed', () => showToast('Reservation confirmed!', 'success'));
         window.addEventListener('reservation-cancelled', () => showToast('Reservation cancelled', 'info'));
+    })();
+
+    // Lightweight gallery slider logic
+    (function(){
+        function init(){
+            const main = document.getElementById('car-main-image');
+            const thumbs = document.getElementById('car-thumbs');
+            const prev = document.querySelector('[data-gal-prev]');
+            const next = document.querySelector('[data-gal-next]');
+            if (!main) return;
+            const imgs = thumbs ? Array.from(thumbs.querySelectorAll('[data-gal-thumb] img')).map(img => img.getAttribute('src')) : [main.getAttribute('src')];
+            let idx = 0;
+            function setIndex(i){
+                if (!imgs.length) return;
+                idx = (i + imgs.length) % imgs.length;
+                main.src = imgs[idx];
+                // update rings on thumbs
+                if (thumbs){
+                    thumbs.querySelectorAll('[data-gal-thumb]').forEach((btn, i) => {
+                        if (i === idx){ btn.classList.add('ring-2','ring-[#1173d4]'); }
+                        else { btn.classList.remove('ring-2','ring-[#1173d4]'); }
+                    });
+                }
+            }
+            if (thumbs){
+                thumbs.querySelectorAll('[data-gal-thumb]').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        const i = parseInt(btn.getAttribute('data-index') || '0', 10) || 0;
+                        setIndex(i);
+                    });
+                });
+            }
+            if (prev) prev.addEventListener('click', () => setIndex(idx - 1));
+            if (next) next.addEventListener('click', () => setIndex(idx + 1));
+            // keyboard support
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft' && prev) { setIndex(idx - 1); }
+                if (e.key === 'ArrowRight' && next) { setIndex(idx + 1); }
+            });
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+        window.addEventListener('livewire:navigated', init);
     })();
 </script>

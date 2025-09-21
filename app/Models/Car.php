@@ -23,6 +23,7 @@ class Car extends Model
         'featured',
         'is_active',
         'location',
+        'images',
     ];
 
     protected $casts = [
