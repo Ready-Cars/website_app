@@ -93,20 +93,19 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Extras</label>
+                                    @if(!empty($availableExtras))
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                        <label class="flex items-center gap-2 text-sm text-slate-700">
-                                            <input type="checkbox" class="rounded border-slate-300 text-[#1173d4] focus:ring-[#1173d4]" wire:model.live="extras.gps">
-                                            GPS (+₦5/day)
-                                        </label>
-                                        <label class="flex items-center gap-2 text-sm text-slate-700">
-                                            <input type="checkbox" class="rounded border-slate-300 text-[#1173d4] focus:ring-[#1173d4]" wire:model.live="extras.child_seat">
-                                            Child Seat (+₦4/day)
-                                        </label>
-                                        <label class="flex items-center gap-2 text-sm text-slate-700">
-                                            <input type="checkbox" class="rounded border-slate-300 text-[#1173d4] focus:ring-[#1173d4]" wire:model.live="extras.insurance">
-                                            Insurance (+₦12/day)
-                                        </label>
+                                        @foreach($availableExtras as $ex)
+                                            @php $name = $ex['name']; $key = $ex['key']; @endphp
+                                            <label class="flex items-center gap-2 text-sm text-slate-700">
+                                                <input type="checkbox" class="rounded border-slate-300 text-[#1173d4] focus:ring-[#1173d4]" wire:model.live="extras.{{ $key }}">
+                                                {{ $name }} (+₦{{ number_format($ex['price_per_day'], 2) }}/day)
+                                            </label>
+                                        @endforeach
                                     </div>
+                                    @else
+                                        <p class="text-sm text-slate-500">No extra options available at this time.</p>
+                                    @endif
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Notes</label>

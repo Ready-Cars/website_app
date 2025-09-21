@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Car;
+use App\Models\Extra;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -21,11 +22,11 @@ class RentCar extends Component
     public string $pickupLocation = '';
     public string $dropoffLocation = '';
 
-    public array $extras = [
-        'gps' => false,
-        'child_seat' => false,
-        'insurance' => true,
-    ];
+    // Selected extras keyed by extra name => bool
+    public array $extras = [];
+
+    // Available extras loaded from DB
+    public array $availableExtras = [];
 
     public string $notes = '';
 
@@ -72,6 +73,8 @@ class RentCar extends Component
                 $this->notes = (string) ($this->editing->notes ?? '');
             }
         }
+
+        $this->loadAvailableExtras();
     }
 
     public function openConfirm(): void
@@ -144,16 +147,14 @@ class RentCar extends Component
     public function getExtrasCostProperty(): float
     {
         $cost = 0.0;
-        if ($this->extras['gps'] ?? false) {
-            $cost += 5.00 * $this->days; // $5 per day
+        foreach ($this->availableExtras as $ex) {
+            $key = (string)($ex['key'] ?? '');
+            $price = (float)($ex['price_per_day'] ?? 0);
+            if ($key !== '' && ($this->extras[$key] ?? false)) {
+                $cost += $price * $this->days;
+            }
         }
-        if ($this->extras['child_seat'] ?? false) {
-            $cost += 4.00 * $this->days; // $4 per day
-        }
-        if ($this->extras['insurance'] ?? false) {
-            $cost += 12.00 * $this->days; // $12 per day
-        }
-        return $cost;
+        return round($cost, 2);
     }
 
     public function getSubtotalProperty(): float
@@ -178,11 +179,8 @@ class RentCar extends Component
         $this->pickupLocation = '';
         $this->dropoffLocation = '';
         $this->notes = '';
-        $this->extras = [
-            'gps' => false,
-            'child_seat' => false,
-            'insurance' => true,
-        ];
+        // Reset extras to defaults from DB
+        $this->loadAvailableExtras(true);
         // Reset dates to today/tomorrow
         $this->startDate = Carbon::today()->toDateString();
         $this->endDate = Carbon::tomorrow()->toDateString();
@@ -332,6 +330,38 @@ class RentCar extends Component
         session()->flash('rent_success', $message);
         $this->redirect(route('trips.index'), navigate: true);
         return;
+    }
+
+    protected function loadAvailableExtras(bool $resetSelection = false): void
+    {
+        $list = Extra::query()->where('is_active', true)->orderBy('name')->get(['name','price_per_day','default_selected'])->toArray();
+        // Build selection keys from names (safe keys for Livewire binding)
+        $selection = [];
+        $avail = [];
+        foreach ($list as $ex) {
+            $name = (string)($ex['name'] ?? '');
+            if ($name === '') continue;
+            $key = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '_', $name));
+            $key = trim(preg_replace('/_+/', '_', $key), '_');
+            $default = (bool)($ex['default_selected'] ?? false);
+            $selection[$key] = $default;
+            $avail[] = [
+                'key' => $key,
+                'name' => $name,
+                'price_per_day' => (float)($ex['price_per_day'] ?? 0),
+            ];
+        }
+        $this->availableExtras = $avail;
+        if ($resetSelection || empty($this->extras)) {
+            $this->extras = $selection;
+        } else {
+            // Merge existing selection with available extras (drop removed ones)
+            $merged = [];
+            foreach ($selection as $name => $def) {
+                $merged[$name] = array_key_exists($name, $this->extras) ? (bool)$this->extras[$name] : $def;
+            }
+            $this->extras = $merged;
+        }
     }
 
     public function render()
