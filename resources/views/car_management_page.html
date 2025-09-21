@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>DriveGo - Car Catalog</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1173d4",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="flex flex-col min-h-screen">
+    <header class="hidden lg:flex items-center justify-between whitespace-nowrap border-b border-primary/20 dark:border-primary/30 px-10 py-4 bg-background-light dark:bg-background-dark sticky top-0 z-20">
+        <div class="flex items-center gap-4 text-slate-800 dark:text-white">
+            <div class="w-8 h-8 text-primary">
+                <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z" fill="currentColor"></path>
+                </svg>
+            </div>
+            <h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">DriveGo</h2>
+        </div>
+        <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
+            <a class="hover:text-primary" href="#">Dashboard</a>
+            <a class="hover:text-primary" href="#">Bookings</a>
+            <a class="text-primary font-semibold" href="#">Cars</a>
+            <a class="hover:text-primary" href="#">Customers</a>
+            <a class="hover:text-primary" href="#">Reports</a>
+        </nav>
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBxFdHa2PdXq8RI3ttHDxEGT5iOoL01Jwbkz3Iw8wqjU8MSCoIWJ_GNBmXsVlJ2ElQ9gc0l6KI7KXxT2_G-XEEhfSLNd9-BIuYk3GTTMAy6pCaMNlmLOx7FYyLk_edFgw0dfAINzJ-HigYg1p_ZRHoN1Di8vLPz6JCapm1nKu3kqMFuzR9S56GjySBWb3yKMc3Q2m-cY_trF5oq8quvLueb2MhHpqdamCjBjp-fEuRidhWdTjWrtUD0xaQWizeEN13Vp8koCw2OWmOg");'></div>
+        </div>
+    </header>
+    <main class="flex-grow p-4 md:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Car Catalog</h1>
+                <button class="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium shadow-sm hover:bg-primary/90 transition-colors">
+                    <span class="material-symbols-outlined">add</span>
+                    <span>Add New Car</span>
+                </button>
+            </div>
+            <div class="mb-6">
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">search</span>
+                    <input class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-background-light dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Search by make, model, or year" type="text"/>
+                </div>
+            </div>
+            <div class="bg-background-light dark:bg-slate-800/50 rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-slate-500 dark:text-slate-400">
+                        <thead class="text-xs text-slate-700 dark:text-slate-300 uppercase bg-slate-100 dark:bg-slate-900/50">
+                        <tr>
+                            <th class="px-6 py-3" scope="col">Image</th>
+                            <th class="px-6 py-3" scope="col">Make &amp; Model</th>
+                            <th class="px-6 py-3 hidden md:table-cell" scope="col">Year</th>
+                            <th class="px-6 py-3 hidden lg:table-cell" scope="col">Price</th>
+                            <th class="px-6 py-3" scope="col">Availability</th>
+                            <th class="px-6 py-3" scope="col"><span class="sr-only">Actions</span></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+                            <td class="px-6 py-4">
+                                <div class="w-12 h-12 rounded-lg bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBML6eR7ijiNjB5vuVRw50ZJKbpOP9H9NJrUgzuOuLk4kr-23VfsW1ksiH2Wc-fH5ObFybgK1O_v1fBek4OrK-Irz_9l16Tvo3iMlkQzDbUp1sek5k8MJ1xeTu1Iq0igAp9Cg5D_M5BCJ2YTNi-SKR4Ag0cnxCsrOIQ_FPGGsu4lq9S9dLh0HE1AitQFA9dkln7Qy_HWtxQwynDZZILVGzB0JCuJ0JRpIMj8c_z1_SfLxOGM3_7VDv_xMjboy9n6WifXXeT2wh9GobS");'></div>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Toyota Camry</td>
+                            <td class="px-6 py-4 hidden md:table-cell">2022</td>
+                            <td class="px-6 py-4 hidden lg:table-cell">$45/day</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Available</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="font-medium text-primary hover:underline">Edit</button>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+                            <td class="px-6 py-4">
+                                <div class="w-12 h-12 rounded-lg bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBTMMUxkiTYruP-reJEz_E_G-32yBt9GMkZs4vZcXosndrae4T51yhCWDnbTuBasM1MtZqZHm31jt3MzLNrOVwv2M2I6Ne1pg2Gt-KCmJgCPFkkojxlC7C9PQV-z46O_2e9gATbj6wqS3qOUvuhyH4UrM-97mcHD4lLmOoSvEFa6SFUf4_BUMeExcERcQjYMWR7FcPzL48WKekTC-70LmEI3rKJ2XO-TQKp5AfvdBkiOrpvpl9USiyznMp1q9_RhamtyxS-Cm_FsVeK");'></div>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Honda CR-V</td>
+                            <td class="px-6 py-4 hidden md:table-cell">2023</td>
+                            <td class="px-6 py-4 hidden lg:table-cell">$55/day</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">Unavailable</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="font-medium text-primary hover:underline">Edit</button>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+                            <td class="px-6 py-4">
+                                <div class="w-12 h-12 rounded-lg bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCGRpbVw_aFFOCgGP9YMKqEVF4HmUbeMuzB7c_74xpOfS6nobg5oLSe8Q0l1mwu2olVk3BUD8OKCd3jjM_Pk-nBqAtxcKEiDKqFGBfeZBSNZvWWLCdyHr-jOhhSj2ymzeSrzBl3Z5-70sko7Oi9jMel4bJI9Yc3cLIElsQWK69k2JGOzha46QGwv1wPmidJIB-euOAoMB4XfPSIbmnqnCngzATHr8TDD_pM-07t5GaGqn3LJKh-WzSoT0Z04ITiUi5NDCnrIG8WojD2");'></div>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Ford F-150</td>
+                            <td class="px-6 py-4 hidden md:table-cell">2021</td>
+                            <td class="px-6 py-4 hidden lg:table-cell">$75/day</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Available</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="font-medium text-primary hover:underline">Edit</button>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">
+                            <td class="px-6 py-4">
+                                <div class="w-12 h-12 rounded-lg bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC2F3pZdfsyjUu7DkqEtDg5EfWg9c05eFiXVhOb188C59zQnL6juK3FHHPUWMWERE0TnWiK3ytgQKj9UBRo6SP10I4X8U0lP4OI40f8NHRWfBZwbh9oD3QPHcAY9WDPwpFIgv2a9gzdPD9V6HdJkBzBPLCX9GvtjnBhfANziJTG7FcpJIspmskiF9-D545VfA928HGD-pujPVZq1letiyQMKX7UuXNv7PXogatkhSVVxGV-zkyGsSXjvg9SmJzSbq6CkkVRHUEV-cS6");'></div>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Chrysler Pacifica</td>
+                            <td class="px-6 py-4 hidden md:table-cell">2022</td>
+                            <td class="px-6 py-4 hidden lg:table-cell">$60/day</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Available</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="font-medium text-primary hover:underline">Edit</button>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800">
+                            <td class="px-6 py-4">
+                                <div class="w-12 h-12 rounded-lg bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDW0YUoBafaEhuXD0GI9rdm5KeiaP8JF7g-hcoSuHme6hloVW55-NvcATp_DtllqkRyy82uGRJoFs2Gg9wK_xf-y2YsxZfDghsrWCkQA20g8htJp1fSaBzm5VX7S1nCeDxlGU-qWDLfaPdx3Uyl9ww9-sx-bq7TwBN_zvPtJr5cyjvlrwdtiJAbdymup_ZAkCAwzTe0WsQwm-O6vbsPgTObUbCfMw_4NkCi_b8X9qGyMVnTFb3gihmLeqgyzC2jrGHBIPSEGLJKzbR0");'></div>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-slate-900 dark:text-white whitespace-nowrap">Chevrolet Corvette</td>
+                            <td class="px-6 py-4 hidden md:table-cell">2023</td>
+                            <td class="px-6 py-4 hidden lg:table-cell">$100/day</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">Unavailable</span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="font-medium text-primary hover:underline">Edit</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark border-t border-primary/20 dark:border-primary/30 flex justify-around p-2 z-20">
+        <a class="flex flex-col items-center justify-center text-slate-600 dark:text-slate-300 hover:text-primary w-full py-1 rounded-lg" href="#">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="text-xs">Dashboard</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-slate-600 dark:text-slate-300 hover:text-primary w-full py-1 rounded-lg" href="#">
+            <span class="material-symbols-outlined">book_online</span>
+            <span class="text-xs">Bookings</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-primary w-full py-1 rounded-lg bg-primary/10 dark:bg-primary/20" href="#">
+            <span class="material-symbols-outlined">directions_car</span>
+            <span class="text-xs font-bold">Cars</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-slate-600 dark:text-slate-300 hover:text-primary w-full py-1 rounded-lg" href="#">
+            <span class="material-symbols-outlined">groups</span>
+            <span class="text-xs">Customers</span>
+        </a>
+        <a class="flex flex-col items-center justify-center text-slate-600 dark:text-slate-300 hover:text-primary w-full py-1 rounded-lg" href="#">
+            <span class="material-symbols-outlined">analytics</span>
+            <span class="text-xs">Reports</span>
+        </a>
+    </nav>
+</div>
+
+</body></html>

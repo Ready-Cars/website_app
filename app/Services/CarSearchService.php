@@ -11,6 +11,7 @@ class CarSearchService
     public function buildQuery(array $params): Builder
     {
         $q = Car::query()
+            ->where('is_active', true)
             ->search($params['q'] ?? null)
             ->filter([
                 'category' => $params['category'] ?? null,
@@ -34,7 +35,7 @@ class CarSearchService
 
     public function featured(int $limit = 3)
     {
-        return Car::query()->where('featured', true)->latest('id')->limit($limit)->get();
+        return Car::query()->where('is_active', true)->where('featured', true)->latest('id')->limit($limit)->get();
     }
 
     public function options(): array

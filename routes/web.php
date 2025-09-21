@@ -6,9 +6,7 @@ use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::view('/', 'home.index')->name('home');
 
 // All cars catalog page
 Route::view('/cars', 'cars.index')->name('cars.index');
@@ -38,9 +36,29 @@ Route::middleware(['auth'])->group(function () {
 
 use App\Http\Middleware\AdminOnly;
 
-Route::view('dashboard', 'dashboard')
+Route::view('dashboard', 'admin.dashboard')
     ->middleware(['auth', 'verified', AdminOnly::class])
     ->name('dashboard');
+
+Route::view('/admin/bookings', 'admin.bookings')
+    ->middleware(['auth', 'verified', AdminOnly::class])
+    ->name('admin.bookings');
+
+Route::view('/admin/cars', 'admin.cars')
+    ->middleware(['auth', 'verified', AdminOnly::class])
+    ->name('admin.cars');
+
+Route::view('/admin/car-options', 'admin.car-options')
+    ->middleware(['auth', 'verified', AdminOnly::class])
+    ->name('admin.car-options');
+
+Route::view('/admin/customers', 'admin.customers')
+    ->middleware(['auth', 'verified', AdminOnly::class])
+    ->name('admin.customers');
+
+Route::view('/admin/reports', 'admin.reports')
+    ->middleware(['auth', 'verified', AdminOnly::class])
+    ->name('admin.reports');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

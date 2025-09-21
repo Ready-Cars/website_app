@@ -44,6 +44,12 @@ class RentCar extends Component
     public function mount(Car $car): void
     {
         $this->car = $car;
+        // Prevent renting disabled cars
+        if (!$this->car->is_active) {
+            session()->flash('error', 'This car is currently unavailable.');
+            $this->redirect(route('cars.index'), navigate: true);
+            return;
+        }
 
         $today = Carbon::today();
         $tomorrow = Carbon::tomorrow();

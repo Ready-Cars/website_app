@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Car extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -20,12 +21,15 @@ class Car extends Model
         'transmission',
         'fuel_type',
         'featured',
+        'is_active',
         'location',
     ];
 
     protected $casts = [
         'featured' => 'boolean',
+        'is_active' => 'boolean',
         'daily_price' => 'decimal:2',
+        'images' => 'array',
     ];
 
     /**

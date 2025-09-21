@@ -44,4 +44,10 @@ class Booking extends Model
     {
         return $this->belongsTo(Car::class);
     }
+
+    public function getStatusAttribute($value)
+    {
+        return strtolower($value);
+
+    }
 }
