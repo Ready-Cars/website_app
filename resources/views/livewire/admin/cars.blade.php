@@ -3,6 +3,9 @@
         <div class="layout-container flex h-full grow flex-col">
             <header class="sticky top-0 z-10 flex items-center justify-between whitespace-nowrap border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur-sm sm:px-6 lg:px-8">
                 <div class="flex items-center gap-3">
+                    <button type="button" class="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100" aria-label="Open menu" data-admin-menu-open aria-controls="admin-mobile-drawer" aria-expanded="false">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
                     <svg class="h-8 w-8 text-sky-600" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10.8284 24L24 10.8284L37.1716 24L24 37.1716L10.8284 24Z" stroke="currentColor" stroke-linejoin="round" stroke-width="4"></path>
                         <path d="M4 24H44" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"></path>
@@ -14,9 +17,7 @@
                     <button class="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-700" title="Notifications">
                         <span class="material-symbols-outlined"> notifications </span>
                     </button>
-                    <div class="h-10 w-10 overflow-hidden rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-bold">
-                        {{ auth()->user()?->initials() }}
-                    </div>
+                    @include('admin.partials.user-menu')
                 </div>
             </header>
 
@@ -24,6 +25,10 @@
                 @include('admin.partials.sidebar', ['active' => 'cars'])
 
                 <main class="flex-1 p-4 sm:p-6 lg:p-8">
+                    @include('admin.partials.breadcrumbs', ['items' => [
+                        ['label' => 'Dashboard', 'url' => route('dashboard')],
+                        ['label' => 'Cars', 'url' => null],
+                    ]])
                     <div class="mb-6 flex items-center justify-between gap-3">
                         <div>
                             <h2 class="text-3xl font-bold tracking-tight">Car Management</h2>

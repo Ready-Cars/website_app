@@ -3,14 +3,15 @@
         <div class="layout-container flex h-full grow flex-col">
             <header class="sticky top-0 z-10 flex items-center justify-between whitespace-nowrap border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur-sm sm:px-6 lg:px-8">
                 <div class="flex items-center gap-3">
+                    <button type="button" class="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100" aria-label="Open menu" data-admin-menu-open aria-controls="admin-mobile-drawer" aria-expanded="false">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
                     <span class="material-symbols-outlined text-sky-600 text-3xl"> assessment </span>
                     <h1 class="text-xl font-bold tracking-tight">{{ config('app.name') }} — Admin Reports</h1>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="text-sm text-slate-600 hidden sm:block">{{ auth()->user()->name ?? 'Admin' }}</span>
-                    <div class="h-10 w-10 overflow-hidden rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-bold">
-                        {{ auth()->user()?->initials() }}
-                    </div>
+                    @include('admin.partials.user-menu')
                 </div>
             </header>
 
@@ -18,6 +19,10 @@
                 @include('admin.partials.sidebar', ['active' => 'reports'])
 
                 <main class="flex-1 p-4 sm:p-6 lg:p-8">
+                    @include('admin.partials.breadcrumbs', ['items' => [
+                        ['label' => 'Dashboard', 'url' => route('dashboard')],
+                        ['label' => 'Reports', 'url' => null],
+                    ]])
                     <div class="mb-6">
                         <h2 class="text-3xl font-bold tracking-tight">Reporting & Analytics</h2>
                         <p class="mt-1 text-slate-500">Visualize booking trends, revenue, status distribution and top-performing cars.</p>

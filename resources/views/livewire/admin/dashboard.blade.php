@@ -3,6 +3,9 @@
         <div class="layout-container flex h-full grow flex-col">
             <header class="sticky top-0 z-10 flex items-center justify-between whitespace-nowrap border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur-sm sm:px-6 lg:px-8">
                 <div class="flex items-center gap-3">
+                    <button type="button" class="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100" aria-label="Open menu" data-admin-menu-open aria-controls="admin-mobile-drawer" aria-expanded="false">
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
                     <svg class="h-8 w-8 text-sky-600" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10.8284 24L24 10.8284L37.1716 24L24 37.1716L10.8284 24Z" stroke="currentColor" stroke-linejoin="round" stroke-width="4"></path>
                         <path d="M4 24H44" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"></path>
@@ -14,9 +17,7 @@
                     <button class="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-700" title="Notifications">
                         <span class="material-symbols-outlined"> notifications </span>
                     </button>
-                    <div class="h-10 w-10 overflow-hidden rounded-full bg-slate-200 flex items-center justify-center text-slate-700 font-bold">
-                        {{ auth()->user()?->initials() }}
-                    </div>
+                    @include('admin.partials.user-menu')
                 </div>
             </header>
 
@@ -24,6 +25,9 @@
                 @include('admin.partials.sidebar', ['active' => 'dashboard'])
 
                 <main class="flex-1 p-4 sm:p-6 lg:p-8">
+                    @include('admin.partials.breadcrumbs', ['items' => [
+                        ['label' => 'Dashboard', 'url' => null],
+                    ]])
                     <div class="mb-8">
                         <h2 class="text-3xl font-bold tracking-tight">Admin Dashboard</h2>
                         <p class="mt-1 text-slate-500">Welcome back{{ auth()->user() ? ", ".e(auth()->user()->name) : '' }}. Here's a concise overview of your platform.</p>
@@ -101,19 +105,19 @@
                                 <div>
                                     <h3 class="text-lg font-semibold leading-6">Quick Actions</h3>
                                     <div class="mt-4 flex flex-col space-y-4">
-                                        <a class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md" href="#">
+                                        <a class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md" href="{{ route('admin.bookings') }}" wire:navigate>
                                             <span class="material-symbols-outlined text-2xl text-sky-600">book_online</span>
                                             <span class="font-medium">Manage Bookings</span>
                                         </a>
-                                        <a class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md" href="#">
+                                        <a class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md" href="{{ route('admin.cars') }}" wire:navigate>
                                             <span class="material-symbols-outlined text-2xl text-sky-600">directions_car</span>
                                             <span class="font-medium">Manage Cars</span>
                                         </a>
-                                        <a class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md" href="#">
+                                        <a class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md" href="{{ route('admin.customers') }}" wire:navigate>
                                             <span class="material-symbols-outlined text-2xl text-sky-600">group</span>
                                             <span class="font-medium">Manage Customers</span>
                                         </a>
-                                        <a class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md" href="#">
+                                        <a class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md" href="{{ route('admin.reports') }}" wire:navigate>
                                             <span class="material-symbols-outlined text-2xl text-sky-600">assessment</span>
                                             <span class="font-medium">View Reports</span>
                                         </a>
