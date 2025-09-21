@@ -216,6 +216,13 @@ class RentCar extends Component
 
         // Wallet check and booking persistence in a transaction
         $user = auth()->user();
+
+        // Prevent banned users from making bookings
+        if ($user && !empty($user->banned_at)) {
+            session()->flash('error', 'Your account has been banned. Please contact the administrator.');
+            $this->redirect(route('cars.index'), navigate: true);
+            return;
+        }
         $editing = null;
         if ($this->booking && $user) {
             $editing = \App\Models\Booking::query()
