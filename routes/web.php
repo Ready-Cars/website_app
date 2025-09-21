@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\WalletFundingController;
+use App\Http\Middleware\AdminOnly;
+use App\Http\Middleware\CustomerOnly;
 use App\Livewire\RentCar;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
+use App\Models\Car;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home.index')->name('home');
@@ -12,7 +16,6 @@ Route::view('/', 'home.index')->name('home');
 Route::view('/cars', 'cars.index')->name('cars.index');
 
 // Rent page - using a blade shell to include Livewire assets consistently
-use App\Models\Car;
 Route::get('/rent/{car}', function (Car $car) {
     return view('rent.show', ['car' => $car]);
 })->name('rent.show');
@@ -28,14 +31,10 @@ Route::view('/wallet', 'wallet.index')
     ->name('wallet.index');
 
 // Wallet funding via Paystack
-use App\Http\Controllers\WalletFundingController;
 Route::middleware(['auth', CustomerOnly::class])->group(function () {
     Route::post('/wallet/paystack/init', [WalletFundingController::class, 'init'])->name('wallet.paystack.init');
     Route::get('/wallet/paystack/callback', [WalletFundingController::class, 'callback'])->name('wallet.paystack.callback');
 });
-
-use App\Http\Middleware\AdminOnly;
-use App\Http\Middleware\CustomerOnly;
 
 Route::view('dashboard', 'admin.dashboard')
     ->middleware(['auth', 'verified', AdminOnly::class])
