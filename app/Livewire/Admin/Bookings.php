@@ -42,6 +42,19 @@ class Bookings extends Component
     // Complete confirmation modal
     public bool $completeOpen = false;
 
+    // Settings modal
+    public bool $settingsOpen = false;
+
+    public function openSettings(): void
+    {
+        $this->settingsOpen = true;
+    }
+
+    public function closeSettings(): void
+    {
+        $this->settingsOpen = false;
+    }
+
     public function mount(BookingManagementService $service): void
     {
         $this->options = $service->getFilterOptions();

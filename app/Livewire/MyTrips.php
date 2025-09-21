@@ -63,19 +63,34 @@ class MyTrips extends Component
             ->first();
 
         if ($booking && $booking->status !== 'cancelled') {
-            $booking->status = 'cancelled';
-            $booking->cancellation_reason = $this->cancelReason;
-            $booking->save();
-
-            // Send cancellation email to the customer
-            try {
-                \Illuminate\Support\Facades\Mail::to(\Illuminate\Support\Facades\Auth::user()->email)
-                    ->send(new \App\Mail\BookingCancelledMail($booking));
-            } catch (\Throwable $e) {
-                \Log::warning('Booking cancellation email failed: '.$e->getMessage());
+            // Check cancellation cutoff policy from settings
+            $hours = \App\Models\Setting::getInt('cancellation_cutoff_hours', 24);
+            if ($hours > 0) {
+                $cutoff = \Carbon\Carbon::parse($booking->start_date)->startOfDay()->subHours($hours);
+                if (now()->greaterThan($cutoff)) {
+                    session()->flash('error', 'Cancellation period has passed. You can no longer cancel this booking.');
+                    $this->cancelOpen = false;
+                    return;
+                }
             }
 
-            $this->dispatch('rent-confirmed');
+            // Use the service to handle status change and conditional refund
+            try {
+                $updated = app(\App\Services\BookingManagementService::class)
+                    ->changeStatus($booking, 'cancelled', $this->cancelReason);
+
+                // Send cancellation email to the customer
+                try {
+                    \Illuminate\Support\Facades\Mail::to(\Illuminate\Support\Facades\Auth::user()->email)
+                        ->send(new \App\Mail\BookingCancelledMail($updated));
+                } catch (\Throwable $e) {
+                    \Log::warning('Booking cancellation email failed: '.$e->getMessage());
+                }
+
+                $this->dispatch('rent-confirmed', message: 'Booking cancelled successfully');
+            } catch (\Throwable $e) {
+                session()->flash('error', $e->getMessage());
+            }
         }
 
         $this->cancelOpen = false;

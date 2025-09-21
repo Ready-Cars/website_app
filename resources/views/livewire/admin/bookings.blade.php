@@ -30,23 +30,33 @@
                         ['label' => 'Bookings', 'url' => null],
                     ]])
                     <div class="mb-6">
-                        <h2 class="text-3xl font-bold tracking-tight">
-                            @php
-                                $selectedCar = null; if(!empty($carId)) { $selectedCar = \App\Models\Car::find($carId); }
-                                $customerCtx = null;
-                                $rawQ = isset($q) ? trim((string)$q) : (property_exists($this,'q') ? trim((string)$this->q) : '');
-                                if (!empty($rawQ)) {
-                                    if (ctype_digit($rawQ)) {
-                                        $customerCtx = \App\Models\User::find((int)$rawQ);
-                                    } elseif (filter_var($rawQ, FILTER_VALIDATE_EMAIL)) {
-                                        $customerCtx = \App\Models\User::where('email', $rawQ)->first();
-                                    }
-                                }
-                            @endphp
-                            Manage Bookings{!! $selectedCar ? ' — <span class="text-slate-700 text-2xl">Car: '.e($selectedCar->name).'</span>' : '' !!}
-                            {!! $customerCtx ? ' — <span class="text-slate-700 text-2xl">Customer: '.e($customerCtx->name).' <span class="text-slate-500 text-xl">('.e($customerCtx->email).')</span></span>' : '' !!}
-                        </h2>
-                        <p class="mt-1 text-slate-500">View, filter, and manage customer bookings.</p>
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <h2 class="text-3xl font-bold tracking-tight">
+                                    @php
+                                        $selectedCar = null; if(!empty($carId)) { $selectedCar = \App\Models\Car::find($carId); }
+                                        $customerCtx = null;
+                                        $rawQ = isset($q) ? trim((string)$q) : (property_exists($this,'q') ? trim((string)$this->q) : '');
+                                        if (!empty($rawQ)) {
+                                            if (ctype_digit($rawQ)) {
+                                                $customerCtx = \App\Models\User::find((int)$rawQ);
+                                            } elseif (filter_var($rawQ, FILTER_VALIDATE_EMAIL)) {
+                                                $customerCtx = \App\Models\User::where('email', $rawQ)->first();
+                                            }
+                                        }
+                                    @endphp
+                                    Manage Bookings{!! $selectedCar ? ' — <span class="text-slate-700 text-2xl">Car: '.e($selectedCar->name).'</span>' : '' !!}
+                                    {!! $customerCtx ? ' — <span class="text-slate-700 text-2xl">Customer: '.e($customerCtx->name).' <span class="text-slate-500 text-xl">('.e($customerCtx->email).')</span></span>' : '' !!}
+                                </h2>
+                                <p class="mt-1 text-slate-500">View, filter, and manage customer bookings.</p>
+                            </div>
+                            <div class="pt-1">
+                                <button type="button" class="inline-flex items-center gap-2 rounded-md h-10 px-4 bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800" wire:click="openSettings">
+                                    <span class="material-symbols-outlined text-base">settings</span>
+                                    <span>Settings</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     @if (session('success'))
@@ -391,6 +401,30 @@
                     <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
                         <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('completeOpen', false)">Close</button>
                         <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" wire:click="completeSelected">Confirm complete</button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- Settings Modal -->
+        @if($settingsOpen)
+            <div class="fixed inset-0 z-[60] flex items-center justify-center">
+                <div class="absolute inset-0 bg-black/50" wire:click="closeSettings"></div>
+                <div class="relative z-10 w-full max-w-3xl rounded-lg bg-white shadow-xl border border-slate-200">
+                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-slate-700">settings</span>
+                            <h3 class="text-lg font-semibold text-slate-900">Booking settings</h3>
+                        </div>
+                        <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="closeSettings">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="px-5 py-4 text-sm text-slate-700 max-h-[80vh] overflow-y-auto">
+                        <livewire:admin.settings />
+                    </div>
+                    <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end">
+                        <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="closeSettings">Close</button>
                     </div>
                 </div>
             </div>

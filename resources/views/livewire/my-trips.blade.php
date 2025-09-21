@@ -124,10 +124,19 @@
                             <span class="material-symbols-outlined text-base">edit</span>
                             <span>Modify</span>
                         </a>
+                        @php
+                            $hours = \App\Models\Setting::getInt('cancellation_cutoff_hours', 24);
+                            $cutoff = \Carbon\Carbon::parse($selected->start_date)->startOfDay()->subHours($hours);
+                            $canCancel = $hours === 0 || now()->lessThanOrEqualTo($cutoff);
+                        @endphp
+                        @if($canCancel)
                         <button wire:click="openCancel" class="inline-flex items-center justify-center gap-2 rounded-md h-10 px-4 bg-[#ef4444] text-white text-sm font-semibold hover:bg-[#dc2626]">
                             <span class="material-symbols-outlined text-base">delete</span>
                             <span>Cancel</span>
                         </button>
+                        @else
+                        <span class="text-xs text-slate-500">Cancellation closed (within cutoff)</span>
+                        @endif
                         @endif
                     </div>
                 </div>

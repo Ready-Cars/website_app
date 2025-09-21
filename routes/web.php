@@ -60,6 +60,10 @@ Route::view('/admin/reports', 'admin.reports')
     ->middleware(['auth', 'verified', AdminOnly::class])
     ->name('admin.reports');
 
+Route::view('/admin/settings', 'admin.settings')
+    ->middleware(['auth', 'verified', AdminOnly::class])
+    ->name('admin.settings');
+
 Route::view('/admin/profile', 'admin.profile')
     ->middleware(['auth', 'verified', AdminOnly::class])
     ->name('admin.profile');

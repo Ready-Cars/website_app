@@ -116,21 +116,25 @@ class BookingManagementService
 
             // Handle refund on cancel (only once, if not already cancelled)
             if ($status === 'cancelled' && $prev !== 'cancelled') {
-                $amount = (float)$booking->total;
-                if ($amount > 0) {
-                    $user = $booking->user()->lockForUpdate()->first();
-                    if ($user) {
-                        $user->wallet_balance = round(((float)$user->wallet_balance) + $amount, 2);
-                        $user->save();
+                // Only refund if admin setting enables it (default true to preserve previous behavior)
+                $shouldRefund = \App\Models\Setting::getBool('refund_on_cancellation', true);
+                if ($shouldRefund) {
+                    $amount = (float)$booking->total;
+                    if ($amount > 0) {
+                        $user = $booking->user()->lockForUpdate()->first();
+                        if ($user) {
+                            $user->wallet_balance = round(((float)$user->wallet_balance) + $amount, 2);
+                            $user->save();
 
-                        WalletTransaction::create([
-                            'user_id' => $user->id,
-                            'type' => 'credit',
-                            'amount' => $amount,
-                            'balance_after' => $user->wallet_balance,
-                            'description' => 'Refund for cancelled booking',
-                            'meta' => ['booking_id' => $booking->id, 'car_id' => $booking->car_id],
-                        ]);
+                            WalletTransaction::create([
+                                'user_id' => $user->id,
+                                'type' => 'credit',
+                                'amount' => $amount,
+                                'balance_after' => $user->wallet_balance,
+                                'description' => 'Refund for cancelled booking',
+                                'meta' => ['booking_id' => $booking->id, 'car_id' => $booking->car_id],
+                            ]);
+                        }
                     }
                 }
             }
