@@ -6,10 +6,12 @@ use App\Models\Booking;
 use App\Models\Car;
 use App\Models\User;
 use App\Models\WalletTransaction;
+use App\Mail\BookingStatusUpdatedMail;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class BookingManagementService
 {
@@ -145,7 +147,27 @@ class BookingManagementService
                 $data['cancellation_reason'] = $reason;
             }
             $booking->update($data);
-            return $booking->fresh(['user','car']);
+            $updated = $booking->fresh(['user','car']);
+
+            // Send email notification to customer about the status change
+            try {
+                if ($updated && $updated->user && $updated->user->email) {
+                    Mail::to($updated->user->email)->send(new BookingStatusUpdatedMail($updated, $prev, $status));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Booking status email failed: '.$e->getMessage(), ['booking_id' => $updated->id ?? null]);
+            }
+
+            // In-app notification
+            try {
+                if ($updated && $updated->user) {
+                    $updated->user->notify(new \App\Notifications\BookingStatusUpdatedNotification($updated, $prev, $status));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Booking status in-app notification failed: '.$e->getMessage(), ['booking_id' => $updated->id ?? null]);
+            }
+
+            return $updated;
         });
     }
 

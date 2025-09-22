@@ -16,6 +16,20 @@ class MyTrips extends Component
     public ?Booking $selected = null;
     public string $cancelReason = '';
 
+    public function mount(): void
+    {
+        // If a direct booking link is provided (?booking=ID), pre-open that booking if it belongs to the user
+        $bookingId = (int) request()->query('booking', 0);
+        if ($bookingId > 0 && Auth::check()) {
+            $this->selected = Booking::query()
+                ->with('car')
+                ->whereKey($bookingId)
+                ->where('user_id', Auth::id())
+                ->first();
+            $this->viewOpen = (bool) $this->selected;
+        }
+    }
+
     public function switchTab(string $tab): void
     {
         $this->tab = in_array($tab, ['upcoming', 'past']) ? $tab : 'upcoming';
@@ -79,14 +93,7 @@ class MyTrips extends Component
                 $updated = app(\App\Services\BookingManagementService::class)
                     ->changeStatus($booking, 'cancelled', $this->cancelReason);
 
-                // Send cancellation email to the customer
-                try {
-                    \Illuminate\Support\Facades\Mail::to(\Illuminate\Support\Facades\Auth::user()->email)
-                        ->send(new \App\Mail\BookingCancelledMail($updated));
-                } catch (\Throwable $e) {
-                    \Log::warning('Booking cancellation email failed: '.$e->getMessage());
-                }
-
+                // Email notification is now handled centrally in BookingManagementService
                 $this->dispatch('rent-confirmed', message: 'Booking cancelled successfully');
             } catch (\Throwable $e) {
                 session()->flash('error', $e->getMessage());

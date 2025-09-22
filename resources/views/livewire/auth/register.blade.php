@@ -43,12 +43,22 @@
                     <div class="relative">
                         <label class="sr-only" for="email">Email address</label>
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <span class="material-symbols-outlined text-gray-400">person</span>
+                            <span class="material-symbols-outlined text-gray-400">mail</span>
                         </div>
                         <input id="email" name="email" type="email" autocomplete="email" wire:model.defer="email" required
                                class="relative block w-full appearance-none border border-gray-300 px-3 py-4 pl-10 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-[#1173d4] focus:outline-none focus:ring-[#1173d4] sm:text-sm"
                                placeholder="Email address">
                         @error('email') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div class="relative">
+                        <label class="sr-only" for="phone">Phone number</label>
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <span class="material-symbols-outlined text-gray-400">call</span>
+                        </div>
+                        <input id="phone" name="phone" type="tel" autocomplete="tel" wire:model.defer="phone" required
+                               class="relative block w-full appearance-none border border-gray-300 px-3 py-4 pl-10 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-[#1173d4] focus:outline-none focus:ring-[#1173d4] sm:text-sm"
+                               placeholder="Phone number (e.g., +234 801 234 5678)">
+                        @error('phone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div class="relative">
                         <label class="sr-only" for="password">Password</label>

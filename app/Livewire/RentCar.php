@@ -318,8 +318,15 @@ class RentCar extends Component
                 ? $editing->fresh(['car','user'])
                 : ($booking ? $booking->load(['car','user']) : null);
             if ($final) {
+                $prev = 'pending';
                 \Illuminate\Support\Facades\Mail::to($user->email)
-                    ->send(new \App\Mail\BookingConfirmedMail($final));
+                    ->send(new \App\Mail\BookingStatusUpdatedMail($final, $prev, 'confirmed'));
+                // In-app notification
+                try {
+                    $user->notify(new \App\Notifications\BookingStatusUpdatedNotification($final, $prev, 'confirmed'));
+                } catch (\Throwable $e) {
+                    \Log::warning('Booking confirmation in-app notification failed: '.$e->getMessage());
+                }
             }
         } catch (\Throwable $e) {
             \Log::warning('Booking confirmation email failed: '.$e->getMessage());

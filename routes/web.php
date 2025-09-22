@@ -30,6 +30,16 @@ Route::view('/wallet', 'wallet.index')
     ->middleware(['auth', CustomerOnly::class])
     ->name('wallet.index');
 
+// Notifications (requires auth)
+Route::view('/notifications', 'notifications.index')
+    ->middleware(['auth', CustomerOnly::class])
+    ->name('notifications.index');
+
+// Profile (customer-facing)
+Route::view('/profile', 'profile.index')
+    ->middleware(['auth', CustomerOnly::class])
+    ->name('profile.index');
+
 // Wallet funding via Paystack
 Route::middleware(['auth', CustomerOnly::class])->group(function () {
     Route::post('/wallet/paystack/init', [WalletFundingController::class, 'init'])->name('wallet.paystack.init');
