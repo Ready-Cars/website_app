@@ -1,4 +1,4 @@
-<header class="relative flex items-center justify-between whitespace-nowrap border-b border-solid border-b-slate-200 px-4 sm:px-6 lg:px-10 py-4" data-mobile-menu-root>
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur supports-backdrop-blur:bg-white/80 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-slate-200 px-4 sm:px-6 lg:px-10 py-4" data-mobile-menu-root>
     <div class="flex items-center gap-3 text-slate-900">
         <svg class="h-8 w-8 text-[#1173d4]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
             <path d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z" fill="currentColor"></path>
