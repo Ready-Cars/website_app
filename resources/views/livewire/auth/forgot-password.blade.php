@@ -1,16 +1,13 @@
  <div class="flex flex-col md:flex-row min-h-screen">
      <!-- Illustration / Brand side -->
-     <div class="w-full md:w-1/2 bg-gray-100 flex flex-col justify-center items-center p-8 lg:p-12 relative">
-         <a href="{{ route('home') }}" class="absolute top-8 left-8 flex items-center gap-3 text-gray-800" wire:navigate>
-             <svg class="h-8 w-8 text-[#1173d4]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                 <path d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z" fill="currentColor"></path>
-             </svg>
-             <h1 class="text-2xl font-bold">{{ config('app.name') }}</h1>
+     <div class="w-full md:w-1/2 bg-[#0e1133] flex flex-col justify-center items-center p-8 lg:p-12 relative">
+         <a href="{{ route('home') }}" class="absolute top-8 left-8 inline-flex items-center" aria-label="{{ config('app.name') }}" wire:navigate>
+             <img src="https://readycars.ng/img/logo.png" alt="{{ config('app.name') }} logo" class="h-9 w-auto object-contain" />
          </a>
          <div class="max-w-md text-center">
              <img alt="Password reset illustration" class="w-full h-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS6i6QbUofp_vAMhhBp0F-ABDnSVWzSQpV6HLuYgeN8cBGGrmmrTbgIUReuOJOSpFgfTd2Y1Np_FMzYah_k9H2gtiniAKhoezOssdCxYWA9SI0Z1jG3hae9pNi60vGqSTrmGPlnRT5QLv2BIl694t_MqzAQO2tCV5gk0RFOccZ2rWCawh6Mqu89ZIM9Q5aO4gIIf_BBqdSg90xhAM-70GawDrpmkaoRFH-oRQjVfSimxpbZGc3hfI14xX7WI1g4L-nED1RvLPx85c0"/>
-             <h2 class="text-3xl font-bold text-gray-800 mt-8">Reset your password</h2>
-             <p class="text-gray-600 mt-4">Enter your email address and we’ll send you a link to reset your password.</p>
+             <h2 class="text-3xl font-bold text-white mt-8">Reset your password</h2>
+             <p class="text-white/80 mt-4">Enter your email address and we’ll send you a link to reset your password.</p>
          </div>
      </div>
 
