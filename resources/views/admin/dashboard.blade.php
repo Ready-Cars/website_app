@@ -9,6 +9,7 @@
     <title>Admin Dashboard - {{ config('app.name') }}</title>
     <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
 <body class="bg-slate-50 text-slate-900" style='font-family: "Work Sans", sans-serif;'>
