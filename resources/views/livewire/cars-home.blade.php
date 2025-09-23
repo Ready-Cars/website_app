@@ -130,7 +130,19 @@
                                         <p class="text-slate-600 text-sm">{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
                                         <div class="mt-3 flex justify-between items-center">
                                             <p class="text-lg font-bold text-slate-900">₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
-                                            <a href="{{ route('rent.show', $car) }}" class="bg-[#1173d4] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-opacity-90" wire:navigate>Rent Now</a>
+                                            <flux:tooltip content="Instant booking" position="top">
+                                                <flux:button
+                                                    href="{{ route('rent.show', $car) }}"
+                                                    variant="primary"
+                                                    size="sm"
+                                                    class="rounded-full"
+                                                    icon:trailing="arrow-right"
+                                                    aria-label="Rent {{ $car->name }} now"
+                                                    wire:navigate
+                                                >
+                                                    Rent Now
+                                                </flux:button>
+                                            </flux:tooltip>
                                         </div>
                                     </div>
                                 </div>
@@ -157,7 +169,19 @@
                                         <p class="text-slate-600 text-sm">{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
                                         <div class="mt-3 flex justify-between items-center">
                                             <p class="text-lg font-bold text-slate-900">₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
-                                            <a href="{{ route('rent.show', $car) }}" class="bg-[#1173d4] text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-opacity-90" wire:navigate>Rent Now</a>
+                                            <flux:tooltip content="Instant booking" position="top">
+                                                <flux:button
+                                                    href="{{ route('rent.show', $car) }}"
+                                                    variant="primary"
+                                                    size="sm"
+                                                    class="rounded-full"
+                                                    icon:trailing="arrow-right"
+                                                    aria-label="Rent {{ $car->name }} now"
+                                                    wire:navigate
+                                                >
+                                                    Rent Now
+                                                </flux:button>
+                                            </flux:tooltip>
                                         </div>
                                     </div>
                                 </div>
