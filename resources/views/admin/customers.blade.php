@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     <title>Customer Management - {{ config('app.name') }}</title>
     <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/5.3.5/apexcharts-legend.min.css" integrity="sha512-c+q4lJ9pAoiVNqS+1EXJ6yo6RnbGN3stU46/3OuQ8S468g6iMdj62TQU8H9UZ3I2xSy7VrY6jRDtFVtPeKAX8w==" crossorigin="anonymous" referrerpolicy="no-referrer" />

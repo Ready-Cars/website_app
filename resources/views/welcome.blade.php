@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     <title>{{ config('app.name') }}</title>
     <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
 <body class="bg-slate-50" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
