@@ -9,6 +9,7 @@
         <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('cars.index') }}" wire:navigate>Car catalog</a>
         @auth
             <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('trips.index') }}" wire:navigate>My trips</a>
+            <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('notifications.index') }}" wire:navigate>Notifications</a>
             <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('wallet.index') }}" wire:navigate>Wallet</a>
             @if(auth()->user()->is_admin ?? false)
                 <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('dashboard') }}" wire:navigate>Dashboard</a>
@@ -31,25 +32,9 @@
                 <span class="truncate">Login</span>
             </a>
         @else
-            <a href="{{ route('notifications.index') }}" class="hidden sm:flex items-center gap-2 rounded-md h-10 px-3 border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50" wire:navigate>
-                <span class="material-symbols-outlined text-base">notifications</span>
-                <span>Notifications</span>
-            </a>
-            <a href="{{ route('trips.index') }}" class="hidden sm:flex min-w-[84px] max-w-[480px] items-center justify-center overflow-hidden rounded-md h-10 px-4 bg-slate-200 text-slate-900 text-sm font-bold tracking-wide hover:bg-slate-300 transition-colors" wire:navigate>
-                <span class="truncate">My trips</span>
-            </a>
+
             @auth
-                @if(auth()->user()->is_admin ?? false)
-                    <a href="{{ route('admin.profile') }}" class="hidden sm:flex items-center gap-2 rounded-md h-10 px-3 border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50" wire:navigate>
-                        <span class="material-symbols-outlined text-base">account_circle</span>
-                        <span>Profile</span>
-                    </a>
-                @else
-                    <a href="{{ route('profile.index') }}" class="hidden sm:flex items-center gap-2 rounded-md h-10 px-3 border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50" wire:navigate>
-                        <span class="material-symbols-outlined text-base">account_circle</span>
-                        <span>Profile</span>
-                    </a>
-                @endif
+
                 <form method="POST" action="{{ route('logout') }}" class="hidden sm:flex">
                     @csrf
                     <button type="submit" class="min-w-[84px] max-w-[240px] items-center justify-center overflow-hidden rounded-md h-10 px-4 bg-rose-100 text-rose-700 text-sm font-bold tracking-wide hover:bg-rose-200 transition-colors">
