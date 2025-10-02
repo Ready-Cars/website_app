@@ -47,6 +47,7 @@
                             'categories' => 'Categories',
                             'transmissions' => 'Transmissions',
                             'fuels' => 'Fuels',
+                            'locations' => 'Locations',
                             'extras' => 'Extras',
                         ];
                     @endphp
@@ -118,6 +119,38 @@
                                                 <td class="px-3 py-2 text-right space-x-2">
                                                     <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700" wire:click="saveRow('transmissions', {{ $i }})"><span class="material-symbols-outlined text-base">save</span><span>Save</span></button>
                                                     <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" data-confirm="Delete this transmission?" wire:click="deleteRow('transmissions', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr><td colspan="2" class="px-3 py-6 text-center text-sm text-slate-500">No items yet.</td></tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    @endif
+
+                    @if($tab === 'locations')
+                        <section class="rounded-lg bg-white shadow-sm border border-slate-200">
+                            <div class="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+                                <h3 class="text-base font-semibold">Locations</h3>
+                                <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="addRow('locations')"><span class="material-symbols-outlined text-base">add</span><span>Add</span></button>
+                            </div>
+                            <div class="p-4 overflow-x-auto">
+                                <table class="min-w-full text-left">
+                                    <thead>
+                                        <tr class="bg-slate-50">
+                                            <th class="px-3 py-2 text-xs font-semibold text-slate-600 uppercase">Value</th>
+                                            <th class="px-3 py-2 text-xs font-semibold text-slate-600 uppercase text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200">
+                                        @forelse($locations as $i => $row)
+                                            <tr>
+                                                <td class="px-3 py-2"><input type="text" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="locations.{{ $i }}.value"></td>
+                                                <td class="px-3 py-2 text-right space-x-2">
+                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700" wire:click="saveRow('locations', {{ $i }})"><span class="material-symbols-outlined text-base">save</span><span>Save</span></button>
+                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" data-confirm="Delete this location?" wire:click="deleteRow('locations', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
                                                 </td>
                                             </tr>
                                         @empty

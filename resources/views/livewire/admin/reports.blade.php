@@ -142,10 +142,17 @@
                                 <h3 class="font-semibold text-slate-900">Bookings & Revenue (Bar)</h3>
                             </div>
                             <div style="height: 32rem;">
-                            <livewire:livewire-column-chart
-                                 key="{{ $lwColumn->reactiveKey() }}"
-                                :column-chart-model="$lwColumn"
-                            />
+
+                                @if($lwColumn)
+                                    <livewire:livewire-column-chart
+                                        key="{{ $lwColumn->reactiveKey() }}"
+                                        :column-chart-model="$lwColumn"
+                                    />
+                                @else
+                                    <div class="h-full flex items-center justify-center text-slate-500 text-sm">
+                                        Chart unavailable. No chart data or package not installed.
+                                    </div>
+                                @endif
                             </div>
 {{--                            <livewire:ui.chart-bar :labels="$labels" :series="$barSeries" :height="360" />--}}
                         </div>
@@ -155,10 +162,16 @@
                             </div>
 
                             <div style="height: 32rem;">
-                            <livewire:livewire-pie-chart
-                                key="{{ $lwPie->reactiveKey() }}"
-                                :pie-chart-model="$lwPie"
-                            />
+                                @if($lwPie)
+                                    <livewire:livewire-pie-chart
+                                        key="{{ $lwPie->reactiveKey() }}"
+                                        :pie-chart-model="$lwPie"
+                                    />
+                                @else
+                                    <div class="h-full flex items-center justify-center text-slate-500 text-sm">
+                                        Pie chart unavailable. No chart data or package not installed.
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

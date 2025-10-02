@@ -120,13 +120,22 @@
                             </div>
                         </div>
                         @if($showAdvanced)
-                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3">
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-8 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Category</label>
                                 <select class="form-select w-full px-3 py-2.5 rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.live="category">
                                     <option value="">All</option>
                                     @foreach(($options['categories'] ?? []) as $c)
                                         <option value="{{ $c }}">{{ $c }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-1">Location</label>
+                                <select class="form-select w-full px-3 py-2.5 rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.live="locationFilter">
+                                    <option value="">All</option>
+                                    @foreach(($options['locations'] ?? []) as $loc)
+                                        <option value="{{ $loc }}">{{ $loc }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -411,7 +420,12 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Location</label>
-                                <input type="text" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="location">
+                                <select class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="location">
+                                    <option value="">Select location</option>
+                                    @foreach(($options['locations'] ?? []) as $loc)
+                                        <option value="{{ $loc }}">{{ $loc }}</option>
+                                    @endforeach
+                                </select>
                                 @error('location') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div class="flex items-center gap-2">

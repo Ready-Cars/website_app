@@ -6,16 +6,21 @@
     </div>
 
     <nav class="hidden lg:flex items-center gap-8">
-        <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('cars.index') }}" wire:navigate>Car catalog</a>
+        @php
+            $linkBase = 'text-sm font-medium transition-colors pb-2';
+            $activeClasses = 'text-white border-b-2 border-[#1173d4]';
+            $inactiveClasses = 'text-white/90 hover:text-white';
+        @endphp
+        <a class="{{ request()->routeIs('cars.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('cars.index') }}" wire:navigate>Car catalog</a>
         @auth
-            <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('trips.index') }}" wire:navigate>My trips</a>
-            <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('notifications.index') }}" wire:navigate>Notifications</a>
-            <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('wallet.index') }}" wire:navigate>Wallet</a>
+            <a class="{{ request()->routeIs('trips.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('trips.index') }}" wire:navigate>My trips</a>
+            <a class="{{ request()->routeIs('notifications.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('notifications.index') }}" wire:navigate>Notifications</a>
+            <a class="{{ request()->routeIs('wallet.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('wallet.index') }}" wire:navigate>Wallet</a>
             @if(auth()->user()->is_admin ?? false)
-                <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('dashboard') }}" wire:navigate>Dashboard</a>
-                <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('admin.profile') }}" wire:navigate>Profile</a>
+                <a class="{{ request()->routeIs('dashboard') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('dashboard') }}" wire:navigate>Dashboard</a>
+                <a class="{{ request()->routeIs('admin.profile') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('admin.profile') }}" wire:navigate>Profile</a>
             @else
-                <a class="text-white/90 hover:text-white text-sm font-medium transition-colors" href="{{ route('profile.index') }}" wire:navigate>Profile</a>
+                <a class="{{ request()->routeIs('profile.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('profile.index') }}" wire:navigate>Profile</a>
             @endif
         @endauth
     </nav>
@@ -48,24 +53,29 @@
     <!-- Mobile dropdown menu -->
     <div id="mobile-menu" class="lg:hidden absolute left-0 right-0 top-full z-40 bg-[#0e1133] border-b border-transparent shadow-sm hidden" data-mobile-menu-panel>
         <div class="px-4 sm:px-6 py-3 flex flex-col gap-2">
-            <a class="block py-2 text-white/90 hover:text-white text-sm font-medium" href="{{ route('cars.index') }}" wire:navigate>Car catalog</a>
+            @php
+                $mActive = 'text-[#1173d4] font-semibold';
+                $mInactive = 'text-white/90 hover:text-white';
+                $mBase = 'block py-2 text-sm font-medium';
+            @endphp
+            <a class="{{ request()->routeIs('cars.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('cars.index') }}" wire:navigate>Car catalog</a>
             @auth
-                <a class="block py-2 text-white/90 hover:text-white text-sm font-medium" href="{{ route('trips.index') }}" wire:navigate>My trips</a>
-                <a class="block py-2 text-white/90 hover:text-white text-sm font-medium" href="{{ route('wallet.index') }}" wire:navigate>Wallet</a>
-                <a class="block py-2 text-white/90 hover:text-white text-sm font-medium" href="{{ route('notifications.index') }}" wire:navigate>Notifications</a>
+                <a class="{{ request()->routeIs('trips.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('trips.index') }}" wire:navigate>My trips</a>
+                <a class="{{ request()->routeIs('wallet.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('wallet.index') }}" wire:navigate>Wallet</a>
+                <a class="{{ request()->routeIs('notifications.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('notifications.index') }}" wire:navigate>Notifications</a>
                 @if(auth()->user()->is_admin ?? false)
-                    <a class="block py-2 text-white/90 hover:text-white text-sm font-medium" href="{{ route('dashboard') }}" wire:navigate>Dashboard</a>
-                    <a class="block py-2 text-white/90 hover:text-white text-sm font-medium" href="{{ route('admin.profile') }}" wire:navigate>Profile</a>
+                    <a class="{{ request()->routeIs('dashboard') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('dashboard') }}" wire:navigate>Dashboard</a>
+                    <a class="{{ request()->routeIs('admin.profile') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('admin.profile') }}" wire:navigate>Profile</a>
                 @else
-                    <a class="block py-2 text-white/90 hover:text-white text-sm font-medium" href="{{ route('profile.index') }}" wire:navigate>Profile</a>
+                    <a class="{{ request()->routeIs('profile.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('profile.index') }}" wire:navigate>Profile</a>
                 @endif
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="block w-full text-left py-2 text-rose-300 hover:text-rose-200 text-sm font-medium">Logout</button>
                 </form>
             @else
-                <a class="block py-2 text-white/90 hover:text-white text-sm font-medium" href="{{ route('login') }}" wire:navigate>Login</a>
-                <a class="block py-2 text-white/90 hover:text-white text-sm font-medium" href="{{ route('register') }}" wire:navigate>Register</a>
+                <a class="{{ request()->routeIs('login') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('login') }}" wire:navigate>Login</a>
+                <a class="{{ request()->routeIs('register') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('register') }}" wire:navigate>Register</a>
             @endauth
         </div>
     </div>

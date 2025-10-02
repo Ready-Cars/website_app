@@ -26,7 +26,7 @@
             <span class="material-symbols-outlined"> tune </span>
             <span>Car Options</span>
         </a>
-        <a class="{{ $active === 'reports' ? $activeCls : $inactive }}" href="{{ route('admin.reports') }}" wire:navigate>
+        <a class="{{ $active === 'reports' ? $activeCls : $inactive }}" href="{{ route('admin.reports') }}" >
             <span class="material-symbols-outlined"> assessment </span>
             <span>Reporting</span>
         </a>

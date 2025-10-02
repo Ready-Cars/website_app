@@ -28,7 +28,12 @@
                                     <option value="{{ $c }}">{{ $c }}</option>
                                 @endforeach
                             </select>
-                            <input wire:model.debounce.400ms="location" type="text" placeholder="Location" class="form-input rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" />
+                            <select wire:model.live="location" class="form-select rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600">
+                                                            <option value="">All Locations</option>
+                                                            @foreach(($options['locations'] ?? []) as $loc)
+                                                                <option value="{{ $loc }}">{{ $loc }}</option>
+                                                            @endforeach
+                                                        </select>
                             <select wire:model.live="transmission" class="form-select rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600">
                                 <option value="">Any Transmission</option>
                                 @foreach(($options['transmissions'] ?? []) as $t)
@@ -66,7 +71,7 @@
                                 <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="background-image: url('{{ $car->image_url }}');"></div>
                                 <div class="p-4 flex flex-col flex-1">
                                     <h3 class="text-slate-900 text-lg font-semibold leading-snug">{{ $car->name }}</h3>
-                                    <p class="text-slate-500 text-sm mt-1 mb-4 flex-1">{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
+                                    <p class="text-slate-500 text-sm mt-1 mb-4 flex-1">{{ $car->location ? $car->location.' • ' : '' }}{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
                                     <div class="flex justify-between items-center">
                                         <p class="text-lg font-bold text-slate-900">₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
                                         <flux:tooltip content="Instant booking" position="top">

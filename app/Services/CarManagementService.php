@@ -17,10 +17,10 @@ class CarManagementService
     public function queryCars(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         $q = Car::query()
-            ->when(isset($filters['q']) && trim((string)$filters['q']) !== '', function (Builder $query) use ($filters) {
-                $raw = trim((string)$filters['q']);
+            ->when(isset($filters['q']) && trim((string) $filters['q']) !== '', function (Builder $query) use ($filters) {
+                $raw = trim((string) $filters['q']);
                 $term = '%'.$raw.'%';
-                $query->where(function(Builder $sub) use ($term) {
+                $query->where(function (Builder $sub) use ($term) {
                     $sub->where('name', 'like', $term)
                         ->orWhere('category', 'like', $term)
                         ->orWhere('location', 'like', $term)
@@ -28,17 +28,19 @@ class CarManagementService
                         ->orWhere('fuel_type', 'like', $term);
                 });
             })
-            ->when(!empty($filters['category']), fn(Builder $qb) => $qb->where('category', $filters['category']))
-            ->when(!empty($filters['transmission']), fn(Builder $qb) => $qb->where('transmission', $filters['transmission']))
-            ->when(!empty($filters['fuel_type']), fn(Builder $qb) => $qb->where('fuel_type', $filters['fuel_type']))
-            ->when(!empty($filters['seats']), fn(Builder $qb) => $qb->where('seats', (int)$filters['seats']))
+            ->when(! empty($filters['category']), fn (Builder $qb) => $qb->where('category', $filters['category']))
+            ->when(! empty($filters['transmission']), fn (Builder $qb) => $qb->where('transmission', $filters['transmission']))
+            ->when(! empty($filters['fuel_type']), fn (Builder $qb) => $qb->where('fuel_type', $filters['fuel_type']))
+            ->when(! empty($filters['seats']), fn (Builder $qb) => $qb->where('seats', (int) $filters['seats']))
+            ->when(! empty($filters['location']), fn (Builder $qb) => $qb->where('location', 'like', '%'.trim((string) $filters['location']).'%'))
             ->when(array_key_exists('featured', $filters) && $filters['featured'] !== '' && $filters['featured'] !== null,
-                fn(Builder $qb) => $qb->where('featured', (bool)$filters['featured']))
-            ->when(isset($filters['minPrice']) && $filters['minPrice'] !== '', fn(Builder $qb) => $qb->where('daily_price', '>=', (float)$filters['minPrice']))
-            ->when(isset($filters['maxPrice']) && $filters['maxPrice'] !== '', fn(Builder $qb) => $qb->where('daily_price', '<=', (float)$filters['maxPrice']))
+                fn (Builder $qb) => $qb->where('featured', (bool) $filters['featured']))
+            ->when(isset($filters['minPrice']) && $filters['minPrice'] !== '', fn (Builder $qb) => $qb->where('daily_price', '>=', (float) $filters['minPrice']))
+            ->when(isset($filters['maxPrice']) && $filters['maxPrice'] !== '', fn (Builder $qb) => $qb->where('daily_price', '<=', (float) $filters['maxPrice']))
             ->latest('id');
 
-        $size = max(5, min(100, (int)($filters['perPage'] ?? $perPage)));
+        $size = max(5, min(100, (int) ($filters['perPage'] ?? $perPage)));
+
         return $q->paginate($size)->withQueryString();
     }
 
@@ -47,7 +49,7 @@ class CarManagementService
      */
     public function bookingsForCar(int $carId, int $perPage = 10): LengthAwarePaginator
     {
-        return Booking::with(['user','car'])
+        return Booking::with(['user', 'car'])
             ->where('car_id', $carId)
             ->latest('id')
             ->paginate(max(5, min(50, $perPage)))
@@ -65,13 +67,16 @@ class CarManagementService
             'categories' => $opt->clone()->where('type', 'category')->orderBy('value')->pluck('value')->filter()->values()->all(),
             'transmissions' => $opt->clone()->where('type', 'transmission')->orderBy('value')->pluck('value')->filter()->values()->all(),
             'fuels' => $opt->clone()->where('type', 'fuel')->orderBy('value')->pluck('value')->filter()->values()->all(),
+            'locations' => $opt->clone()->where('type', 'location')->orderBy('value')->pluck('value')->filter()->values()->all(),
         ];
+
         return [
-            'categories' => !empty($managed['categories']) ? $managed['categories'] : Car::query()->distinct()->orderBy('category')->pluck('category')->filter()->values()->all(),
-            'transmissions' => !empty($managed['transmissions']) ? $managed['transmissions'] : Car::query()->distinct()->orderBy('transmission')->pluck('transmission')->filter()->values()->all(),
-            'fuels' => !empty($managed['fuels']) ? $managed['fuels'] : Car::query()->distinct()->orderBy('fuel_type')->pluck('fuel_type')->filter()->values()->all(),
+            'categories' => ! empty($managed['categories']) ? $managed['categories'] : Car::query()->distinct()->orderBy('category')->pluck('category')->filter()->values()->all(),
+            'transmissions' => ! empty($managed['transmissions']) ? $managed['transmissions'] : Car::query()->distinct()->orderBy('transmission')->pluck('transmission')->filter()->values()->all(),
+            'fuels' => ! empty($managed['fuels']) ? $managed['fuels'] : Car::query()->distinct()->orderBy('fuel_type')->pluck('fuel_type')->filter()->values()->all(),
+            'locations' => ! empty($managed['locations']) ? $managed['locations'] : Car::query()->whereNotNull('location')->distinct()->orderBy('location')->pluck('location')->filter()->values()->all(),
             'seats' => Car::query()->distinct()->orderBy('seats')->pluck('seats')->filter()->values()->all(),
-            'perPages' => [10,25,50,100],
+            'perPages' => [10, 25, 50, 100],
         ];
     }
 
@@ -79,7 +84,9 @@ class CarManagementService
     public function normalizeImages($value): array
     {
         if (is_array($value)) {
-            return array_values(array_filter(array_map(function($v){ return is_string($v) ? trim($v) : null; }, $value)));
+            return array_values(array_filter(array_map(function ($v) {
+                return is_string($v) ? trim($v) : null;
+            }, $value)));
         }
         if (is_string($value)) {
             $decoded = json_decode($value, true);
@@ -89,8 +96,11 @@ class CarManagementService
             if (str_contains($value, ',')) {
                 return $this->normalizeImages(array_map('trim', explode(',', $value)));
             }
-            if (filter_var($value, FILTER_VALIDATE_URL)) return [$value];
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                return [$value];
+            }
         }
+
         return [];
     }
 
@@ -98,9 +108,10 @@ class CarManagementService
     public function createCar(array $data): Car
     {
         $images = $this->normalizeImages($data['images'] ?? []);
-        $payload = Arr::only($data, ['name','category','description','image_url','daily_price','seats','transmission','fuel_type','featured','location']);
-        $payload['featured'] = (bool)($payload['featured'] ?? false);
+        $payload = Arr::only($data, ['name', 'category', 'description', 'image_url', 'daily_price', 'seats', 'transmission', 'fuel_type', 'featured', 'location']);
+        $payload['featured'] = (bool) ($payload['featured'] ?? false);
         $payload['images'] = $images;
+
         return Car::create($payload);
     }
 
@@ -108,10 +119,11 @@ class CarManagementService
     public function updateCar(Car $car, array $data): Car
     {
         $images = $this->normalizeImages($data['images'] ?? []);
-        $payload = Arr::only($data, ['name','category','description','image_url','daily_price','seats','transmission','fuel_type','featured','location']);
-        $payload['featured'] = (bool)($payload['featured'] ?? false);
+        $payload = Arr::only($data, ['name', 'category', 'description', 'image_url', 'daily_price', 'seats', 'transmission', 'fuel_type', 'featured', 'location']);
+        $payload['featured'] = (bool) ($payload['featured'] ?? false);
         $payload['images'] = $images;
         $car->update($payload);
+
         return $car->fresh();
     }
 
@@ -124,6 +136,7 @@ class CarManagementService
     public function setActive(Car $car, bool $active): Car
     {
         $car->update(['is_active' => $active]);
+
         return $car->fresh();
     }
 
@@ -134,12 +147,14 @@ class CarManagementService
     public function availabilityForCars(array $carIds, ?string $date = null): array
     {
         $carIds = array_values(array_unique(array_filter(array_map('intval', $carIds))));
-        if (empty($carIds)) return [];
+        if (empty($carIds)) {
+            return [];
+        }
         $date = $date ?: now()->toDateString();
         // A car is unavailable if it has any non-cancelled booking overlapping the given date
         $busy = Booking::query()
             ->whereIn('car_id', $carIds)
-            ->whereIn('status', ['pending','confirmed'])
+            ->whereIn('status', ['pending', 'confirmed'])
             ->whereDate('start_date', '<=', $date)
             ->whereDate('end_date', '>=', $date)
             ->pluck('car_id')
@@ -147,8 +162,9 @@ class CarManagementService
         $busySet = array_fill_keys($busy, true);
         $out = [];
         foreach ($carIds as $id) {
-            $out[$id] = !isset($busySet[$id]);
+            $out[$id] = ! isset($busySet[$id]);
         }
+
         return $out;
     }
 }

@@ -45,6 +45,8 @@ class Reports extends Component
             $this->from = Carbon::now()->subDays(30)->toDateString();
             $this->to = Carbon::now()->toDateString();
         }
+
+
     }
 
     protected function baseQuery()
@@ -231,6 +233,17 @@ class Reports extends Component
         // Totals
         $totals = $this->baseQuery()->selectRaw('COUNT(*) as cnt, COALESCE(SUM(total),0) as sum')->first();
 
+//        dd([
+//            'labels' => $labels,
+//            'bookingsSeries' => $bookings,
+//            'revenueSeries' => $revenue,
+//            'status' => $status,
+//            'topCars' => $topCars,
+//            'totalBookings' => (int)($totals->cnt ?? 0),
+//            'totalRevenue' => (float)($totals->sum ?? 0),
+//            'lwColumn' => $lwColumn,
+//            'lwPie' => $lwPie,
+//        ]);
         return view('livewire.admin.reports', [
             'labels' => $labels,
             'bookingsSeries' => $bookings,

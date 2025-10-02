@@ -110,7 +110,12 @@
                             @endforeach
                         </select>
                         <div class="md:col-span-5 grid grid-cols-2 md:grid-cols-4 gap-3 mt-1">
-                            <input wire:model.debounce.400ms="location" type="text" placeholder="Location" class="form-input rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" />
+                            <select wire:model.live="location" class="form-select rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600">
+                                                        <option value="">All Locations</option>
+                                                        @foreach(($options['locations'] ?? []) as $loc)
+                                                            <option value="{{ $loc }}">{{ $loc }}</option>
+                                                        @endforeach
+                                                    </select>
                             <input wire:model.debounce.400ms="minPrice" type="number" min="0" placeholder="Min ₦/day" class="form-input rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" />
                             <input wire:model.debounce.400ms="maxPrice" type="number" min="0" placeholder="Max ₦/day" class="form-input rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" />
                             <button wire:click="resetFilters" type="button" class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Reset</button>
@@ -127,7 +132,7 @@
                                     <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="background-image: url('{{ $car->image_url }}');"></div>
                                     <div class="p-5">
                                         <h3 class="text-lg font-bold text-slate-900">{{ $car->name }}</h3>
-                                        <p class="text-slate-600 text-sm">{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
+                                        <p class="text-slate-600 text-sm">{{ $car->location ? $car->location.' • ' : '' }}{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
                                         <div class="mt-3 flex justify-between items-center">
                                             <p class="text-lg font-bold text-slate-900">₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
                                             <flux:tooltip content="Instant booking" position="top">
@@ -166,7 +171,7 @@
                                     <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="background-image: url('{{ $car->image_url }}');"></div>
                                     <div class="p-4 pt-3">
                                         <h3 class="text-base font-bold text-slate-900">{{ $car->name }}</h3>
-                                        <p class="text-slate-600 text-sm">{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
+                                        <p class="text-slate-600 text-sm">{{ $car->location ? $car->location.' • ' : '' }}{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
                                         <div class="mt-3 flex justify-between items-center">
                                             <p class="text-lg font-bold text-slate-900">₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
                                             <flux:tooltip content="Instant booking" position="top">

@@ -40,12 +40,18 @@ class CarSearchService
 
     public function options(): array
     {
+        // Prefer admin-managed options when available, falling back to data derived from cars
+        $opt = \App\Models\CarAttributeOption::query();
+        $managedLocations = $opt->clone()->where('type', 'location')->orderBy('value')->pluck('value')->filter()->values()->all();
+
         return [
             'categories' => Car::query()->whereNotNull('category')->distinct()->orderBy('category')->pluck('category')->all(),
             'transmissions' => Car::query()->whereNotNull('transmission')->distinct()->orderBy('transmission')->pluck('transmission')->all(),
             'fuels' => Car::query()->whereNotNull('fuel_type')->distinct()->orderBy('fuel_type')->pluck('fuel_type')->all(),
             'seats' => Car::query()->distinct()->orderBy('seats')->pluck('seats')->all(),
-            'locations' => Car::query()->whereNotNull('location')->distinct()->orderBy('location')->pluck('location')->all(),
+            'locations' => ! empty($managedLocations)
+                ? $managedLocations
+                : Car::query()->whereNotNull('location')->distinct()->orderBy('location')->pluck('location')->filter()->values()->all(),
             'sorts' => [
                 'newest' => 'Newest',
                 'price_asc' => 'Price: Low to High',
