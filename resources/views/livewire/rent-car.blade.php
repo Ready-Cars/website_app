@@ -95,7 +95,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Service type</label>
                                     <select data-field="serviceTypeId" class="form-select w-full rounded-md border-slate-300 focus:border-[#1173d4] focus:ring-[#1173d4]" wire:model.defer="serviceTypeId">
-                                        <option value="">Select a service type</option>
+                                        <option value="0" >Select a service type</option>
                                         @foreach($serviceTypeOptions as $st)
                                             <option value="{{ $st['id'] }}">{{ $st['name'] }}</option>
 {{--                                            <option value="{{ $st['id'] }}">{{ $st['name'] }} — {{ ucfirst($st['pricing_type']) }}</option>--}}
@@ -106,11 +106,11 @@
                                         $sel = null;
                                         foreach ($serviceTypeOptions as $opt) { if ((int)($opt['id'] ?? 0) === (int)($serviceTypeId ?? 0)) { $sel = $opt; break; } }
                                     @endphp
-                                    @if($sel && ($sel['pricing_type'] ?? '') === 'negotiable')
-                                        <div class="mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800 text-sm">
-                                            This service type is Negotiable. No payment will be deducted now. A Support Agent will set the price and confirm your booking.
-                                        </div>
-                                    @endif
+{{--                                    @if($sel && ($sel['pricing_type'] ?? '') === 'negotiable')--}}
+{{--                                        <div class="mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800 text-sm">--}}
+{{--                                            This service type is Negotiable. No payment will be deducted now. A Support Agent will set the price and confirm your booking.--}}
+{{--                                        </div>--}}
+{{--                                    @endif--}}
                                 </div>
 
                                 <div>

@@ -34,7 +34,7 @@ class RentCar extends Component
     public string $notes = '';
 
     // Service type selection
-    public ?int $serviceTypeId = null;
+    public ?int $serviceTypeId = 0;
 
     public array $serviceTypeOptions = [];
 
