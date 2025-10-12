@@ -165,7 +165,7 @@
                                 <span class="truncate">View all cars</span>
                             </a>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             @forelse($catalog as $car)
                                 <div class="flex flex-col gap-3 group rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
                                     <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="background-image: url('{{ $car->image_url }}');"></div>
