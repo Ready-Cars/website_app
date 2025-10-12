@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Car;
 use App\Models\Extra;
+use App\Models\ServiceType;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -16,10 +17,12 @@ class RentCar extends Component
 
     #[Url]
     public ?string $startDate = null; // Y-m-d
+
     #[Url]
     public ?string $endDate = null;   // Y-m-d
 
     public string $pickupLocation = '';
+
     public string $dropoffLocation = '';
 
     // Selected extras keyed by extra name => bool
@@ -30,9 +33,15 @@ class RentCar extends Component
 
     public string $notes = '';
 
+    // Service type selection
+    public ?int $serviceTypeId = null;
+
+    public array $serviceTypeOptions = [];
+
     // Editing existing booking (optional)
     #[Url]
     public ?int $booking = null; // booking id from query string
+
     protected ?\App\Models\Booking $editing = null;
 
     // UI: confirm modal state
@@ -40,15 +49,17 @@ class RentCar extends Component
 
     // UI: success modal state
     public bool $successOpen = false;
+
     public string $successMessage = '';
 
     public function mount(Car $car): void
     {
         $this->car = $car;
         // Prevent renting disabled cars
-        if (!$this->car->is_active) {
+        if (! $this->car->is_active) {
             session()->flash('error', 'This car is currently unavailable.');
             $this->redirect(route('cars.index'), navigate: true);
+
             return;
         }
 
@@ -75,6 +86,14 @@ class RentCar extends Component
         }
 
         $this->loadAvailableExtras();
+
+        $this->loadServiceTypes();
+        // Set default service type
+        if ($this->editing && $this->editing->service_type_id) {
+            $this->serviceTypeId = (int) $this->editing->service_type_id;
+        } elseif ($this->serviceTypeId === null && ! empty($this->serviceTypeOptions)) {
+            $this->serviceTypeId = (int) ($this->serviceTypeOptions[0]['id'] ?? null);
+        }
     }
 
     public function openConfirm(): void
@@ -106,7 +125,7 @@ class RentCar extends Component
 
     protected function normalizeDates(): void
     {
-        if (!$this->startDate || !$this->endDate) {
+        if (! $this->startDate || ! $this->endDate) {
             return;
         }
         try {
@@ -128,8 +147,26 @@ class RentCar extends Component
             'dropoffLocation' => ['required', 'string', 'min:2', 'max:120'],
             'startDate' => ['required', 'date', 'after_or_equal:today'],
             'endDate' => ['required', 'date', 'after:startDate'],
+            'serviceTypeId' => [
+                'required',
+                'integer',
+                Rule::exists('service_types', 'id')->where(fn ($q) => $q->where('is_active', true)),
+            ],
             'notes' => ['nullable', 'string', 'max:500'],
         ];
+    }
+
+    protected function loadServiceTypes(): void
+    {
+        $this->serviceTypeOptions = ServiceType::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'pricing_type'])
+            ->map(fn ($st) => [
+                'id' => $st->id,
+                'name' => $st->name,
+                'pricing_type' => $st->pricing_type,
+            ])->all();
     }
 
     public function getDaysProperty(): int
@@ -138,6 +175,7 @@ class RentCar extends Component
             $start = Carbon::parse($this->startDate)->startOfDay();
             $end = Carbon::parse($this->endDate)->startOfDay();
             $days = $start->diffInDays($end);
+
             return max(1, $days);
         } catch (\Exception $e) {
             return 1;
@@ -148,12 +186,13 @@ class RentCar extends Component
     {
         $cost = 0.0;
         foreach ($this->availableExtras as $ex) {
-            $key = (string)($ex['key'] ?? '');
-            $price = (float)($ex['price_per_day'] ?? 0);
+            $key = (string) ($ex['key'] ?? '');
+            $price = (float) ($ex['price_per_day'] ?? 0);
             if ($key !== '' && ($this->extras[$key] ?? false)) {
                 $cost += $price * $this->days;
             }
         }
+
         return round($cost, 2);
     }
 
@@ -201,11 +240,12 @@ class RentCar extends Component
         }
 
         // Require authentication before making a booking
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             // Close modal if open
             $this->confirmOpen = false;
             // Redirect guests to login, preserving intended URL
             $this->redirect(route('login'));
+
             return;
         }
 
@@ -216,9 +256,10 @@ class RentCar extends Component
         $user = auth()->user();
 
         // Prevent banned users from making bookings
-        if ($user && !empty($user->banned_at)) {
+        if ($user && ! empty($user->banned_at)) {
             session()->flash('error', 'Your account has been banned. Please contact the administrator.');
             $this->redirect(route('cars.index'), navigate: true);
+
             return;
         }
         $editing = null;
@@ -230,26 +271,38 @@ class RentCar extends Component
                 ->first();
         }
 
+        // Determine service type and charge behavior
+        $serviceType = ServiceType::find($this->serviceTypeId);
+        $isNegotiable = $serviceType && strtolower((string) $serviceType->pricing_type) === 'negotiable';
+        $newStatus = $isNegotiable ? 'pending' : 'confirmed';
+
         // Determine amount to charge (or refund) based on editing state
         $charge = 0.0;
         $refund = 0.0;
-        if ($editing && $editing->status !== 'cancelled') {
-            $diff = round($this->total - (float)$editing->total, 2);
-            if ($diff > 0) { $charge = $diff; }
-            if ($diff < 0) { $refund = abs($diff); }
-        } else {
-            $charge = round($this->total, 2);
+        if (! $isNegotiable) {
+            if ($editing && $editing->status !== 'cancelled') {
+                $diff = round($this->total - (float) $editing->total, 2);
+                if ($diff > 0) {
+                    $charge = $diff;
+                }
+                if ($diff < 0) {
+                    $refund = abs($diff);
+                }
+            } else {
+                $charge = round($this->total, 2);
+            }
         }
 
         // If charge required, ensure balance is sufficient
         if ($charge > 0 && $user->wallet_balance < $charge) {
             session()->flash('wallet_error', 'Insufficient wallet balance. Please fund your wallet to complete the reservation.');
             $this->redirect(route('wallet.index'), navigate: true);
+
             return;
         }
 
         $booking = null;
-        \Illuminate\Support\Facades\DB::transaction(function () use ($user, $editing, $charge, $refund, &$booking) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($user, $editing, $charge, $refund, $newStatus, &$booking) {
             // Update wallet balance
             if ($charge > 0) {
                 $user->wallet_balance = round($user->wallet_balance - $charge, 2);
@@ -270,7 +323,8 @@ class RentCar extends Component
                     'subtotal' => $this->subtotal,
                     'taxes' => $this->taxes,
                     'total' => $this->total,
-                    'status' => 'confirmed',
+                    'service_type_id' => $this->serviceTypeId,
+                    'status' => $newStatus,
                 ]);
             } else {
                 $booking = \App\Models\Booking::create([
@@ -285,7 +339,8 @@ class RentCar extends Component
                     'subtotal' => $this->subtotal,
                     'taxes' => $this->taxes,
                     'total' => $this->total,
-                    'status' => 'confirmed',
+                    'service_type_id' => $this->serviceTypeId,
+                    'status' => $newStatus,
                 ]);
             }
 
@@ -312,12 +367,12 @@ class RentCar extends Component
             }
         });
 
-        // Send confirmation email (non-blocking intention; swallow errors)
+        // Send confirmation email only if confirmed
         try {
             $final = $editing && $editing->status !== 'cancelled'
-                ? $editing->fresh(['car','user'])
-                : ($booking ? $booking->load(['car','user']) : null);
-            if ($final) {
+                ? $editing->fresh(['car', 'user'])
+                : ($booking ? $booking->load(['car', 'user']) : null);
+            if ($final && $final->status === 'confirmed') {
                 $prev = 'pending';
                 \Illuminate\Support\Facades\Mail::to($user->email)
                     ->send(new \App\Mail\BookingStatusUpdatedMail($final, $prev, 'confirmed'));
@@ -333,29 +388,33 @@ class RentCar extends Component
         }
 
         // Success message and redirect to My Trips
-        $message = "Your reservation request has been received! We'll contact you shortly.";
+        $message = $newStatus === 'pending'
+            ? "Your reservation request has been received. No payment has been taken yet. We'll contact you to confirm the price."
+            : 'Your reservation request has been received!';
         session()->flash('rent_success', $message);
         $this->redirect(route('trips.index'), navigate: true);
-        return;
+
     }
 
     protected function loadAvailableExtras(bool $resetSelection = false): void
     {
-        $list = Extra::query()->where('is_active', true)->orderBy('name')->get(['name','price_per_day','default_selected'])->toArray();
+        $list = Extra::query()->where('is_active', true)->orderBy('name')->get(['name', 'price_per_day', 'default_selected'])->toArray();
         // Build selection keys from names (safe keys for Livewire binding)
         $selection = [];
         $avail = [];
         foreach ($list as $ex) {
-            $name = (string)($ex['name'] ?? '');
-            if ($name === '') continue;
+            $name = (string) ($ex['name'] ?? '');
+            if ($name === '') {
+                continue;
+            }
             $key = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '_', $name));
             $key = trim(preg_replace('/_+/', '_', $key), '_');
-            $default = (bool)($ex['default_selected'] ?? false);
+            $default = (bool) ($ex['default_selected'] ?? false);
             $selection[$key] = $default;
             $avail[] = [
                 'key' => $key,
                 'name' => $name,
-                'price_per_day' => (float)($ex['price_per_day'] ?? 0),
+                'price_per_day' => (float) ($ex['price_per_day'] ?? 0),
             ];
         }
         $this->availableExtras = $avail;
@@ -365,7 +424,7 @@ class RentCar extends Component
             // Merge existing selection with available extras (drop removed ones)
             $merged = [];
             foreach ($selection as $name => $def) {
-                $merged[$name] = array_key_exists($name, $this->extras) ? (bool)$this->extras[$name] : $def;
+                $merged[$name] = array_key_exists($name, $this->extras) ? (bool) $this->extras[$name] : $def;
             }
             $this->extras = $merged;
         }

@@ -12,6 +12,10 @@ class Bookings extends Component
 {
     use WithPagination;
 
+    // Confirm with price modal
+    public bool $confirmPriceOpen = false;
+    public string $confirmPrice = '';
+
     // Filters
     #[Url(as: 'q')]
     public string $q = '';
@@ -102,9 +106,14 @@ class Bookings extends Component
     {
         try {
             $booking = Booking::findOrFail($id);
+            if (strtolower((string)$booking->status) === 'pending') {
+                // Open modal to set price for pending bookings
+                $this->viewingId = $id;
+                $this->confirmPrice = '';
+                $this->confirmPriceOpen = true;
+                return;
+            }
             $service->changeStatus($booking, 'confirmed');
-            $this->successMessage = 'Booking confirmed';
-            $this->successOpen = true;
             session()->flash('success', 'Booking confirmed');
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());
@@ -133,14 +142,31 @@ class Bookings extends Component
     public function completeSelected(BookingManagementService $service): void
     {
         $id = $this->viewingId;
-        if (!$id) return;
+        if (!$id) { return; }
         try {
             $booking = Booking::findOrFail($id);
             $service->changeStatus($booking, 'completed');
             $this->completeOpen = false;
-            $this->successMessage = 'Booking marked as completed';
-            $this->successOpen = true;
             session()->flash('success', 'Booking marked as completed');
+        } catch (\Throwable $e) {
+            session()->flash('error', $e->getMessage());
+        }
+    }
+
+    public function confirmPendingWithPrice(BookingManagementService $service): void
+    {
+        $id = $this->viewingId;
+        if (!$id) { return; }
+        $amount = (float) str_replace([',',' '], ['', ''], $this->confirmPrice);
+        try {
+            if ($amount <= 0) {
+                throw new \InvalidArgumentException('Please enter a valid amount greater than zero.');
+            }
+            $booking = Booking::findOrFail($id);
+            $service->confirmWithPrice($booking, $amount);
+            $this->confirmPriceOpen = false;
+            $this->confirmPrice = '';
+            session()->flash('success', 'Booking confirmed with price ₦'.number_format($amount, 2));
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());
         }

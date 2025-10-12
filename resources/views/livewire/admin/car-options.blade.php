@@ -49,6 +49,7 @@
                             'fuels' => 'Fuels',
                             'locations' => 'Locations',
                             'extras' => 'Extras',
+                            'serviceTypes' => 'Service Types',
                         ];
                     @endphp
                     <div class="mb-4 border-b border-slate-200">
@@ -231,6 +232,49 @@
                                             </tr>
                                         @empty
                                             <tr><td colspan="5" class="px-3 py-6 text-center text-sm text-slate-500">No extras yet.</td></tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    @endif
+
+                    @if($tab === 'serviceTypes')
+                        <section class="rounded-lg bg-white shadow-sm border border-slate-200">
+                            <div class="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+                                <h3 class="text-base font-semibold">Service Types</h3>
+                                <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="addRow('serviceTypes')"><span class="material-symbols-outlined text-base">add</span><span>Add</span></button>
+                            </div>
+                            <div class="p-4 overflow-x-auto">
+                                <table class="min-w-full text-left">
+                                    <thead>
+                                        <tr class="bg-slate-50">
+                                            <th class="px-3 py-2 text-xs font-semibold text-slate-600 uppercase">Name</th>
+                                            <th class="px-3 py-2 text-xs font-semibold text-slate-600 uppercase">Pricing Type</th>
+                                            <th class="px-3 py-2 text-xs font-semibold text-slate-600 uppercase">Active</th>
+                                            <th class="px-3 py-2 text-xs font-semibold text-slate-600 uppercase text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-200">
+                                        @forelse($serviceTypes as $i => $row)
+                                            <tr>
+                                                <td class="px-3 py-2"><input type="text" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="serviceTypes.{{ $i }}.name"></td>
+                                                <td class="px-3 py-2">
+                                                    <select class="form-select w-40 rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="serviceTypes.{{ $i }}.pricing_type">
+                                                        <option value="fixed">Fixed</option>
+                                                        <option value="negotiable">Negotiable</option>
+                                                    </select>
+                                                </td>
+                                                <td class="px-3 py-2">
+                                                    <input type="checkbox" class="rounded border-slate-300 text-sky-600 focus:ring-sky-600" wire:model.defer="serviceTypes.{{ $i }}.is_active">
+                                                </td>
+                                                <td class="px-3 py-2 text-right space-x-2">
+                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700" wire:click="saveRow('serviceTypes', {{ $i }})"><span class="material-symbols-outlined text-base">save</span><span>Save</span></button>
+                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" data-confirm="Delete this service type?" wire:click="deleteRow('serviceTypes', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr><td colspan="4" class="px-3 py-6 text-center text-sm text-slate-500">No service types yet.</td></tr>
                                         @endforelse
                                     </tbody>
                                 </table>

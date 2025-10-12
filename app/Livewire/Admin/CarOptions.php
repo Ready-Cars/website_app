@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\CarAttributeOption;
 use App\Models\Extra;
+use App\Models\ServiceType;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
@@ -19,7 +20,9 @@ class CarOptions extends Component
 
     public array $extras = [];
 
-    // Active tab: categories | transmissions | fuels | locations | extras (URL-bound for shareable state)
+    public array $serviceTypes = [];
+
+    // Active tab: categories | transmissions | fuels | locations | extras | serviceTypes (URL-bound for shareable state)
     #[Url(as: 'tab')]
     public string $tab = 'categories';
 
@@ -31,7 +34,7 @@ class CarOptions extends Component
 
     protected function normalizeTab(): void
     {
-        if (! in_array($this->tab, ['categories', 'transmissions', 'fuels', 'locations', 'extras'], true)) {
+        if (! in_array($this->tab, ['categories', 'transmissions', 'fuels', 'locations', 'extras', 'serviceTypes'], true)) {
             $this->tab = 'categories';
         }
     }
@@ -49,6 +52,7 @@ class CarOptions extends Component
         $this->fuels = CarAttributeOption::where('type', 'fuel')->orderBy('value')->get(['id', 'value'])->toArray();
         $this->locations = CarAttributeOption::where('type', 'location')->orderBy('value')->get(['id', 'value'])->toArray();
         $this->extras = Extra::orderBy('name')->get(['id', 'name', 'price_per_day', 'is_active', 'default_selected'])->toArray();
+        $this->serviceTypes = ServiceType::orderBy('name')->get(['id', 'name', 'pricing_type', 'is_active'])->toArray();
     }
 
     public function addRow(string $type): void
@@ -56,6 +60,8 @@ class CarOptions extends Component
         $arr = &$this->$type;
         if ($type === 'extras') {
             $arr[] = ['id' => null, 'name' => '', 'price_per_day' => 0, 'is_active' => true, 'default_selected' => false];
+        } elseif ($type === 'serviceTypes') {
+            $arr[] = ['id' => null, 'name' => '', 'pricing_type' => 'fixed', 'is_active' => true];
         } else {
             $arr[] = ['id' => null, 'value' => ''];
         }
@@ -103,6 +109,39 @@ class CarOptions extends Component
             return;
         }
 
+        if ($type === 'serviceTypes') {
+            $name = trim((string) ($row['name'] ?? ''));
+            $pricing = strtolower((string) ($row['pricing_type'] ?? 'fixed'));
+            $isActive = (bool) ($row['is_active'] ?? false);
+            if ($name === '') {
+                session()->flash('error', 'Name cannot be empty.');
+
+                return;
+            }
+            if (! in_array($pricing, ['fixed', 'negotiable'], true)) {
+                session()->flash('error', 'Invalid pricing type.');
+
+                return;
+            }
+
+            if (! empty($row['id'])) {
+                ServiceType::whereKey($row['id'])->update([
+                    'name' => $name,
+                    'pricing_type' => $pricing,
+                    'is_active' => $isActive,
+                ]);
+            } else {
+                ServiceType::updateOrCreate(
+                    ['name' => $name],
+                    ['pricing_type' => $pricing, 'is_active' => $isActive]
+                );
+            }
+            $this->loadOptions();
+            session()->flash('success', 'Service type saved successfully');
+
+            return;
+        }
+
         $val = trim((string) ($row['value'] ?? ''));
         if ($val === '') {
             session()->flash('error', 'Value cannot be empty.');
@@ -131,6 +170,19 @@ class CarOptions extends Component
                 Extra::whereKey($row['id'])->delete();
                 $this->loadOptions();
                 session()->flash('success', 'Extra deleted');
+            } else {
+                unset($arr[$index]);
+                $arr = array_values($arr);
+            }
+
+            return;
+        }
+
+        if ($type === 'serviceTypes') {
+            if (! empty($row['id'])) {
+                ServiceType::whereKey($row['id'])->delete();
+                $this->loadOptions();
+                session()->flash('success', 'Service type deleted');
             } else {
                 unset($arr[$index]);
                 $arr = array_values($arr);

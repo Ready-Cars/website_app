@@ -73,7 +73,7 @@
                                     <h3 class="text-slate-900 text-lg font-semibold leading-snug">{{ $car->name }}</h3>
                                     <p class="text-slate-500 text-sm mt-1 mb-4 flex-1">{{ $car->location ? $car->location.' • ' : '' }}{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
                                     <div class="flex justify-between items-center">
-                                        <p class="text-lg font-bold text-slate-900">₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
+                                        <p class="text-lg font-bold text-slate-900">From ₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
                                         <flux:tooltip content="Instant booking" position="top">
                                             <flux:button
                                                 href="{{ route('rent.show', $car) }}"

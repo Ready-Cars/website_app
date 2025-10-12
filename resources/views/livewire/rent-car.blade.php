@@ -58,7 +58,7 @@
                                             <p class="text-slate-600 text-sm">{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats • {{ $car->fuel_type }}</p>
                                         </div>
                                         <div class="text-right">
-                                            <p class="text-lg font-bold text-slate-900">₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
+                                            <p class="text-lg font-bold text-slate-900">From ₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
                                         </div>
                                     </div>
                                 </div>
@@ -91,6 +91,28 @@
                                         @error('endDate') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                                     </div>
                                 </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Service type</label>
+                                    <select data-field="serviceTypeId" class="form-select w-full rounded-md border-slate-300 focus:border-[#1173d4] focus:ring-[#1173d4]" wire:model.defer="serviceTypeId">
+                                        <option value="">Select a service type</option>
+                                        @foreach($serviceTypeOptions as $st)
+                                            <option value="{{ $st['id'] }}">{{ $st['name'] }}</option>
+{{--                                            <option value="{{ $st['id'] }}">{{ $st['name'] }} — {{ ucfirst($st['pricing_type']) }}</option>--}}
+                                        @endforeach
+                                    </select>
+                                    @error('serviceTypeId') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                                    @php
+                                        $sel = null;
+                                        foreach ($serviceTypeOptions as $opt) { if ((int)($opt['id'] ?? 0) === (int)($serviceTypeId ?? 0)) { $sel = $opt; break; } }
+                                    @endphp
+                                    @if($sel && ($sel['pricing_type'] ?? '') === 'negotiable')
+                                        <div class="mt-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800 text-sm">
+                                            This service type is Negotiable. No payment will be deducted now. A Support Agent will set the price and confirm your booking.
+                                        </div>
+                                    @endif
+                                </div>
+
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Extras</label>
                                     @if(!empty($availableExtras))
@@ -130,6 +152,13 @@
                             <div class="rounded-lg bg-white shadow-sm border border-slate-200 p-5">
                                 <h3 class="text-lg font-semibold text-slate-900 mb-4">Price summary</h3>
                                 <ul class="space-y-2 text-sm text-slate-700">
+                                    @php
+                                        $sel = null;
+                                        foreach ($serviceTypeOptions as $opt) { if ((int)($opt['id'] ?? 0) === (int)($serviceTypeId ?? 0)) { $sel = $opt; break; } }
+                                    @endphp
+                                    @if($sel)
+                                        <li class="flex justify-between"><span>Service type</span> <span>{{ $sel['name'] }} ({{ ucfirst($sel['pricing_type']) }})</span></li>
+                                    @endif
                                     <li class="flex justify-between"><span>Days</span> <span>{{ $this->days }}</span></li>
                                     <li class="flex justify-between"><span>Daily rate</span> <span>₦{{ number_format($car->daily_price, 2) }}</span></li>
                                     <li class="flex justify-between"><span>Extras</span> <span>₦{{ number_format($this->extrasCost, 2) }}</span></li>
@@ -185,6 +214,13 @@
                     <li class="flex justify-between"><span class="text-slate-500">Pick-up</span><span class="font-medium text-slate-900">{{ $pickupLocation ?: '—' }}</span></li>
                     <li class="flex justify-between"><span class="text-slate-500">Drop-off</span><span class="font-medium text-slate-900">{{ $dropoffLocation ?: '—' }}</span></li>
                     <li class="flex justify-between"><span class="text-slate-500">Dates</span><span class="font-medium text-slate-900">{{ $startDate }} → {{ $endDate }}</span></li>
+                    @php
+                        $sel = null;
+                        foreach ($serviceTypeOptions as $opt) { if ((int)($opt['id'] ?? 0) === (int)($serviceTypeId ?? 0)) { $sel = $opt; break; } }
+                    @endphp
+                    @if($sel)
+                        <li class="flex justify-between"><span class="text-slate-500">Service type</span><span class="font-medium text-slate-900">{{ $sel['name'] }} ({{ ucfirst($sel['pricing_type']) }})</span></li>
+                    @endif
                     <li class="flex justify-between"><span class="text-slate-500">Total</span><span class="font-extrabold text-slate-900">${{ number_format($this->total, 2) }}</span></li>
                 </ul>
             </div>

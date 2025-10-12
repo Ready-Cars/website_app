@@ -134,7 +134,7 @@
                                         <h3 class="text-lg font-bold text-slate-900">{{ $car->name }}</h3>
                                         <p class="text-slate-600 text-sm">{{ $car->location ? $car->location.' • ' : '' }}{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
                                         <div class="mt-3 flex justify-between items-center">
-                                            <p class="text-lg font-bold text-slate-900">₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
+                                            <p class="text-lg font-bold text-slate-900">From ₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
                                             <flux:tooltip content="Instant booking" position="top">
                                                 <flux:button
                                                     href="{{ route('rent.show', $car) }}"
@@ -173,7 +173,7 @@
                                         <h3 class="text-base font-bold text-slate-900">{{ $car->name }}</h3>
                                         <p class="text-slate-600 text-sm">{{ $car->location ? $car->location.' • ' : '' }}{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
                                         <div class="mt-3 flex justify-between items-center">
-                                            <p class="text-lg font-bold text-slate-900">₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
+                                            <p class="text-lg font-bold text-slate-900">From ₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
                                             <flux:tooltip content="Instant booking" position="top">
                                                 <flux:button
                                                     href="{{ route('rent.show', $car) }}"

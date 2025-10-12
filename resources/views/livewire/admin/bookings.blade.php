@@ -370,6 +370,38 @@
             </div>
         @endif
 
+        <!-- Confirm with Price Modal -->
+        @if($confirmPriceOpen && $viewingId)
+            <div class="fixed inset-0 z-50 flex items-center justify-center">
+                <div class="absolute inset-0 bg-black/50" wire:click="$set('confirmPriceOpen', false)"></div>
+                <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
+                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-slate-900">Confirm booking and set price</h3>
+                        <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="$set('confirmPriceOpen', false)">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="px-5 py-4 text-sm text-slate-700">
+                        @php $bk = \App\Models\Booking::with(['user','car'])->find($viewingId); @endphp
+                        @if($bk)
+                            <div class="mb-3 rounded-md border border-slate-200 bg-slate-50 p-3">
+                                <div class="font-medium text-slate-900">#{{ $bk->id }} • {{ $bk->user->name ?? '—' }}</div>
+                                <div class="text-slate-600 text-sm">{{ $bk->car->name ?? '—' }}</div>
+                                <div class="text-slate-600 text-sm">{{ optional($bk->start_date)->format('M d, Y') }} — {{ optional($bk->end_date)->format('M d, Y') }}</div>
+                                <div class="text-slate-900 text-sm mt-1">Current total: ₦{{ number_format((float)($bk->total ?? 0), 2) }}</div>
+                            </div>
+                        @endif
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Final price (₦)</label>
+                        <input type="number" min="0" step="0.01" inputmode="decimal" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" placeholder="Enter amount" wire:model.defer="confirmPrice">
+                        <p class="text-xs text-slate-500 mt-1">The amount will be charged from the customer's wallet immediately.</p>
+                    </div>
+                    <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
+                        <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('confirmPriceOpen', false)">Close</button>
+                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="confirmPendingWithPrice">Confirm & Charge</button>
+                    </div>
+                </div>
+            </div>
+        @endif
 
 
         <!-- Success Message Modal -->

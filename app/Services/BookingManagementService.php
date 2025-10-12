@@ -16,6 +16,75 @@ use Illuminate\Support\Facades\Mail;
 class BookingManagementService
 {
     /**
+     * Confirm a pending booking by setting the final price and charging the customer's wallet.
+     * The provided amount overrides the existing booking total.
+     */
+    public function confirmWithPrice(Booking $booking, float $amount): Booking
+    {
+        if (strtolower((string) $booking->status) !== 'pending') {
+            throw new \DomainException('Only pending bookings can be confirmed with a price.');
+        }
+        $amount = round(max(0, $amount), 2);
+        if ($amount <= 0) {
+            throw new \InvalidArgumentException('Amount must be greater than zero.');
+        }
+
+        return DB::transaction(function () use ($booking, $amount) {
+            // Lock user for wallet update
+            $user = $booking->user()->lockForUpdate()->first();
+            if (!$user) {
+                throw new \RuntimeException('Booking has no user.');
+            }
+
+            // Ensure sufficient balance
+            if ((float) $user->wallet_balance < $amount) {
+                throw new \DomainException('Insufficient wallet balance to confirm this booking.');
+            }
+
+            // Debit wallet
+            $user->wallet_balance = round(((float)$user->wallet_balance) - $amount, 2);
+            $user->save();
+
+            // Update booking totals and status
+            $booking->update([
+                'subtotal' => $amount, // collapse into subtotal for simplicity; taxes already in amount if needed
+                'taxes' => 0,
+                'total' => $amount,
+                'status' => 'confirmed',
+            ]);
+
+            // Log wallet transaction
+            WalletTransaction::create([
+                'user_id' => $user->id,
+                'type' => 'debit',
+                'amount' => $amount,
+                'balance_after' => $user->wallet_balance,
+                'description' => 'Booking charge on admin confirmation',
+                'meta' => ['booking_id' => $booking->id, 'car_id' => $booking->car_id],
+            ]);
+
+            $updated = $booking->fresh(['user','car']);
+
+            // Notifications
+            try {
+                if ($updated && $updated->user && $updated->user->email) {
+                    Mail::to($updated->user->email)->send(new BookingStatusUpdatedMail($updated, 'pending', 'confirmed'));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Booking confirmWithPrice email failed: '.$e->getMessage(), ['booking_id' => $updated->id ?? null]);
+            }
+            try {
+                if ($updated && $updated->user) {
+                    $updated->user->notify(new \App\Notifications\BookingStatusUpdatedNotification($updated, 'pending', 'confirmed'));
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Booking confirmWithPrice notification failed: '.$e->getMessage(), ['booking_id' => $updated->id ?? null]);
+            }
+
+            return $updated;
+        });
+    }
+    /**
      * Return paginated bookings applying filters.
      * Filters supported:
      * - q: search in user name/email, car name, car category, booking id, pickup/dropoff, status
