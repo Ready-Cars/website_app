@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use App\Models\Setting;
 
 class RentCar extends Component
 {
@@ -203,13 +204,32 @@ class RentCar extends Component
 
     public function getTaxesProperty(): float
     {
-        // Flat 8% tax for demonstration
-        return round($this->subtotal * 0.08, 2);
+        $rate = (float) Setting::get('tax_rate', '0.08');
+        if ($rate < 0) {
+            $rate = 0.0;
+        }
+        // If admin saved as whole percentage (e.g., 8 or 10), normalize down to fraction
+        if ($rate > 1.0) {
+            $rate = $rate / 100.0;
+        }
+        return round($this->subtotal * $rate, 2);
     }
 
     public function getTotalProperty(): float
     {
         return round($this->subtotal + $this->taxes, 2);
+    }
+
+    public function getTaxRateProperty(): float
+    {
+        $rate = (float) Setting::get('tax_rate', '0.08');
+        if ($rate < 0) {
+            return 0.0;
+        }
+        if ($rate > 1.0) {
+            $rate = $rate / 100.0;
+        }
+        return $rate;
     }
 
     protected function resetRentalForm(): void

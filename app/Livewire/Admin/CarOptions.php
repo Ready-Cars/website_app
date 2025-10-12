@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\CarAttributeOption;
 use App\Models\Extra;
 use App\Models\ServiceType;
+use App\Models\Setting;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
@@ -22,6 +23,8 @@ class CarOptions extends Component
 
     public array $serviceTypes = [];
 
+    public string $taxRate = '';
+
     // Active tab: categories | transmissions | fuels | locations | extras | serviceTypes (URL-bound for shareable state)
     #[Url(as: 'tab')]
     public string $tab = 'categories';
@@ -30,11 +33,15 @@ class CarOptions extends Component
     {
         $this->normalizeTab();
         $this->loadOptions();
+        $rate = (float) Setting::get('tax_rate', '0.08');
+        if ($rate > 1.0) { $rate = $rate / 100.0; }
+        if ($rate < 0) { $rate = 0.0; }
+        $this->taxRate = number_format($rate * 100, 2, '.', '');
     }
 
     protected function normalizeTab(): void
     {
-        if (! in_array($this->tab, ['categories', 'transmissions', 'fuels', 'locations', 'extras', 'serviceTypes'], true)) {
+        if (! in_array($this->tab, ['categories', 'transmissions', 'fuels', 'locations', 'extras', 'serviceTypes', 'settings'], true)) {
             $this->tab = 'categories';
         }
     }
@@ -53,6 +60,28 @@ class CarOptions extends Component
         $this->locations = CarAttributeOption::where('type', 'location')->orderBy('value')->get(['id', 'value'])->toArray();
         $this->extras = Extra::orderBy('name')->get(['id', 'name', 'price_per_day', 'is_active', 'default_selected'])->toArray();
         $this->serviceTypes = ServiceType::orderBy('name')->get(['id', 'name', 'pricing_type', 'is_active'])->toArray();
+    }
+
+    public function saveTaxRate(): void
+    {
+        $input = trim($this->taxRate);
+        if ($input === '') {
+            session()->flash('error', 'Tax rate cannot be empty.');
+            return;
+        }
+        // Accept numbers like 8, 8.5, 10.00 meaning percents
+        if (!is_numeric($input)) {
+            session()->flash('error', 'Tax rate must be a number.');
+            return;
+        }
+        $percent = (float) $input;
+        if ($percent < 0 || $percent > 100) {
+            session()->flash('error', 'Tax rate must be between 0 and 100.');
+            return;
+        }
+        $fraction = $percent / 100.0;
+        Setting::setValue('tax_rate', $fraction);
+        session()->flash('success', 'Tax rate saved successfully.');
     }
 
     public function addRow(string $type): void

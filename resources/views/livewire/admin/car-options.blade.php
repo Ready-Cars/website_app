@@ -50,6 +50,7 @@
                             'locations' => 'Locations',
                             'extras' => 'Extras',
                             'serviceTypes' => 'Service Types',
+                            'settings' => 'Settings',
                         ];
                     @endphp
                     <div class="mb-4 border-b border-slate-200">
@@ -95,6 +96,24 @@
                                         @endforelse
                                     </tbody>
                                 </table>
+                            </div>
+                        </section>
+                    @endif
+
+                    @if($tab === 'settings')
+                        <section class="rounded-lg bg-white shadow-sm border border-slate-200">
+                            <div class="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+                                <h3 class="text-base font-semibold">Settings</h3>
+                            </div>
+                            <div class="p-4 space-y-4">
+                                <div class="max-w-md">
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Tax rate (%)</label>
+                                    <div class="flex gap-2">
+                                        <input type="number" step="0.01" min="0" max="100" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="taxRate" placeholder="e.g. 8 or 10.5">
+                                        <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="saveTaxRate"><span class="material-symbols-outlined text-base">save</span><span>Save</span></button>
+                                    </div>
+                                    <p class="mt-1 text-xs text-slate-500">Enter the tax rate as a percentage. Example: 8 for 8%.</p>
+                                </div>
                             </div>
                         </section>
                     @endif

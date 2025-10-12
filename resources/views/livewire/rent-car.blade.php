@@ -163,7 +163,7 @@
                                     <li class="flex justify-between"><span>Daily rate</span> <span>₦{{ number_format($car->daily_price, 2) }}</span></li>
                                     <li class="flex justify-between"><span>Extras</span> <span>₦{{ number_format($this->extrasCost, 2) }}</span></li>
                                     <li class="flex justify-between"><span>Subtotal</span> <span>₦{{ number_format($this->subtotal, 2) }}</span></li>
-                                    <li class="flex justify-between"><span>Taxes (8%)</span> <span>₦{{ number_format($this->taxes, 2) }}</span></li>
+                                    <li class="flex justify-between"><span>Taxes ({{ number_format($this->taxRate * 100, 2) }}%)</span> <span>₦{{ number_format($this->taxes, 2) }}</span></li>
                                 </ul>
                                 <div class="mt-3 border-t pt-3 flex justify-between items-center">
                                     <span class="text-base font-semibold text-slate-900">Total</span>
