@@ -129,7 +129,7 @@
                                                     @if($isBanned)
                                                         <button class="w-full text-left px-3 py-2 text-green-700 hover:bg-green-50" wire:click="unban({{ $u->id }})">Unban</button>
                                                     @else
-                                                        <button class="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50" wire:click="ban({{ $u->id }})">Ban</button>
+                                                        <button class="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50" wire:click="openBan({{ $u->id }})">Ban</button>
                                                     @endif
                                                 </div>
                                             </div>
@@ -171,7 +171,7 @@
                                                     @if($isBanned)
                                                         <button class="w-full text-left px-3 py-2 text-green-700 hover:bg-green-50" wire:click="unban({{ $u->id }})">Unban</button>
                                                     @else
-                                                        <button class="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50" wire:click="ban({{ $u->id }})">Ban</button>
+                                                        <button class="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50" wire:click="openBan({{ $u->id }})">Ban</button>
                                                     @endif
                                                 </div>
                                             </div>
@@ -305,7 +305,7 @@
                             @if($isBanned)
                                 <button class="rounded-md h-10 px-4 bg-green-600 text-white text-sm font-semibold hover:bg-green-700" wire:click="unban({{ $selected->id }})">Unban</button>
                             @else
-                                <button class="rounded-md h-10 px-4 bg-red-600 text-white text-sm font-semibold hover:bg-red-700" wire:click="ban({{ $selected->id }})">Ban</button>
+                                <button class="rounded-md h-10 px-4 bg-red-600 text-white text-sm font-semibold hover:bg-red-700" wire:click="openBan({{ $selected->id }})">Ban</button>
                             @endif
                             <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="closeView">Close</button>
                         </div>
@@ -314,6 +314,28 @@
             </div>
         </div>
 
+    @endif
+
+    @if($banOpen && $banUserId)
+        <div class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/50" wire:click="closeBan"></div>
+            <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
+                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-slate-900">Ban customer</h3>
+                    <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="closeBan">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="px-5 py-4 text-sm text-slate-700">
+                    <p>Are you sure you want to ban this customer? They will be prevented from making new bookings until unbanned.</p>
+                    <p class="text-xs text-slate-500 mt-2">This action can be reversed by unbanning later.</p>
+                </div>
+                <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
+                    <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="closeBan">Cancel</button>
+                    <button class="rounded-md h-10 px-4 bg-red-600 text-white text-sm font-semibold hover:bg-red-700" wire:click="confirmBan">Confirm ban</button>
+                </div>
+            </div>
+        </div>
     @endif
 </div>
 

@@ -442,7 +442,30 @@
                     </div>
                     <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
                         <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('editOpen', false)">Close</button>
-                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="save">Save</button>
+                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="openSaveConfirm">Save</button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- Save confirm modal -->
+        @if($saveConfirmOpen)
+            <div class="fixed inset-0 z-50 flex items-center justify-center">
+                <div class="absolute inset-0 bg-black/50" wire:click="closeSaveConfirm"></div>
+                <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
+                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-slate-900">Confirm save</h3>
+                        <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="closeSaveConfirm">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="px-5 py-4 text-sm text-slate-700">
+                        <p>Are you sure you want to {{ $editingId ? 'update this car' : 'create this car' }} with the current details?</p>
+                        <p class="text-xs text-slate-500 mt-2">You can edit these details later if needed.</p>
+                    </div>
+                    <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
+                        <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="closeSaveConfirm">Cancel</button>
+                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="confirmSave">Confirm save</button>
                     </div>
                 </div>
             </div>

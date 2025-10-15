@@ -13,6 +13,9 @@ class Cars extends Component
 {
     use WithFileUploads, WithPagination;
 
+    // Save confirmation modal state
+    public bool $saveConfirmOpen = false;
+
     // Filters
     #[Url(as: 'q')]
     public string $q = '';
@@ -237,6 +240,23 @@ class Cars extends Component
         $this->editingId = $car->id;
         $this->loadCarIntoForm($car);
         $this->editOpen = true;
+    }
+
+    public function openSaveConfirm(): void
+    {
+        $this->saveConfirmOpen = true;
+    }
+
+    public function closeSaveConfirm(): void
+    {
+        $this->saveConfirmOpen = false;
+    }
+
+    public function confirmSave(CarManagementService $service): void
+    {
+        // Delegate to existing save logic
+        $this->save($service);
+        $this->saveConfirmOpen = false;
     }
 
     public function save(CarManagementService $service): void

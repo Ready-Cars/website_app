@@ -88,7 +88,7 @@
                                                 <td class="px-3 py-2"><input type="text" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="categories.{{ $i }}.value"></td>
                                                 <td class="px-3 py-2 text-right space-x-2">
                                                     <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700" wire:click="saveRow('categories', {{ $i }})"><span class="material-symbols-outlined text-base">save</span><span>Save</span></button>
-                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" data-confirm="Delete this category?" wire:click="deleteRow('categories', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
+                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" wire:click="requestDelete('categories', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
                                                 </td>
                                             </tr>
                                         @empty
@@ -138,7 +138,7 @@
                                                 <td class="px-3 py-2"><input type="text" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="transmissions.{{ $i }}.value"></td>
                                                 <td class="px-3 py-2 text-right space-x-2">
                                                     <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700" wire:click="saveRow('transmissions', {{ $i }})"><span class="material-symbols-outlined text-base">save</span><span>Save</span></button>
-                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" data-confirm="Delete this transmission?" wire:click="deleteRow('transmissions', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
+                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" wire:click="requestDelete('transmissions', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
                                                 </td>
                                             </tr>
                                         @empty
@@ -170,7 +170,7 @@
                                                 <td class="px-3 py-2"><input type="text" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="locations.{{ $i }}.value"></td>
                                                 <td class="px-3 py-2 text-right space-x-2">
                                                     <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700" wire:click="saveRow('locations', {{ $i }})"><span class="material-symbols-outlined text-base">save</span><span>Save</span></button>
-                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" data-confirm="Delete this location?" wire:click="deleteRow('locations', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
+                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" wire:click="requestDelete('locations', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
                                                 </td>
                                             </tr>
                                         @empty
@@ -202,7 +202,7 @@
                                                 <td class="px-3 py-2"><input type="text" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="fuels.{{ $i }}.value"></td>
                                                 <td class="px-3 py-2 text-right space-x-2">
                                                     <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700" wire:click="saveRow('fuels', {{ $i }})"><span class="material-symbols-outlined text-base">save</span><span>Save</span></button>
-                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" data-confirm="Delete this fuel type?" wire:click="deleteRow('fuels', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
+                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" wire:click="requestDelete('fuels', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
                                                 </td>
                                             </tr>
                                         @empty
@@ -246,7 +246,7 @@
                                                 </td>
                                                 <td class="px-3 py-2 text-right space-x-2">
                                                     <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700" wire:click="saveRow('extras', {{ $i }})"><span class="material-symbols-outlined text-base">save</span><span>Save</span></button>
-                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" data-confirm="Delete this extra?" wire:click="deleteRow('extras', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
+                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" wire:click="requestDelete('extras', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
                                                 </td>
                                             </tr>
                                         @empty
@@ -289,7 +289,7 @@
                                                 </td>
                                                 <td class="px-3 py-2 text-right space-x-2">
                                                     <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-sky-600 text-white text-xs font-semibold hover:bg-sky-700" wire:click="saveRow('serviceTypes', {{ $i }})"><span class="material-symbols-outlined text-base">save</span><span>Save</span></button>
-                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" data-confirm="Delete this service type?" wire:click="deleteRow('serviceTypes', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
+                                                    <button class="inline-flex items-center gap-2 rounded-md h-9 px-3 bg-red-600 text-white text-xs font-semibold hover:bg-red-700" wire:click="requestDelete('serviceTypes', {{ $i }})"><span class="material-symbols-outlined text-base">delete</span><span>Delete</span></button>
                                                 </td>
                                             </tr>
                                         @empty
@@ -304,25 +304,36 @@
             </div>
         </div>
     </div>
-</div>
 
-<script>
-// Simple confirmation intercepter for elements with data-confirm
-(function(){
-  function handler(e){
-    const msg = this.getAttribute('data-confirm');
-    if (!msg) return;
-    if (!confirm(msg)) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-    }
-  }
-  function init(){
-    document.querySelectorAll('[data-confirm]')
-      .forEach(el=>{ if (!el.__confirmInited){ el.addEventListener('click', handler, true); el.__confirmInited = true; }});
-  }
-  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
-  window.addEventListener('livewire:navigated', init);
-})();
-</script>
+    @if($deleteConfirmOpen)
+        <div class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/50" wire:click="closeDeleteConfirm"></div>
+            <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
+                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-slate-900">Confirm deletion</h3>
+                    <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="closeDeleteConfirm">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="px-5 py-4 text-sm text-slate-700">
+                    @php
+                        $typeLabels = [
+                            'categories' => 'this category',
+                            'transmissions' => 'this transmission',
+                            'fuels' => 'this fuel type',
+                            'locations' => 'this location',
+                            'extras' => 'this extra',
+                            'serviceTypes' => 'this service type',
+                        ];
+                        $label = $typeLabels[$deleteType ?? 'categories'] ?? 'this item';
+                    @endphp
+                    <p>Are you sure you want to delete {{ $label }}? This action cannot be undone.</p>
+                </div>
+                <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
+                    <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="closeDeleteConfirm">Cancel</button>
+                    <button class="rounded-md h-10 px-4 bg-red-600 text-white text-sm font-semibold hover:bg-red-700" wire:click="confirmDelete">Confirm delete</button>
+                </div>
+            </div>
+        </div>
+    @endif
+</div>

@@ -25,6 +25,13 @@ class CarOptions extends Component
 
     public string $taxRate = '';
 
+    // Confirmation modal state for deletions
+    public bool $deleteConfirmOpen = false;
+
+    public ?string $deleteType = null;
+
+    public ?int $deleteIndex = null;
+
     // Active tab: categories | transmissions | fuels | locations | extras | serviceTypes (URL-bound for shareable state)
     #[Url(as: 'tab')]
     public string $tab = 'categories';
@@ -34,8 +41,12 @@ class CarOptions extends Component
         $this->normalizeTab();
         $this->loadOptions();
         $rate = (float) Setting::get('tax_rate', '0.08');
-        if ($rate > 1.0) { $rate = $rate / 100.0; }
-        if ($rate < 0) { $rate = 0.0; }
+        if ($rate > 1.0) {
+            $rate = $rate / 100.0;
+        }
+        if ($rate < 0) {
+            $rate = 0.0;
+        }
         $this->taxRate = number_format($rate * 100, 2, '.', '');
     }
 
@@ -52,6 +63,28 @@ class CarOptions extends Component
         $this->normalizeTab();
     }
 
+    public function requestDelete(string $type, int $index): void
+    {
+        $this->deleteType = $type;
+        $this->deleteIndex = $index;
+        $this->deleteConfirmOpen = true;
+    }
+
+    public function closeDeleteConfirm(): void
+    {
+        $this->deleteConfirmOpen = false;
+        $this->deleteType = null;
+        $this->deleteIndex = null;
+    }
+
+    public function confirmDelete(): void
+    {
+        if ($this->deleteType !== null && $this->deleteIndex !== null) {
+            $this->deleteRow($this->deleteType, $this->deleteIndex);
+        }
+        $this->closeDeleteConfirm();
+    }
+
     protected function loadOptions(): void
     {
         $this->categories = CarAttributeOption::where('type', 'category')->orderBy('value')->get(['id', 'value'])->toArray();
@@ -66,22 +99,25 @@ class CarOptions extends Component
     {
         $input = trim($this->taxRate);
         if ($input === '') {
-            session()->flash('error', 'Tax rate cannot be empty.');
+            session()->put('error', 'Tax rate cannot be empty.');
+
             return;
         }
         // Accept numbers like 8, 8.5, 10.00 meaning percents
-        if (!is_numeric($input)) {
-            session()->flash('error', 'Tax rate must be a number.');
+        if (! is_numeric($input)) {
+            session()->put('error', 'Tax rate must be a number.');
+
             return;
         }
         $percent = (float) $input;
         if ($percent < 0 || $percent > 100) {
-            session()->flash('error', 'Tax rate must be between 0 and 100.');
+            session()->put('error', 'Tax rate must be between 0 and 100.');
+
             return;
         }
         $fraction = $percent / 100.0;
         Setting::setValue('tax_rate', $fraction);
-        session()->flash('success', 'Tax rate saved successfully.');
+        session()->put('success', 'Tax rate saved successfully.');
     }
 
     public function addRow(string $type): void
