@@ -31,9 +31,9 @@
                                 <input type="number" step="0.01" min="1" name="amount" wire:model.defer="amount" class="form-input w-full rounded-md border-gray-300 focus:border-[#1173d4] focus:ring-[#1173d4]" placeholder="e.g., 5000.00">
                                 <button type="submit" class="inline-flex items-center justify-center rounded-md h-11 px-5 bg-[#1173d4] text-white text-sm font-bold tracking-wide hover:bg-[#0f63b9] transition-colors">Fund Wallet</button>
                             </form>
-                            <div class="mt-2">
-                                <button type="button" wire:click="addFunds" class="inline-flex items-center justify-center rounded-md h-9 px-3 border border-slate-300 text-slate-700 text-xs font-medium hover:bg-slate-50">Add dummy funds (dev)</button>
-                            </div>
+{{--                            <div class="mt-2">--}}
+{{--                                <button type="button" wire:click="addFunds" class="inline-flex items-center justify-center rounded-md h-9 px-3 border border-slate-300 text-slate-700 text-xs font-medium hover:bg-slate-50">Add dummy funds (dev)</button>--}}
+{{--                            </div>--}}
                             @error('amount') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             <div class="mt-3 flex items-center gap-2">
                                 <span class="text-xs text-slate-500">Quick add:</span>

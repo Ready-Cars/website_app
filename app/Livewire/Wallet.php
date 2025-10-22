@@ -18,26 +18,27 @@ class Wallet extends Component
 
     public function addFunds(): void
     {
+
         $this->validate();
         $user = Auth::user();
         $inc = round((float)$this->amount, 2);
         $user->wallet_balance = $user->wallet_balance + $inc;
         $user->save();
 
-        // Log wallet transaction (credit)
-        \App\Models\WalletTransaction::create([
-            'user_id' => $user->id,
-            'type' => 'credit',
-            'amount' => $inc,
-            'balance_after' => $user->wallet_balance,
-            'description' => 'Wallet funding',
-            'meta' => ['source' => 'dummy_funding'],
-        ]);
+//        // Log wallet transaction (credit)
+//        \App\Models\WalletTransaction::create([
+//            'user_id' => $user->id,
+//            'type' => 'credit',
+//            'amount' => $inc,
+//            'balance_after' => $user->wallet_balance,
+//            'description' => 'Wallet funding',
+//            'meta' => ['source' => 'dummy_funding'],
+//        ]);
 
         $this->amount = '';
         // After balance changes, reset to the first page to avoid empty page view
         $this->resetPage();
-        session()->flash('wallet_success', 'Funds added successfully.');
+//        session()->flash('wallet_success', 'Funds added successfully.');
     }
 
     public function preset($value): void
