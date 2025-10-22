@@ -13,6 +13,6 @@ class AuthPagesLogoTest extends TestCase
         $response = $this->get(route('login'));
 
         $response->assertOk();
-        $response->assertSee('https://readycars.ng/img/logo.png', escape: false);
+        $response->assertSee('{{asset('img.png')}}', escape: false);
     }
 }

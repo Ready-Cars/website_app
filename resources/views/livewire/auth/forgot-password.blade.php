@@ -2,7 +2,7 @@
      <!-- Illustration / Brand side -->
      <div class="w-full md:w-1/2 bg-[#0e1133] flex flex-col justify-center items-center p-8 lg:p-12 relative">
          <a href="{{ route('home') }}" class="absolute top-8 left-8 inline-flex items-center" aria-label="{{ config('app.name') }}" wire:navigate>
-             <img src="https://readycars.ng/img/logo.png" alt="{{ config('app.name') }} logo" class="h-9 w-auto object-contain" />
+             <img src="{{asset('img.png')}}" alt="{{ config('app.name') }} logo" class="h-9 w-auto object-contain" />
          </a>
          <div class="max-w-md text-center">
              <img alt="Password reset illustration" class="w-full h-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS6i6QbUofp_vAMhhBp0F-ABDnSVWzSQpV6HLuYgeN8cBGGrmmrTbgIUReuOJOSpFgfTd2Y1Np_FMzYah_k9H2gtiniAKhoezOssdCxYWA9SI0Z1jG3hae9pNi60vGqSTrmGPlnRT5QLv2BIl694t_MqzAQO2tCV5gk0RFOccZ2rWCawh6Mqu89ZIM9Q5aO4gIIf_BBqdSg90xhAM-70GawDrpmkaoRFH-oRQjVfSimxpbZGc3hfI14xX7WI1g4L-nED1RvLPx85c0"/>
