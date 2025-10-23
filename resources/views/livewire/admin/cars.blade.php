@@ -385,7 +385,35 @@
 
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Primary image</label>
-                                <input type="file" class="block w-full text-sm" wire:model="primaryUpload" accept="image/*">
+                                <input id="primaryUploadInput" type="file" class="hidden" wire:model="primaryUpload" accept="image/*">
+                                <div
+                                    class="group rounded-md border-2 border-dashed border-slate-300 bg-slate-50/50 hover:bg-slate-50 transition-colors p-4 cursor-pointer"
+                                    role="button"
+                                    tabindex="0"
+                                    data-dropzone
+                                    data-dropzone-target="#primaryUploadInput"
+                                    onclick="document.getElementById('primaryUploadInput')?.click()"
+                                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('primaryUploadInput')?.click()}"
+                                >
+                                    @if($primaryUpload)
+                                        <div class="relative">
+                                            <img src="{{ $primaryUpload->temporaryUrl() }}" alt="Primary preview" class="w-full aspect-video object-cover rounded" />
+                                            <div class="mt-2 flex items-center justify-between">
+                                                <span class="text-xs text-slate-600">Selected: {{ $primaryUpload->getClientOriginalName() }}</span>
+                                                <button type="button" class="text-xs text-red-600 hover:underline" wire:click="$set('primaryUpload', null)">Remove</button>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="flex flex-col items-center justify-center text-center py-8">
+                                            <span class="material-symbols-outlined text-4xl text-slate-400 mb-2">upload_file</span>
+                                            <p class="text-sm text-slate-700"><span class="font-medium">Click to upload</span> or drag & drop</p>
+                                            <p class="text-xs text-slate-500 mt-1">PNG, JPG up to 2MB</p>
+                                        </div>
+                                    @endif
+                                    <div class="mt-2">
+                                        <div class="text-xs text-slate-500" wire:loading wire:target="primaryUpload">Uploading...</div>
+                                    </div>
+                                </div>
                                 @error('primaryUpload') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
@@ -435,10 +463,45 @@
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Additional images</label>
-                                <input type="file" class="block w-full text-sm" wire:model="galleryUploads" accept="image/*" multiple>
+                                <input id="galleryUploadsInput" type="file" class="hidden" wire:model="newGalleryUpload" accept="image/*">
+                                <div
+                                    class="group rounded-md border-2 border-dashed border-slate-300 bg-slate-50/50 hover:bg-slate-50 transition-colors p-4 cursor-pointer"
+                                    role="button"
+                                    tabindex="0"
+                                    data-dropzone
+                                    data-dropzone-target="#galleryUploadsInput"
+                                    onclick="document.getElementById('galleryUploadsInput')?.click()"
+                                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('galleryUploadsInput')?.click()}"
+                                >
+                                    @if(is_array($galleryUploads) && count($galleryUploads) > 0)
+                                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                            @foreach($galleryUploads as $f)
+                                                <div class="relative rounded overflow-hidden border border-slate-200 bg-white">
+                                                    <img src="{{ $f->temporaryUrl() }}" alt="Gallery preview" class="w-full aspect-video object-cover" />
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        <div class="mt-2 flex items-center justify-between">
+                                            <span class="text-xs text-slate-600">{{ count($galleryUploads) }} image(s) selected</span>
+{{--                                            <button type="button" class="text-xs text-red-600 hover:underline" wire:click="$set('galleryUploads', [])">Remove all</button>--}}
+                                        </div>
+                                    @else
+                                        <div class="flex flex-col items-center justify-center text-center py-8">
+                                            <span class="material-symbols-outlined text-4xl text-slate-400 mb-2">imagesmode</span>
+                                            <p class="text-sm text-slate-700"><span class="font-medium">Click to add an image</span> or drag & drop (add one at a time)</p>
+                                            <p class="text-xs text-slate-500 mt-1">PNG, JPG up to 2MB each</p>
+                                        </div>
+                                    @endif
+                                    <div class="mt-2">
+                                        <div class="text-xs text-slate-500" wire:loading wire:target="newGalleryUpload, galleryUploads">Uploading...</div>
+                                    </div>
+                                </div>
                                 @error('galleryUploads.*') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>
+                        @if(is_array($galleryUploads) && count($galleryUploads) > 0)
+                        <button type="button" class="text-xs text-red-600 hover:underline" wire:click="$set('galleryUploads', [])">Remove all</button>
+                        @endif
                     </div>
                     <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
                         <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('editOpen', false)">Close</button>
@@ -561,6 +624,42 @@
 })();
 </script>
 
+<script>
+// Drag & Drop file pickers for image uploads (primary and gallery)
+(function(){
+  function bindDropzone(el){
+    if (!el || el.__dzBound) return; el.__dzBound = true;
+    var targetSel = el.getAttribute('data-dropzone-target');
+    var input = targetSel ? document.querySelector(targetSel) : null;
+    if (!input) return;
+    function prevent(e){ e.preventDefault(); e.stopPropagation(); }
+    function onOver(e){ prevent(e); el.classList.add('border-sky-400','bg-sky-50/50'); el.classList.remove('border-slate-300'); }
+    function onLeave(e){ prevent(e); el.classList.remove('border-sky-400','bg-sky-50/50'); el.classList.add('border-slate-300'); }
+    function onDrop(e){
+      prevent(e);
+      try { el.classList.remove('border-sky-400','bg-sky-50/50'); el.classList.add('border-slate-300'); } catch(_){ }
+      var files = (e.dataTransfer && e.dataTransfer.files) ? e.dataTransfer.files : null;
+      if (!files || files.length === 0) return;
+      try {
+        // Assign dropped files to input and trigger change
+        input.files = files;
+      } catch(_){
+        // Fallback: open native picker as a graceful degradation
+      }
+      try { input.dispatchEvent(new Event('change', { bubbles: true })); } catch(_){ }
+    }
+    el.addEventListener('dragenter', onOver);
+    el.addEventListener('dragover', onOver);
+    el.addEventListener('dragleave', onLeave);
+    el.addEventListener('drop', onDrop);
+  }
+  function initAll(){ document.querySelectorAll('[data-dropzone]').forEach(bindDropzone); }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initAll); } else { initAll(); }
+  window.addEventListener('livewire:navigated', initAll);
+  window.addEventListener('livewire:load', initAll);
+  window.addEventListener('livewire:update', initAll);
+})();
+</script>
 
 <script>
 // Lightweight gallery for admin edit modal (robust init via Livewire events + MutationObserver)

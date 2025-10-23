@@ -85,6 +85,9 @@ class Cars extends Component
 
     public array $galleryUploads = []; // array of TemporaryUploadedFile
 
+    // Helper single-file binder to append to galleryUploads incrementally
+    public $newGalleryUpload = null; // TemporaryUploadedFile
+
     // Bookings link: direct navigation is used; no modal needed
 
     // Toggle (disable/enable) modal state
@@ -106,6 +109,7 @@ class Cars extends Component
         'image_url' => 'nullable|string|max:2048',
         'primaryUpload' => 'nullable|image|max:2048',
         'galleryUploads.*' => 'nullable|image|max:2048',
+        'newGalleryUpload' => 'nullable|image|max:2048',
         'daily_price' => 'required|numeric|min:0',
         'seats_field' => 'nullable|integer|min:1|max:20',
         'transmission_field' => 'nullable|string|max:64',
@@ -310,6 +314,22 @@ class Cars extends Component
     public function addImageField(): void
     {
         $this->images[] = '';
+    }
+
+    // When a single gallery file is picked, append it to the galleryUploads array
+    public function updatedNewGalleryUpload(): void
+    {
+        try {
+            $this->validateOnly('newGalleryUpload');
+        } catch (\Throwable $e) {
+            // Validation errors will be available via $errors; do not append invalid file
+            return;
+        }
+        if ($this->newGalleryUpload) {
+            $this->galleryUploads[] = $this->newGalleryUpload;
+            // Reset the single-file binder so the same file can be re-selected if needed
+            $this->newGalleryUpload = null;
+        }
     }
 
     public function openBookings(int $carId): void
