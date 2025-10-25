@@ -12,6 +12,8 @@
             $inactiveClasses = 'text-white/90 hover:text-white';
         @endphp
         <a class="{{ request()->routeIs('cars.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('cars.index') }}" wire:navigate>Car catalog</a>
+        <a class="{{ request()->routeIs('contact.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('contact.index') }}" wire:navigate>Contact</a>
+{{--        <a class="{{ request()->routeIs('terms.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('terms.index') }}" wire:navigate>Terms & Conditions</a>--}}
         @auth
             <a class="{{ request()->routeIs('trips.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('trips.index') }}" wire:navigate>My trips</a>
             <a class="{{ request()->routeIs('notifications.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('notifications.index') }}" wire:navigate>Notifications</a>
@@ -59,6 +61,8 @@
                 $mBase = 'block py-2 text-sm font-medium';
             @endphp
             <a class="{{ request()->routeIs('cars.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('cars.index') }}" wire:navigate>Car catalog</a>
+            <a class="{{ request()->routeIs('contact.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('contact.index') }}" wire:navigate>Contact</a>
+            <a class="{{ request()->routeIs('terms.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('terms.index') }}" wire:navigate>Terms & Conditions</a>
             @auth
                 <a class="{{ request()->routeIs('trips.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('trips.index') }}" wire:navigate>My trips</a>
                 <a class="{{ request()->routeIs('wallet.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('wallet.index') }}" wire:navigate>Wallet</a>

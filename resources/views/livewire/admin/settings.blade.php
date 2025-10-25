@@ -1,5 +1,5 @@
 <div class="p-6">
-    <h1 class="text-2xl font-bold text-slate-900 mb-4">Booking & Cancellation Settings</h1>
+    <h1 class="text-2xl font-bold text-slate-900 mb-6">Settings</h1>
 
     @if (session('success'))
         <div class="mb-4 rounded-md border border-green-300 bg-green-50 p-3 text-green-800">{{ session('success') }}</div>
@@ -24,7 +24,37 @@
             @error('cancellationCutoffHours') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
         </div>
 
-        <div class="pt-2">
+        <!-- Contact Information Section -->
+        <div class="pt-8 border-t border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Contact Information</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                    <input type="email" class="form-input w-full max-w-md" wire:model.defer="contactEmail" placeholder="contact@example.com">
+                    @error('contactEmail') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
+                    <input type="text" class="form-input w-full max-w-md" wire:model.defer="contactPhone" placeholder="+1 (555) 123-4567">
+                    @error('contactPhone') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Address</label>
+                    <textarea class="form-textarea w-full max-w-md" rows="3" wire:model.defer="contactAddress" placeholder="Street address, city, state, ZIP code"></textarea>
+                    @error('contactAddress') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                    <textarea class="form-textarea w-full max-w-md" rows="4" wire:model.defer="contactDescription" placeholder="Brief description about your company or services"></textarea>
+                    @error('contactDescription') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-6">
             <button wire:click="save" class="inline-flex items-center justify-center gap-2 rounded-md h-10 px-5 bg-[#1173d4] text-white text-sm font-semibold hover:bg-[#0f63b9]">
                 <span class="material-symbols-outlined text-base">save</span>
                 <span>Save settings</span>

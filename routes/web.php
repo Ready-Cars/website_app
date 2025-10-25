@@ -3,7 +3,6 @@
 use App\Http\Controllers\WalletFundingController;
 use App\Http\Middleware\AdminOnly;
 use App\Http\Middleware\CustomerOnly;
-use App\Livewire\RentCar;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -11,6 +10,13 @@ use App\Models\Car;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home.index')->name('home');
+Route::view('/book-online', 'home.index')->name('home');
+
+// Terms and Conditions page
+Route::view('/terms', 'terms.index')->name('terms.index');
+
+// Contact Us page
+Route::view('/contact-us', 'contact.index')->name('contact.index');
 
 // All cars catalog page
 Route::view('/cars', 'cars.index')->name('cars.index');

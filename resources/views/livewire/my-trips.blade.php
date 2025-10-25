@@ -56,6 +56,7 @@
                     </div>
                 </div>
             </main>
+     @include('partials.footer')
         </div>
 
         <!-- Toast Container -->

@@ -16,7 +16,7 @@ class HeaderLogoTest extends TestCase
         $response = $this->get(route('home'));
 
         $response->assertOk();
-        $response->assertSee('{{asset('img.png')}}', escape: false);
+        $response->assertSee(asset('img.png'), escape: false);
         // Basic check for the dark navbar class
         $response->assertSee('bg-[#0e1133]', escape: false);
     }

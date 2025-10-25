@@ -185,14 +185,7 @@
                 </div>
             </main>
 
-            <footer class="bg-slate-100 border-t border-slate-200">
-                <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
-                    <div class="flex items-center justify-between">
-                        <p class="text-sm text-slate-500">© {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
-                        <a href="{{ route('cars.index') }}" class="text-sm text-[#1173d4] hover:text-[#0f63b9]" wire:navigate>Browse more cars</a>
-                    </div>
-                </div>
-            </footer>
+          @include('partials.footer')
         </div>
     </div>
 
