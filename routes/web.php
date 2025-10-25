@@ -16,7 +16,7 @@ Route::view('/book-online', 'home.index')->name('home');
 Route::view('/terms', 'terms.index')->name('terms.index');
 
 // Contact Us page
-Route::view('/contact-us', 'contact.index')->name('contact.index');
+Route::view('/contact', 'contact.index')->name('contact.index');
 
 // All cars catalog page
 Route::view('/cars', 'cars.index')->name('cars.index');
