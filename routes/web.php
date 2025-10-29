@@ -11,7 +11,7 @@ use App\Models\Car;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home.index')->name('home');
-Route::view('/book-online', 'home.index')->name('home');
+Route::view('/book-online', 'home.index')->name('home2');
 
 // Terms and Conditions page
 Route::view('/terms', 'terms.index')->name('terms.index');

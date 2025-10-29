@@ -114,5 +114,6 @@ class ZeptomailTransport extends AbstractTransport
         if (! $response->successful()) {
             throw new \Exception('ZeptoMail API request failed: '.$response->body());
         }
+
     }
 }
