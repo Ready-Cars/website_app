@@ -214,7 +214,7 @@
                     @if($sel)
                         <li class="flex justify-between"><span class="text-slate-500">Service type</span><span class="font-medium text-slate-900">{{ $sel['name'] }} ({{ ucfirst($sel['pricing_type']) }})</span></li>
                     @endif
-                    <li class="flex justify-between"><span class="text-slate-500">Total</span><span class="font-extrabold text-slate-900">${{ number_format($this->total, 2) }}</span></li>
+                    <li class="flex justify-between"><span class="text-slate-500">Total</span><span class="font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span></li>
                 </ul>
             </div>
             <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-3">
