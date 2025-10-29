@@ -95,6 +95,10 @@ return [
             ],
         ],
 
+        'zeptomail' => [
+            'transport' => 'zeptomail',
+        ],
+
     ],
 
     /*

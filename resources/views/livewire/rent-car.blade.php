@@ -178,7 +178,7 @@
                             </div>
                             <div class="rounded-lg bg-white shadow-sm border border-slate-200 p-5 text-sm text-slate-600">
                                 <p><strong>Free cancellation</strong> up to 24 hours before pick-up.</p>
-                                <p class="mt-2">Driver must present a valid driver’s license and a credit card at pick-up.</p>
+                                <p class="mt-2">Client must present a valid means of identification at pick-up.</p>
                             </div>
                         </aside>
                     </div>
