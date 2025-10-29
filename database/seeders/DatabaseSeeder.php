@@ -14,20 +14,20 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'is_admin' => 1,
-        ]);
+        //        User::factory()->create([
+        //            'name' => 'Test User',
+        //            'email' => 'test@example.com',
+        //            'is_admin' => 1,
+        //        ]);
+        //
+        //        User::factory()->create([
+        //            'name' => 'Olurotimi Rabiu',
+        //            'email' => 'rotimi@readycars.com',
+        //            'is_admin' => 1,
+        //        ]);
 
-        User::factory()->create([
-            'name' => 'Olurotimi Rabiu',
-            'email' => 'rotimi@readycars.com',
-            'is_admin' => 1,
+        $this->call([
+            CarSeeder::class,
         ]);
-
-//        $this->call([
-////            CarSeeder::class,
-//        ]);
     }
 }

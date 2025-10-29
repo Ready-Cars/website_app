@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
+use App\Mail\BookingStatusUpdatedMail;
 use App\Models\Booking;
 use App\Models\Car;
 use App\Models\User;
 use App\Models\WalletTransaction;
-use App\Mail\BookingStatusUpdatedMail;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,8 +18,9 @@ class BookingManagementService
     /**
      * Confirm a pending booking by setting the final price and charging the customer's wallet.
      * The provided amount overrides the existing booking total.
+     * Payment evidence is required for confirmation.
      */
-    public function confirmWithPrice(Booking $booking, float $amount): Booking
+    public function confirmWithPrice(Booking $booking, float $amount, string $paymentEvidencePath): Booking
     {
         if (strtolower((string) $booking->status) !== 'pending') {
             throw new \DomainException('Only pending bookings can be confirmed with a price.');
@@ -28,11 +29,14 @@ class BookingManagementService
         if ($amount <= 0) {
             throw new \InvalidArgumentException('Amount must be greater than zero.');
         }
+        if (empty($paymentEvidencePath)) {
+            throw new \InvalidArgumentException('Payment evidence is required for booking confirmation.');
+        }
 
-        return DB::transaction(function () use ($booking, $amount) {
+        return DB::transaction(function () use ($booking, $amount, $paymentEvidencePath) {
             // Lock user for wallet update
             $user = $booking->user()->lockForUpdate()->first();
-            if (!$user) {
+            if (! $user) {
                 throw new \RuntimeException('Booking has no user.');
             }
 
@@ -42,28 +46,31 @@ class BookingManagementService
             }
 
             // Debit wallet
-            $user->wallet_balance = round(((float)$user->wallet_balance) - $amount, 2);
+            $newBalance = round(((float) $user->wallet_balance) - $amount, 2);
+            $user->wallet_balance = $newBalance;
             $user->save();
 
             // Update booking totals and status
-            $booking->update([
+            $updateData = [
                 'subtotal' => $amount, // collapse into subtotal for simplicity; taxes already in amount if needed
                 'taxes' => 0,
                 'total' => $amount,
                 'status' => 'confirmed',
-            ]);
+                'payment_evidence' => $paymentEvidencePath,
+            ];
+
+            $booking->update($updateData);
 
             // Log wallet transaction
             WalletTransaction::create([
                 'user_id' => $user->id,
                 'type' => 'debit',
                 'amount' => $amount,
-                'balance_after' => $user->wallet_balance,
+                'balance_after' => $newBalance,
                 'description' => 'Booking charge on admin confirmation',
                 'meta' => ['booking_id' => $booking->id, 'car_id' => $booking->car_id],
             ]);
-
-            $updated = $booking->fresh(['user','car']);
+            $updated = $booking->fresh(['user', 'car']);
 
             // Notifications
             try {
@@ -84,6 +91,7 @@ class BookingManagementService
             return $updated;
         });
     }
+
     /**
      * Return paginated bookings applying filters.
      * Filters supported:
@@ -99,10 +107,10 @@ class BookingManagementService
     {
         $q = Booking::query()
             ->with(['user', 'car'])
-            ->when(isset($filters['q']) && trim((string)$filters['q']) !== '', function (Builder $query) use ($filters) {
-                $raw = trim((string)$filters['q']);
-                $term = '%' . $raw . '%';
-                $id = ctype_digit($raw) ? (int)$raw : null;
+            ->when(isset($filters['q']) && trim((string) $filters['q']) !== '', function (Builder $query) use ($filters) {
+                $raw = trim((string) $filters['q']);
+                $term = '%'.$raw.'%';
+                $id = ctype_digit($raw) ? (int) $raw : null;
                 $query->where(function (Builder $sub) use ($term, $id) {
                     if ($id !== null) {
                         // Allow direct booking id match
@@ -111,29 +119,29 @@ class BookingManagementService
                     // Search user and car
                     $sub->orWhereHas('user', function (Builder $u) use ($term) {
                         $u->where('name', 'like', $term)
-                          ->orWhere('email', 'like', $term);
+                            ->orWhere('email', 'like', $term);
                     })
-                    ->orWhereHas('car', function (Builder $c) use ($term) {
-                        $c->where('name', 'like', $term)
-                          ->orWhere('category', 'like', $term);
-                    })
+                        ->orWhereHas('car', function (Builder $c) use ($term) {
+                            $c->where('name', 'like', $term)
+                                ->orWhere('category', 'like', $term);
+                        })
                     // Search booking fields
-                    ->orWhere('pickup_location', 'like', $term)
-                    ->orWhere('dropoff_location', 'like', $term)
-                    ->orWhere('status', 'like', $term);
+                        ->orWhere('pickup_location', 'like', $term)
+                        ->orWhere('dropoff_location', 'like', $term)
+                        ->orWhere('status', 'like', $term);
                 });
             })
-            ->when(!empty($filters['status']), fn (Builder $query) => $query->where('status', $filters['status']))
-            ->when(!empty($filters['car_id']), fn (Builder $query) => $query->where('car_id', (int)$filters['car_id']))
-            ->when(!empty($filters['category']), function (Builder $query) use ($filters) {
+            ->when(! empty($filters['status']), fn (Builder $query) => $query->where('status', $filters['status']))
+            ->when(! empty($filters['car_id']), fn (Builder $query) => $query->where('car_id', (int) $filters['car_id']))
+            ->when(! empty($filters['category']), function (Builder $query) use ($filters) {
                 $query->whereHas('car', function (Builder $c) use ($filters) {
                     $c->where('category', $filters['category']);
                 });
             })
-            ->when(!empty($filters['from']) || !empty($filters['to']), function (Builder $query) use ($filters) {
+            ->when(! empty($filters['from']) || ! empty($filters['to']), function (Builder $query) use ($filters) {
                 // Overlap between [start_date,end_date] and [from,to]
-                $from = !empty($filters['from']) ? Carbon::parse($filters['from'])->toDateString() : null;
-                $to = !empty($filters['to']) ? Carbon::parse($filters['to'])->toDateString() : null;
+                $from = ! empty($filters['from']) ? Carbon::parse($filters['from'])->toDateString() : null;
+                $to = ! empty($filters['to']) ? Carbon::parse($filters['to'])->toDateString() : null;
                 $query->where(function (Builder $sub) use ($from, $to) {
                     if ($from && $to) {
                         $sub->whereDate('start_date', '<=', $to)
@@ -147,8 +155,9 @@ class BookingManagementService
             })
             ->latest('id');
 
-        $size = (int)($filters['perPage'] ?? $perPage);
+        $size = (int) ($filters['perPage'] ?? $perPage);
         $size = max(5, min(100, $size));
+
         return $q->paginate($size)->withQueryString();
     }
 
@@ -157,7 +166,7 @@ class BookingManagementService
     {
         return [
             'statuses' => ['pending', 'confirmed', 'completed', 'cancelled'],
-            'cars' => Car::orderBy('name')->get(['id','name']),
+            'cars' => Car::orderBy('name')->get(['id', 'name']),
             'categories' => Car::query()->distinct()->orderBy('category')->pluck('category')->filter()->values()->all(),
             'perPages' => [10, 25, 50, 100],
         ];
@@ -167,17 +176,17 @@ class BookingManagementService
     public function changeStatus(Booking $booking, string $status, ?string $reason = null): Booking
     {
         $status = strtolower($status);
-        $allowed = ['pending','confirmed','completed','cancelled'];
-        if (!in_array($status, $allowed, true)) {
+        $allowed = ['pending', 'confirmed', 'completed', 'cancelled'];
+        if (! in_array($status, $allowed, true)) {
             throw new \InvalidArgumentException('Invalid status');
         }
 
         return DB::transaction(function () use ($booking, $status, $reason) {
-            $prev = strtolower((string)$booking->status);
+            $prev = strtolower((string) $booking->status);
 
             // Enforce transition rules
             if ($prev === 'completed') {
-                if (in_array($status, ['confirmed','cancelled'], true)) {
+                if (in_array($status, ['confirmed', 'cancelled'], true)) {
                     throw new \DomainException('Completed bookings cannot be modified.');
                 }
             }
@@ -190,11 +199,11 @@ class BookingManagementService
                 // Only refund if admin setting enables it (default true to preserve previous behavior)
                 $shouldRefund = \App\Models\Setting::getBool('refund_on_cancellation', true);
                 if ($shouldRefund) {
-                    $amount = (float)$booking->total;
+                    $amount = (float) $booking->total;
                     if ($amount > 0) {
                         $user = $booking->user()->lockForUpdate()->first();
                         if ($user) {
-                            $user->wallet_balance = round(((float)$user->wallet_balance) + $amount, 2);
+                            $user->wallet_balance = round(((float) $user->wallet_balance) + $amount, 2);
                             $user->save();
 
                             WalletTransaction::create([
@@ -212,11 +221,11 @@ class BookingManagementService
 
             // Persist booking new status and reason (if column exists)
             $data = ['status' => $status];
-            if ($status === 'cancelled' && !empty($reason) && $this->hasCancellationReasonColumn()) {
+            if ($status === 'cancelled' && ! empty($reason) && $this->hasCancellationReasonColumn()) {
                 $data['cancellation_reason'] = $reason;
             }
             $booking->update($data);
-            $updated = $booking->fresh(['user','car']);
+            $updated = $booking->fresh(['user', 'car']);
 
             // Send email notification to customer about the status change
             try {
@@ -244,9 +253,12 @@ class BookingManagementService
     protected function hasCancellationReasonColumn(): bool
     {
         static $cache = null;
-        if ($cache !== null) return $cache;
+        if ($cache !== null) {
+            return $cache;
+        }
         try {
             $columns = DB::getSchemaBuilder()->getColumnListing('bookings');
+
             return $cache = in_array('cancellation_reason', $columns, true);
         } catch (\Throwable $e) {
             return $cache = false;

@@ -137,7 +137,7 @@
                                 <!-- Desktop-only total + confirm at bottom of form -->
                                 <div class="hidden lg:flex items-center justify-between pt-3 border-t border-slate-200">
                                     <div class="text-base">
-                                        <span class="text-slate-600">Total</span>
+                                        <span class="text-slate-600">Total (Tax Incl)</span>
                                         <span class="ml-2 text-xl font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
                                     </div>
                                     <button wire:click="openConfirm" class="inline-flex items-center justify-center rounded-md h-11 px-5 bg-[#1173d4] text-white text-sm font-bold tracking-wide hover:bg-[#0f63b9] transition-colors">
@@ -163,10 +163,9 @@
                                     <li class="flex justify-between"><span>Daily rate</span> <span>₦{{ number_format($car->daily_price, 2) }}</span></li>
                                     <li class="flex justify-between"><span>Extras</span> <span>₦{{ number_format($this->extrasCost, 2) }}</span></li>
                                     <li class="flex justify-between"><span>Subtotal</span> <span>₦{{ number_format($this->subtotal, 2) }}</span></li>
-                                    <li class="flex justify-between"><span>Taxes ({{ number_format($this->taxRate * 100, 2) }}%)</span> <span>₦{{ number_format($this->taxes, 2) }}</span></li>
                                 </ul>
                                 <div class="mt-3 border-t pt-3 flex justify-between items-center">
-                                    <span class="text-base font-semibold text-slate-900">Total</span>
+                                    <span class="text-base font-semibold text-slate-900">Total (Tax Incl)</span>
                                     <span class="text-xl font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
                                 </div>
                                 <div class="mt-5">
@@ -214,7 +213,7 @@
                     @if($sel)
                         <li class="flex justify-between"><span class="text-slate-500">Service type</span><span class="font-medium text-slate-900">{{ $sel['name'] }} ({{ ucfirst($sel['pricing_type']) }})</span></li>
                     @endif
-                    <li class="flex justify-between"><span class="text-slate-500">Total</span><span class="font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span></li>
+                    <li class="flex justify-between"><span class="text-slate-500">Total (Tax Incl)</span><span class="font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span></li>
                 </ul>
             </div>
             <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-3">

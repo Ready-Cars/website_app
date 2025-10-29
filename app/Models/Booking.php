@@ -24,6 +24,7 @@ class Booking extends Model
         'taxes',
         'total',
         'status',
+        'payment_evidence',
         'cancellation_reason',
     ];
 

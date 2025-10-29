@@ -37,11 +37,11 @@
                             @error('amount') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             <div class="mt-3 flex items-center gap-2">
                                 <span class="text-xs text-slate-500">Quick add:</span>
-                                <button type="button" wire:click="preset(20)" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50">₦20</button>
-                                <button type="button" wire:click="preset(50)" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50">₦50</button>
-                                <button type="button" wire:click="preset(100)" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50">₦100</button>
+                                <button type="button" wire:click="preset(1000)" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50">₦1000</button>
+                                <button type="button" wire:click="preset(10000)" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50">₦10000</button>
+                                <button type="button" wire:click="preset(50000)" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50">₦50000</button>
                             </div>
-                            <div class="text-xs text-slate-500 mt-2">Note: Funding is simulated for demo purposes. No real payment is processed.</div>
+{{--                            <div class="text-xs text-slate-500 mt-2">Note: Funding is simulated for demo purposes. No real payment is processed.</div>--}}
                         </div>
 
                         <!-- History -->

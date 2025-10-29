@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\WalletFundingController;
 use App\Http\Middleware\AdminOnly;
 use App\Http\Middleware\CustomerOnly;
@@ -51,6 +52,16 @@ Route::middleware(['auth', CustomerOnly::class])->group(function () {
     Route::post('/wallet/paystack/init', [WalletFundingController::class, 'init'])->name('wallet.paystack.init');
     Route::get('/wallet/paystack/callback', [WalletFundingController::class, 'callback'])->name('wallet.paystack.callback');
 });
+
+// Booking receipt download
+Route::get('/bookings/{booking}/receipt/download', [BookingController::class, 'downloadReceipt'])
+    ->middleware(['auth', CustomerOnly::class])
+    ->name('bookings.receipt.download');
+
+// Payment evidence download (admin only)
+Route::get('/admin/bookings/{booking}/payment-evidence/download', [BookingController::class, 'downloadPaymentEvidence'])
+    ->middleware(['auth', 'verified', AdminOnly::class])
+    ->name('admin.bookings.payment-evidence.download');
 
 Route::view('dashboard', 'admin.dashboard')
     ->middleware(['auth', 'verified', AdminOnly::class])

@@ -6,29 +6,39 @@ use App\Models\Booking;
 use App\Services\BookingManagementService;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class Bookings extends Component
 {
-    use WithPagination;
+    use WithFileUploads, WithPagination;
 
     // Confirm with price modal
     public bool $confirmPriceOpen = false;
+
     public string $confirmPrice = '';
+
+    public $paymentEvidence;
 
     // Filters
     #[Url(as: 'q')]
     public string $q = '';
+
     #[Url(as: 'status')]
     public string $status = '';
+
     #[Url(as: 'car')]
     public $carId = '';
+
     #[Url(as: 'category')]
     public string $category = '';
+
     #[Url(as: 'from')]
     public string $from = '';
+
     #[Url(as: 'to')]
     public string $to = '';
+
     #[Url(as: 'per')]
     public int $perPage = 10;
 
@@ -40,7 +50,9 @@ class Bookings extends Component
 
     // UI State for modals/actions
     public ?int $viewingId = null;
+
     public bool $cancelOpen = false;
+
     public string $cancelReason = '';
 
     // Complete confirmation modal
@@ -62,20 +74,20 @@ class Bookings extends Component
     public function mount(BookingManagementService $service): void
     {
         $this->options = $service->getFilterOptions();
-        if (!in_array($this->perPage, $this->options['perPages'])) {
+        if (! in_array($this->perPage, $this->options['perPages'])) {
             $this->perPage = 10;
         }
     }
 
     public function toggleAdvanced(): void
     {
-        $this->showAdvanced = !$this->showAdvanced;
+        $this->showAdvanced = ! $this->showAdvanced;
     }
 
     public function updating($name, $value): void
     {
         // reset to first page when filters change
-        if (in_array($name, ['q','status','carId','category','from','to','perPage','showAdvanced'])) {
+        if (in_array($name, ['q', 'status', 'carId', 'category', 'from', 'to', 'perPage', 'showAdvanced'])) {
             $this->resetPage();
         }
     }
@@ -106,11 +118,12 @@ class Bookings extends Component
     {
         try {
             $booking = Booking::findOrFail($id);
-            if (strtolower((string)$booking->status) === 'pending') {
+            if (strtolower((string) $booking->status) === 'pending') {
                 // Open modal to set price for pending bookings
                 $this->viewingId = $id;
                 $this->confirmPrice = '';
                 $this->confirmPriceOpen = true;
+
                 return;
             }
             $service->changeStatus($booking, 'confirmed');
@@ -142,7 +155,9 @@ class Bookings extends Component
     public function completeSelected(BookingManagementService $service): void
     {
         $id = $this->viewingId;
-        if (!$id) { return; }
+        if (! $id) {
+            return;
+        }
         try {
             $booking = Booking::findOrFail($id);
             $service->changeStatus($booking, 'completed');
@@ -156,16 +171,26 @@ class Bookings extends Component
     public function confirmPendingWithPrice(BookingManagementService $service): void
     {
         $id = $this->viewingId;
-        if (!$id) { return; }
-        $amount = (float) str_replace([',',' '], ['', ''], $this->confirmPrice);
+        if (! $id) {
+            return;
+        }
+        $amount = (float) str_replace([',', ' '], ['', ''], $this->confirmPrice);
         try {
             if ($amount <= 0) {
                 throw new \InvalidArgumentException('Please enter a valid amount greater than zero.');
             }
+            if (! $this->paymentEvidence) {
+                throw new \InvalidArgumentException('Payment evidence is required for booking confirmation.');
+            }
             $booking = Booking::findOrFail($id);
-            $service->confirmWithPrice($booking, $amount);
+
+            // Handle payment evidence upload
+            $evidencePath = $this->paymentEvidence->store('payment-evidence', 'public');
+
+            $service->confirmWithPrice($booking, $amount, $evidencePath);
             $this->confirmPriceOpen = false;
             $this->confirmPrice = '';
+            $this->paymentEvidence = null;
             session()->flash('success', 'Booking confirmed with price ₦'.number_format($amount, 2));
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());
@@ -182,7 +207,9 @@ class Bookings extends Component
     public function cancel(BookingManagementService $service): void
     {
         $id = $this->viewingId;
-        if (!$id) return;
+        if (! $id) {
+            return;
+        }
         $booking = Booking::findOrFail($id);
         $reason = trim($this->cancelReason);
         $service->changeStatus($booking, 'cancelled', $reason ?: null);
@@ -204,8 +231,8 @@ class Bookings extends Component
 
         $bookings = $service->queryBookings($filters, $this->perPage);
         $selected = $this->viewingId ? $bookings->getCollection()->firstWhere('id', $this->viewingId) : null;
-        if (!$selected && $this->viewingId) {
-            $selected = Booking::with(['user','car'])->find($this->viewingId);
+        if (! $selected && $this->viewingId) {
+            $selected = Booking::with(['user', 'car'])->find($this->viewingId);
         }
 
         return view('livewire.admin.bookings', [

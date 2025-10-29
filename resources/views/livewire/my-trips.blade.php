@@ -41,6 +41,12 @@
                                             <span class="material-symbols-outlined text-lg"> visibility </span>
                                             <span>View Booking</span>
                                         </button>
+                                        @if($trip->status === 'confirmed')
+                                            <a href="{{ route('bookings.receipt.download', $trip->id) }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md h-10 px-4 border border-green-200 text-green-700 bg-green-50 text-sm font-semibold hover:bg-green-100 transition-colors" aria-label="Download receipt">
+                                                <span class="material-symbols-outlined text-base"> download </span>
+                                                <span>Download Receipt</span>
+                                            </a>
+                                        @endif
                                         @if($trip->status !== 'cancelled')
                                             <button wire:click="view({{ $trip->id }})" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md h-10 px-4 border border-red-200 text-red-700 bg-red-50 text-sm font-semibold hover:bg-red-100 transition-colors" aria-label="Cancel booking">
                                                 <span class="material-symbols-outlined text-base"> delete </span>

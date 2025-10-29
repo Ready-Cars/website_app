@@ -5,12 +5,12 @@ namespace App\Livewire;
 use App\Models\Car;
 use App\Models\Extra;
 use App\Models\ServiceType;
+use App\Models\Setting;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Url;
 use Livewire\Component;
-use App\Models\Setting;
 
 class RentCar extends Component
 {
@@ -212,6 +212,7 @@ class RentCar extends Component
         if ($rate > 1.0) {
             $rate = $rate / 100.0;
         }
+
         return round($this->subtotal * $rate, 2);
     }
 
@@ -229,6 +230,7 @@ class RentCar extends Component
         if ($rate > 1.0) {
             $rate = $rate / 100.0;
         }
+
         return $rate;
     }
 
@@ -401,6 +403,14 @@ class RentCar extends Component
                     $user->notify(new \App\Notifications\BookingStatusUpdatedNotification($final, $prev, 'confirmed'));
                 } catch (\Throwable $e) {
                     \Log::warning('Booking confirmation in-app notification failed: '.$e->getMessage());
+                }
+
+                // Send receipt email with PDF attachment
+                try {
+                    \Illuminate\Support\Facades\Mail::to($user->email)
+                        ->send(new \App\Mail\BookingReceiptMail($final));
+                } catch (\Throwable $e) {
+                    \Log::warning('Booking receipt email failed: '.$e->getMessage());
                 }
             }
         } catch (\Throwable $e) {

@@ -308,6 +308,17 @@
                                 <div class="font-medium text-slate-900">{{ optional($selected->start_date)->format('M d, Y') }} — {{ optional($selected->end_date)->format('M d, Y') }}</div>
                                 <div class="text-slate-500 mt-3">Total</div>
                                 <div class="font-extrabold text-slate-900">₦{{ number_format((float)($selected->total ?? 0), 2) }}</div>
+                                @if($selected->payment_evidence)
+                                    <div class="text-slate-500 mt-3">Payment Evidence</div>
+                                    <div class="font-medium">
+                                        <a href="{{ route('admin.bookings.payment-evidence.download', $selected) }}"
+                                           class="inline-flex items-center gap-2 text-sky-600 hover:text-sky-800 hover:underline"
+                                           target="_blank">
+                                            <span class="material-symbols-outlined text-base">download</span>
+                                            Download Evidence
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         @php $extras = (array)($selected->extras ?? []); @endphp
@@ -394,6 +405,10 @@
                         <label class="block text-sm font-medium text-slate-700 mb-1">Final price (₦)</label>
                         <input type="number" min="0" step="0.01" inputmode="decimal" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" placeholder="Enter amount" wire:model.defer="confirmPrice">
                         <p class="text-xs text-slate-500 mt-1">The amount will be charged from the customer's wallet immediately.</p>
+
+                        <label class="block text-sm font-medium text-slate-700 mb-1 mt-4">Payment Evidence <span class="text-red-500">*</span></label>
+                        <input type="file" accept="image/*,.pdf" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model="paymentEvidence" required>
+                        <p class="text-xs text-slate-500 mt-1">Upload payment receipt or proof of payment (images or PDF). <strong>Required for confirmation.</strong></p>
                     </div>
                     <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
                         <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('confirmPriceOpen', false)">Close</button>
