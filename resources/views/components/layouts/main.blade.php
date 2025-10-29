@@ -14,6 +14,7 @@
     @include('partials.header')
 
     <main>
+        @include('partials.ajax-loader')
         {{ $slot }}
     </main>
 
