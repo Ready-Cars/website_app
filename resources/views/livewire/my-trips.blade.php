@@ -1,7 +1,6 @@
 <div>
     <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
         <div class="layout-container flex h-full grow flex-col">
-            @include('partials.header')
 
             <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8 w-full max-w-6xl mx-auto pb-24 md:pb-8">
                 <div class="flex flex-col gap-8">

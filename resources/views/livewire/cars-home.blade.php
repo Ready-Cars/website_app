@@ -1,7 +1,6 @@
 <div>
     <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
         <div class="layout-container flex h-full grow flex-col">
-            @include('partials.header')
 
             <main class="flex-1 px-4 sm:px-6 lg:px-24 pt-0 pb-12">
                 <div class="mx-auto max-w-5xl">
