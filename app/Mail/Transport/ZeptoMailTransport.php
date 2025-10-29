@@ -9,7 +9,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\MessageConverter;
 
-class ZeptomailTransport extends AbstractTransport
+class ZeptoMailTransport extends AbstractTransport
 {
     protected string $apiKey;
 
