@@ -2,7 +2,7 @@
     <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div class="flex items-center gap-3 text-slate-900 col-span-2 md:col-span-1">
-                <img src="{{asset('img.png')}}">
+                <img src="{{asset('img2.png')}}">
                 {{--                            <h2 class="text-xl font-bold tracking-tight">{{ config('app.name') }}</h2>--}}
             </div>
             <div>
