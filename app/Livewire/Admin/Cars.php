@@ -216,7 +216,7 @@ class Cars extends Component
         $this->images = array_values((array) ($car->images ?? []));
     }
 
-    protected function resetForm(): void
+    public function resetForm(): void
     {
         $this->editingId = null;
         $this->name = '';

@@ -71,7 +71,7 @@
                     @endif
 
                     <!-- Filters -->
-                    <div class="rounded-lg bg-white shadow-sm border border-slate-200 p-4 mb-4">
+                    <div x-data="{ showAdvanced : false }" class="rounded-lg bg-white shadow-sm border border-slate-200 p-4 mb-4">
                         <!-- Primary search row -->
                         <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
                             <div class="relative md:flex-1">
@@ -80,16 +80,16 @@
                             </div>
                             <div class="flex gap-2">
                                 <button type="button" class="rounded-md border border-slate-300 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50" wire:click="resetFilters">Reset</button>
-                                <button type="button" class="inline-flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-50" wire:click="toggleAdvanced" aria-expanded="{{ $showAdvanced ? 'true' : 'false' }}">
-                                    <span class="material-symbols-outlined text-base">{{ $showAdvanced ? 'expand_less' : 'tune' }}</span>
-                                    <span>{{ $showAdvanced ? 'Hide advanced' : 'Advanced filters' }}</span>
+                                <button type="button" class="inline-flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-50" x-on:click="showAdvanced = !showAdvanced" x-bind:aria-expanded="showAdvanced">
+                                    <span class="material-symbols-outlined text-base" x-text="showAdvanced ? 'expand_less' : 'tune'"></span>
+                                    <span x-text="showAdvanced ? 'Hide advanced' : 'Advanced filters'"></span>
                                 </button>
                             </div>
                         </div>
 
-                        @if($showAdvanced)
+
                         <!-- Advanced grid -->
-                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
+                        <div x-show="showAdvanced" class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Status</label>
                                 <select class="form-select w-full px-3 py-2.5 rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.live="status">
@@ -134,7 +134,7 @@
                                 </select>
                             </div>
                         </div>
-                        @endif
+
                     </div>
 
                     <!-- Mobile list (cards) -->

@@ -10,10 +10,11 @@
     <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
+@include('partials.ajax-loader')
 <body class="bg-slate-50 text-slate-900" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
 
     <main>
-        @include('partials.ajax-loader')
         {{ $slot }}
     </main>
 

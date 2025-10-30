@@ -1,4 +1,4 @@
-<div>
+<div x-data="{ editOpen :@entangle('editOpen')}">
     <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-slate-50 text-slate-900" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
         <div class="layout-container flex h-full grow flex-col">
             <header class="sticky top-0 z-10 flex items-center justify-between whitespace-nowrap border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur-sm sm:px-6 lg:px-8">
@@ -35,7 +35,7 @@
                             <p class="mt-1 text-slate-500">Search, add, edit, and manage your cars. View bookings per car.</p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button class="inline-flex items-center gap-2 rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="openCreate">
+                            <button class="inline-flex items-center gap-2 rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" x-on:click="editOpen = !editOpen" wire:click="resetForm">
                                 <span class="material-symbols-outlined text-base">add</span>
                                 <span>Add New Car</span>
                             </button>
@@ -105,7 +105,7 @@
                     @endif
 
                     <!-- Filters -->
-                    <div class="rounded-lg bg-white shadow-sm border border-slate-200 p-4 mb-4">
+                    <div x-data="{ showAdvanced : false }" class="rounded-lg bg-white shadow-sm border border-slate-200 p-4 mb-4">
                         <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
                             <div class="relative md:flex-1">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
@@ -113,14 +113,14 @@
                             </div>
                             <div class="flex gap-2">
                                 <button type="button" class="rounded-md border border-slate-300 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50" wire:click="resetFilters">Reset</button>
-                                <button type="button" class="inline-flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-50" wire:click="toggleAdvanced" aria-expanded="{{ $showAdvanced ? 'true' : 'false' }}">
-                                    <span class="material-symbols-outlined text-base">{{ $showAdvanced ? 'expand_less' : 'tune' }}</span>
-                                    <span>{{ $showAdvanced ? 'Hide advanced' : 'Advanced filters' }}</span>
+                                <button type="button" class="inline-flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium border border-slate-300 text-slate-700 hover:bg-slate-50" x-on:click="showAdvanced = !showAdvanced" x-bind:aria-expanded="showAdvanced">
+                                    <span class="material-symbols-outlined text-base" x-text="showAdvanced ? 'expand_less' : 'tune' "></span>
+                                    <span x-text="showAdvanced ? 'Hide advanced' : 'Advanced filters'"></span>
                                 </button>
                             </div>
                         </div>
-                        @if($showAdvanced)
-                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-8 gap-3">
+
+                        <div x-show="showAdvanced" class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-8 gap-3">
                             <div>
                                 <label class="block text-xs font-medium text-slate-600 mb-1">Category</label>
                                 <select class="form-select w-full px-3 py-2.5 rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.live="category">
@@ -183,7 +183,7 @@
                                 <input type="number" class="form-input w-full px-3 py-2.5 rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.debounce.400ms="maxPrice" min="0">
                             </div>
                         </div>
-                        @endif
+
                     </div>
 
                     <!-- Mobile list -->
@@ -211,7 +211,7 @@
                                         </button>
                                         <div class="absolute right-0 mt-2 w-44 origin-top-right rounded-md border border-slate-200 bg-white shadow-lg z-30 hidden" data-dropdown-menu>
                                             <div class="py-1 text-sm flex flex-col items-stretch">
-                                                <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openEdit({{ $car->id }})">Edit</button>
+                                                <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openEdit({{ $car->id }})" >Edit</button>
                                                 <a class="w-full text-left px-3 py-2 hover:bg-slate-50 text-left" href="{{ route('admin.bookings', ['car' => $car->id]) }}" wire:navigate>Manage bookings</a>
                                                 @if($car->is_active)
                                                     <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openDisable({{ $car->id }})">Disable</button>
@@ -311,13 +311,13 @@
         </div>
 
         <!-- Create/Edit Modal -->
-        @if($editOpen)
-            <div class="fixed inset-0 z-50 flex items-center justify-center">
-                <div class="absolute inset-0 bg-black/50" wire:click="$set('editOpen', false)"></div>
+
+            <div x-show="editOpen" class="fixed inset-0 z-50 flex items-center justify-center" style="display: none">
+                <div class="absolute inset-0 bg-black/50" x-on:click="editOpen=false"></div>
                 <div class="relative z-10 w-full max-w-2xl rounded-lg bg-white shadow-xl border border-slate-200 max-h-[85vh] flex flex-col">
                     <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
                         <h3 class="text-lg font-semibold text-slate-900">{{ $editingId ? 'Edit Car' : 'Add New Car' }}</h3>
-                        <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="$set('editOpen', false)">
+                        <button class="p-1 text-slate-500 hover:text-slate-700" x-on:click="editOpen=false">
                             <span class="material-symbols-outlined">close</span>
                         </button>
                     </div>
@@ -504,12 +504,12 @@
                         @endif
                     </div>
                     <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
-                        <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('editOpen', false)">Close</button>
+                        <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" x-on:click="editOpen=false">Close</button>
                         <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="openSaveConfirm">Save</button>
                     </div>
                 </div>
             </div>
-        @endif
+
 
         <!-- Save confirm modal -->
         @if($saveConfirmOpen)
