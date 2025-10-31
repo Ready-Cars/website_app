@@ -13,7 +13,6 @@
 
 @include('partials.ajax-loader')
 <body class="bg-slate-50 text-slate-900" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
-
     <main>
         {{ $slot }}
     </main>

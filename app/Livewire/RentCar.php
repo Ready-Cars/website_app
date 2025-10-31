@@ -135,9 +135,9 @@ class RentCar extends Component
         } catch (\Exception $e) {
             return;
         }
-        if ($end->lessThanOrEqualTo($start)) {
-            // Minimum 1 day rental
-            $this->endDate = $start->copy()->addDay()->toDateString();
+        if ($end->lessThan($start)) {
+            // If end date is before start date, set end date to start date (same day booking)
+            $this->endDate = $start->toDateString();
         }
     }
 
@@ -147,7 +147,7 @@ class RentCar extends Component
             'pickupLocation' => ['required', 'string', 'min:2', 'max:120'],
             'dropoffLocation' => ['required', 'string', 'min:2', 'max:120'],
             'startDate' => ['required', 'date', 'after_or_equal:today'],
-            'endDate' => ['required', 'date', 'after:startDate'],
+            'endDate' => ['required', 'date', 'after_or_equal:startDate'],
             'serviceTypeId' => [
                 'required',
                 'integer',
