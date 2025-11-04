@@ -177,6 +177,20 @@
                             <div class="rounded-lg bg-white shadow-sm border border-slate-200 p-5 text-sm text-slate-600">
                                 <p><strong>Free cancellation</strong> up to 24 hours before pick-up.</p>
                                 <p class="mt-2">Client must present a valid means of identification at pick-up.</p>
+                                <div class="mt-4 space-y-2">
+                                    <p><strong>Contact us via WhatsApp:</strong></p>
+                                    <p>IBADAN: <a href="https://wa.me/2349022072949" class="text-[#1173d4] hover:underline">+234 902 207 2949</a>
+                                    </p>
+                                    <p>LAGOS: <a href="https://wa.me/2349121448260" class="text-[#1173d4] hover:underline">+234 912 144 8260</a></p>
+                                    <p>ABEOKUTA: <a href="https://wa.me/2347068413686" class="text-[#1173d4] hover:underline">+234 706 841 3686</a>
+                                    </p>
+                                    <p>OSOGBO: <a href="https://wa.me/2348106022024" class="text-[#1173d4] hover:underline">+234 810 602 2024</a>
+                                    </p>
+                                    <p>ENUGU: <a href="https://wa.me/2348168098526" class="text-[#1173d4] hover:underline">+234 816 809 8526</a></p>
+                                    <p>ILORIN: <a href="https://wa.me/2349033437179" class="text-[#1173d4] hover:underline">+234 903 343 7179</a>
+                                    </p>
+                                    <p>AKURE: <a href="https://wa.me/2349068012096" class="text-[#1173d4] hover:underline">+234 906 801 2096</a></p>
+                                </div>
                             </div>
                         </aside>
                     </div>
