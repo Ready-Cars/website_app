@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Booking;
 use App\Services\BookingManagementService;
+use App\Services\PaystackService;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -168,7 +169,7 @@ class Bookings extends Component
         }
     }
 
-    public function confirmPendingWithPrice(BookingManagementService $service): void
+    public function confirmPendingWithPrice(BookingManagementService $service, PaystackService $paystackService): void
     {
         $id = $this->viewingId;
         if (! $id) {
@@ -179,19 +180,20 @@ class Bookings extends Component
             if ($amount <= 0) {
                 throw new \InvalidArgumentException('Please enter a valid amount greater than zero.');
             }
-            if (! $this->paymentEvidence) {
-                throw new \InvalidArgumentException('Payment evidence is required for booking confirmation.');
-            }
+
             $booking = Booking::findOrFail($id);
 
-            // Handle payment evidence upload
-            $evidencePath = $this->paymentEvidence->store('payment-evidence', 'public');
+            $result = $service->confirmWithWalletCheck($booking, $amount, $paystackService);
 
-            $service->confirmWithPrice($booking, $amount, $evidencePath);
             $this->confirmPriceOpen = false;
             $this->confirmPrice = '';
             $this->paymentEvidence = null;
-            session()->flash('success', 'Booking confirmed with price ₦'.number_format($amount, 2));
+
+            if ($result['status'] === 'confirmed') {
+                session()->flash('success', 'Booking confirmed successfully with wallet payment of ₦'.number_format($amount, 2));
+            } elseif ($result['status'] === 'pending_payment') {
+                session()->flash('success', 'Insufficient wallet balance. Payment link sent to customer via email.');
+            }
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());
         }

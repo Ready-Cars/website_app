@@ -25,6 +25,7 @@ class Booking extends Model
         'total',
         'status',
         'payment_evidence',
+        'payment_reference',
         'cancellation_reason',
     ];
 

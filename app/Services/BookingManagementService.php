@@ -113,6 +113,213 @@ class BookingManagementService
     }
 
     /**
+     * Confirm a pending booking by admin with wallet balance check.
+     * If customer has sufficient balance, confirm booking immediately.
+     * If insufficient balance, set status to "pending payment" and generate payment link.
+     */
+    public function confirmWithWalletCheck(Booking $booking, float $amount, PaystackService $paystackService): array
+    {
+        if (strtolower((string) $booking->status) !== 'pending') {
+            throw new \DomainException('Only pending bookings can be confirmed.');
+        }
+
+        $amount = round(max(0, $amount), 2);
+        if ($amount <= 0) {
+            throw new \InvalidArgumentException('Amount must be greater than zero.');
+        }
+
+        return DB::transaction(function () use ($booking, $amount, $paystackService) {
+            // Lock user for wallet update
+            $user = $booking->user()->lockForUpdate()->first();
+            if (! $user) {
+                throw new \RuntimeException('Booking has no user.');
+            }
+
+            $userBalance = (float) $user->wallet_balance;
+
+            // Check if user has sufficient balance
+            if ($userBalance >= $amount) {
+                // Sufficient balance - confirm booking immediately
+                $user->wallet_balance = round($userBalance - $amount, 2);
+                $user->save();
+
+                // Update booking totals and status
+                $booking->update([
+                    'subtotal' => $amount,
+                    'taxes' => 0,
+                    'total' => $amount,
+                    'status' => 'confirmed',
+                ]);
+
+                // Log wallet transaction
+                WalletTransaction::create([
+                    'user_id' => $user->id,
+                    'type' => 'debit',
+                    'amount' => $amount,
+                    'balance_after' => $user->wallet_balance,
+                    'description' => 'Booking charge on admin confirmation',
+                    'meta' => json_encode(['booking_id' => $booking->id, 'car_id' => $booking->car_id]),
+                ]);
+
+                $updated = $booking->fresh(['user', 'car']);
+
+                // Send confirmation notification
+                $this->sendBookingNotification($updated, 'pending', 'confirmed');
+
+                return [
+                    'status' => 'confirmed',
+                    'message' => 'Booking confirmed successfully',
+                    'booking' => $updated,
+                ];
+            } else {
+                // Insufficient balance - set to pending payment and generate payment link
+                $booking->update([
+                    'subtotal' => $amount,
+                    'taxes' => 0,
+                    'total' => $amount,
+                    'status' => 'pending payment',
+                ]);
+
+                // Generate payment link
+                $amountKobo = (int) ($amount * 100);
+                $callbackUrl = route('booking.payment.callback');
+                $reference = 'BOOKING_'.$booking->id.'_'.time();
+
+                $paymentInit = $paystackService->initialize(
+                    $amountKobo,
+                    $user->email,
+                    $callbackUrl,
+                    $reference
+                );
+
+                if (! $paymentInit['status']) {
+                    throw new \RuntimeException('Failed to generate payment link: '.($paymentInit['message'] ?? 'Unknown error'));
+                }
+
+                // Store payment reference in booking
+                $booking->update(['payment_reference' => $reference]);
+
+                $updated = $booking->fresh(['user', 'car']);
+
+                // Send payment link notification
+                $this->sendPaymentLinkNotification($updated, $paymentInit['authorization_url']);
+
+                return [
+                    'status' => 'pending_payment',
+                    'message' => 'Payment link sent to customer',
+                    'booking' => $updated,
+                    'payment_url' => $paymentInit['authorization_url'],
+                ];
+            }
+        });
+    }
+
+    /**
+     * Handle successful payment callback and confirm booking
+     */
+    public function handlePaymentCallback(string $reference, PaystackService $paystackService): array
+    {
+        $verification = $paystackService->verify($reference);
+
+        if (! $verification['status']) {
+            throw new \RuntimeException('Payment verification failed: '.($verification['message'] ?? 'Unknown error'));
+        }
+
+        return DB::transaction(function () use ($reference, $verification) {
+            // Find booking by payment reference
+            $booking = Booking::where('payment_reference', $reference)->first();
+            if (! $booking) {
+                throw new \RuntimeException('Booking not found for payment reference');
+            }
+
+            if ($booking->status !== 'pending payment') {
+                throw new \DomainException('Booking is not in pending payment status');
+            }
+
+            // Verify amount matches
+            $expectedAmount = (int) ($booking->total * 100);
+            if ($verification['amount_kobo'] !== $expectedAmount) {
+                throw new \RuntimeException('Payment amount mismatch');
+            }
+
+            $user = $booking->user;
+
+            // Update booking status to confirmed
+            $booking->update([
+                'status' => 'confirmed',
+                'payment_evidence' => 'paystack_payment_'.$reference,
+            ]);
+
+            // Log wallet transactions
+            $now = now();
+            WalletTransaction::insert([
+                [
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                    'user_id' => $user->id,
+                    'type' => 'credit',
+                    'amount' => $booking->total,
+                    'balance_after' => $user->wallet_balance + $booking->total,
+                    'description' => 'Payment received from Paystack',
+                    'meta' => json_encode(['booking_id' => $booking->id, 'car_id' => $booking->car_id]),
+                ],
+                [
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                    'user_id' => $user->id,
+                    'type' => 'debit',
+                    'amount' => $booking->total,
+                    'balance_after' => $user->wallet_balance,
+                    'description' => 'Booking charge',
+                    'meta' => json_encode(['booking_id' => $booking->id, 'car_id' => $booking->car_id]),
+                ],
+            ]);
+
+            $updated = $booking->fresh(['user', 'car']);
+
+            // Send confirmation notification
+            $this->sendBookingNotification($updated, 'pending payment', 'confirmed');
+
+            return [
+                'status' => 'success',
+                'message' => 'Booking confirmed successfully',
+                'booking' => $updated,
+            ];
+        });
+    }
+
+    private function sendBookingNotification(Booking $booking, string $oldStatus, string $newStatus): void
+    {
+        try {
+            if ($booking->user && $booking->user->email) {
+                Mail::to($booking->user->email)->send(new BookingStatusUpdatedMail($booking, $oldStatus, $newStatus));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Booking notification email failed: '.$e->getMessage(), ['booking_id' => $booking->id ?? null]);
+        }
+
+        try {
+            if ($booking->user) {
+                $booking->user->notify(new \App\Notifications\BookingStatusUpdatedNotification($booking, $oldStatus, $newStatus));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Booking notification failed: '.$e->getMessage(), ['booking_id' => $booking->id ?? null]);
+        }
+    }
+
+    private function sendPaymentLinkNotification(Booking $booking, string $paymentUrl): void
+    {
+        try {
+            if ($booking->user && $booking->user->email) {
+                // Create a payment link email - we'll need to create this mail class
+                Mail::to($booking->user->email)->send(new \App\Mail\BookingPaymentLinkMail($booking, $paymentUrl));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Payment link email failed: '.$e->getMessage(), ['booking_id' => $booking->id ?? null]);
+        }
+    }
+
+    /**
      * Return paginated bookings applying filters.
      * Filters supported:
      * - q: search in user name/email, car name, car category, booking id, pickup/dropoff, status

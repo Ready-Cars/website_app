@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\BookingPaymentController;
 use App\Http\Controllers\WalletFundingController;
 use App\Http\Middleware\AdminOnly;
 use App\Http\Middleware\CustomerOnly;
@@ -52,6 +53,14 @@ Route::middleware(['auth', CustomerOnly::class])->group(function () {
     Route::post('/wallet/paystack/init', [WalletFundingController::class, 'init'])->name('wallet.paystack.init');
     Route::get('/wallet/paystack/callback', [WalletFundingController::class, 'callback'])->name('wallet.paystack.callback');
 });
+
+// Booking payment callback (public access for Paystack)
+Route::get('/booking/payment/callback', [BookingPaymentController::class, 'callback'])->name('booking.payment.callback');
+
+// Booking payment result page
+Route::get('/booking/result', function () {
+    return view('booking-result');
+})->name('booking.result');
 
 // Booking receipt download
 Route::get('/bookings/{booking}/receipt/download', [BookingController::class, 'downloadReceipt'])

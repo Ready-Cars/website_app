@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Jobs\NotifyAdminOfNewBooking;
 use App\Models\Car;
 use App\Models\Extra;
 use App\Models\ServiceType;
@@ -389,33 +390,8 @@ class RentCar extends Component
             }
         });
 
-        // Send confirmation email only if confirmed
-        try {
-            $final = $editing && $editing->status !== 'cancelled'
-                ? $editing->fresh(['car', 'user'])
-                : ($booking ? $booking->load(['car', 'user']) : null);
-            if ($final && $final->status === 'confirmed') {
-                $prev = 'pending';
-                \Illuminate\Support\Facades\Mail::to($user->email)
-                    ->send(new \App\Mail\BookingStatusUpdatedMail($final, $prev, 'confirmed'));
-                // In-app notification
-                try {
-                    $user->notify(new \App\Notifications\BookingStatusUpdatedNotification($final, $prev, 'confirmed'));
-                } catch (\Throwable $e) {
-                    \Log::warning('Booking confirmation in-app notification failed: '.$e->getMessage());
-                }
-
-                // Send receipt email with PDF attachment
-                try {
-                    \Illuminate\Support\Facades\Mail::to($user->email)
-                        ->send(new \App\Mail\BookingReceiptMail($final));
-                } catch (\Throwable $e) {
-                    \Log::warning('Booking receipt email failed: '.$e->getMessage());
-                }
-            }
-        } catch (\Throwable $e) {
-            \Log::warning('Booking confirmation email failed: '.$e->getMessage());
-        }
+        NotifyAdminOfNewBooking::dispatch($user, $editing, $booking);
+        // Send admin notification for new bookings (regardless of status)
 
         // Success message and redirect to My Trips
         $message = $newStatus === 'pending'

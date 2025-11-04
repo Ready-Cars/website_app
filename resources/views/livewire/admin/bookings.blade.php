@@ -399,6 +399,17 @@
                         </button>
                     </div>
                     <div class="px-5 py-4 text-sm text-slate-700">
+
+                        @if (session('success'))
+                            <div class="mb-4 rounded-md border border-green-300 bg-green-50 px-4 py-3 text-green-800">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        @if (session('error'))
+                            <div class="mb-4 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-red-800">
+                                {{ session('error') }}
+                            </div>
+                        @endif
                         @php $bk = \App\Models\Booking::with(['user','car'])->find($viewingId); @endphp
                         @if($bk)
                             <div class="mb-3 rounded-md border border-slate-200 bg-slate-50 p-3">
@@ -410,11 +421,7 @@
                         @endif
                         <label class="block text-sm font-medium text-slate-700 mb-1">Final price (₦)</label>
                         <input type="number" min="0" step="0.01" inputmode="decimal" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" placeholder="Enter amount" wire:model.defer="confirmPrice">
-                        <p class="text-xs text-slate-500 mt-1">The amount will be charged from the customer's wallet immediately.</p>
-
-                        <label class="block text-sm font-medium text-slate-700 mb-1 mt-4">Payment Evidence <span class="text-red-500">*</span></label>
-                        <input type="file" accept="image/*,.pdf" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model="paymentEvidence" required>
-                        <p class="text-xs text-slate-500 mt-1">Upload payment receipt or proof of payment (images or PDF). <strong>Required for confirmation.</strong></p>
+                        <p class="text-xs text-slate-500 mt-1">If customer has sufficient wallet balance, booking will be confirmed immediately. Otherwise, a payment link will be sent to their email.</p>
                     </div>
                     <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
                         <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('confirmPriceOpen', false)">Close</button>
