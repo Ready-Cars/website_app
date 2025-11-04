@@ -136,7 +136,7 @@ class ValidatePendingPayments extends Command
 
         // Find bookings that might have pending payments
         $bookings = Booking::whereNotNull('payment_reference')
-            ->whereIn('status', ['pending', 'awaiting_payment'])
+            ->whereIn('status', ['pending payment'])
             ->where('created_at', '>=', now()->subDays(7)) // Only check recent bookings
             ->get();
 
