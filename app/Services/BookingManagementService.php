@@ -107,9 +107,9 @@ class BookingManagementService
                 \Log::warning('Booking confirmWithPrice notification failed: '.$e->getMessage(), ['booking_id' => $updated->id ?? null]);
             }
 
-            return $updated;
+            return dd($updated);
         });
-        dd($booking);
+
     }
 
     /**
