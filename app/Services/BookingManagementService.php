@@ -22,7 +22,7 @@ class BookingManagementService
      */
     public function confirmWithPrice(Booking $booking, float $amount, string $paymentEvidencePath): Booking
     {
-        dd($booking);
+
         if (strtolower((string) $booking->status) !== 'pending') {
             throw new \DomainException('Only pending bookings can be confirmed with a price.');
         }
@@ -109,6 +109,7 @@ class BookingManagementService
 
             return $updated;
         });
+        dd($booking);
     }
 
     /**
