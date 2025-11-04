@@ -41,13 +41,12 @@ class BookingManagementService
             }
 
             // Ensure sufficient balance
-            if ((float) $user->wallet_balance < $amount) {
-                throw new \DomainException('Insufficient wallet balance to confirm this booking.');
-            }
+            //            if ((float) $user->wallet_balance < $amount) {
+            //                throw new \DomainException('Insufficient wallet balance to confirm this booking.');
+            //            }
 
             // Debit wallet
-            $newBalance = round(((float) $user->wallet_balance) - $amount, 2);
-            $user->wallet_balance = $newBalance;
+            $user->wallet_balance = round(((float) $user->wallet_balance) + $amount, 2);
             $user->save();
 
             // Update booking totals and status
@@ -62,14 +61,33 @@ class BookingManagementService
             $booking->update($updateData);
 
             // Log wallet transaction
-            WalletTransaction::create([
-                'user_id' => $user->id,
-                'type' => 'debit',
-                'amount' => $amount,
-                'balance_after' => $newBalance,
-                'description' => 'Booking charge on admin confirmation',
-                'meta' => ['booking_id' => $booking->id, 'car_id' => $booking->car_id],
+
+            $now = now();
+            WalletTransaction::insert([
+                [
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                    'user_id' => $user->id,
+                    'type' => 'credit',
+                    'amount' => $amount,
+                    'balance_after' => $user->wallet_balance,
+                    'description' => 'Booking funding on admin confirmation',
+                    'meta' => json_encode(['booking_id' => $booking->id, 'car_id' => $booking->car_id]),
+                ],
+                [
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                    'user_id' => $user->id,
+                    'type' => 'debit',
+                    'amount' => $amount,
+                    'balance_after' => $user->wallet_balance - $amount,
+                    'description' => 'Booking charge on admin confirmation',
+                    'meta' => json_encode(['booking_id' => $booking->id, 'car_id' => $booking->car_id]),
+                ],
             ]);
+
+            $user->wallet_balance = round(((float) $user->wallet_balance) - $amount, 2);
+            $user->save();
             $updated = $booking->fresh(['user', 'car']);
 
             // Notifications
