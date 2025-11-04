@@ -294,7 +294,13 @@
                                 </div>
                                 <div class="space-y-1">
                                     <div class="text-slate-500">Customer</div>
-                                    <div class="font-medium text-slate-900">{{ $selected->user->name ?? '—' }} ({{ $selected->user->email ?? '' }} , {{ $selected->user->phone ?? '' }})</div>
+                                    <div class="font-medium text-slate-900">
+                                        {{ $selected->user->name ?? '—' }}
+                                        (<a href="mailto:{{ $selected->user->email }}"
+                                            class="text-blue-600 hover:underline">{{ $selected->user->email }}</a>,
+                                        <a href="https://wa.me/{{ $selected->user->phone }}" target="_blank"
+                                           class="text-blue-600 hover:underline">{{ $selected->user->phone }}</a>)
+                                    </div>
                                     <div class="text-slate-500 mt-3">Car</div>
                                     <div class="font-medium text-slate-900">{{ $selected->car->name ?? '—' }}</div>
                                     <div class="text-slate-500 mt-3">Status</div>
