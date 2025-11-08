@@ -22,13 +22,16 @@ class BookingPaymentController extends Controller
             $result = $bookingService->handlePaymentCallback($reference, $paystackService);
 
             if ($result['status'] === 'success') {
+
                 return redirect()->route('booking.result')
                     ->with('success', 'Payment successful! Your booking has been confirmed.')
                     ->with('booking', $result['booking'] ?? null);
-            } else {
-                return redirect()->route('booking.result')->with('error', 'Payment verification failed. Please contact support.');
             }
+
+            return redirect()->route('booking.result')->with('error', 'Payment verification failed. Please contact support.');
+
         } catch (\Throwable $e) {
+
             Log::error('Booking payment callback failed: '.$e->getMessage(), [
                 'reference' => $reference,
                 'exception' => $e,

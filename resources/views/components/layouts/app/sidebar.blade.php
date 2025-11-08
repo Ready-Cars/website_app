@@ -127,6 +127,8 @@
 
         {{ $slot }}
 
+        <!-- Pricing Disclaimer Modal -->
+
         @fluxScripts
     </body>
 </html>

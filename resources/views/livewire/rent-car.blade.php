@@ -66,6 +66,7 @@
                             <!-- Rental form -->
                             <div class="rounded-lg bg-white shadow-sm border border-slate-200 p-5 space-y-5">
                                 <h3 class="text-lg font-semibold text-slate-900">Trip details</h3>
+                               <div>  <p class="text-red-600">{{session('error')}}</p></div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium text-slate-700 mb-1">Pick-up location</label>
@@ -93,7 +94,7 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Service type</label>
-                                    <select data-field="serviceTypeId" class="form-select w-full rounded-md border-slate-300 focus:border-[#1173d4] focus:ring-[#1173d4]" wire:model.defer="serviceTypeId">
+                                    <select data-field="serviceTypeId" class="form-select w-full rounded-md border-slate-300 focus:border-[#1173d4] focus:ring-[#1173d4]" wire:model.defer="serviceTypeId" wire:change="getIsNegotiableServiceProperty">
                                         <option value="0" >Select a service type</option>
                                         @foreach($serviceTypeOptions as $st)
                                             <option value="{{ $st['id'] }}">{{ $st['name'] }}</option>
@@ -137,13 +138,18 @@
                                 <div class="hidden lg:flex items-center justify-between pt-3 border-t border-slate-200">
                                     <div class="text-base">
                                         <span class="text-slate-600">Total (Tax Incl)</span>
-                                        <span class="ml-2 text-xl font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
+                                        @if($this->isNegotiableService)
+                                            <span class="ml-2 text-xl font-extrabold text-slate-900">To be Determined</span>
+                                        @else
+                                            <span class="ml-2 text-xl font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
+                                        @endif
                                     </div>
                                     <button wire:click="openConfirm" class="inline-flex items-center justify-center rounded-md h-11 px-5 bg-[#1173d4] text-white text-sm font-bold tracking-wide hover:bg-[#0f63b9] transition-colors">
                                         Confirm reservation
                                     </button>
                                 </div>
                             </div>
+
                         </div>
 
                         <!-- Summary card -->
@@ -159,13 +165,35 @@
                                         <li class="flex justify-between"><span>Service type</span> <span>{{ $sel['name'] }} ({{ ucfirst($sel['pricing_type']) }})</span></li>
                                     @endif
                                     <li class="flex justify-between"><span>Days</span> <span>{{ $this->days }}</span></li>
-                                    <li class="flex justify-between"><span>Daily rate</span> <span>₦{{ number_format($car->daily_price, 2) }}</span></li>
-                                    <li class="flex justify-between"><span>Extras</span> <span>₦{{ number_format($this->extrasCost, 2) }}</span></li>
-                                    <li class="flex justify-between"><span>Subtotal</span> <span>₦{{ number_format($this->subtotal, 2) }}</span></li>
+                                    <li class="flex justify-between"><span>Daily rate</span>
+                                        @if($this->isNegotiableService)
+                                            <span>To be Determined</span>
+                                        @else
+                                            <span>₦{{ number_format($car->daily_price, 2) }}</span>
+                                        @endif
+                                    </li>
+                                    <li class="flex justify-between"><span>Extras</span>
+                                        @if($this->isNegotiableService)
+                                            <span>To be Determined</span>
+                                        @else
+                                            <span>₦{{ number_format($this->extrasCost, 2) }}</span>
+                                        @endif
+                                    </li>
+                                    <li class="flex justify-between"><span>Subtotal</span>
+                                        @if($this->isNegotiableService)
+                                            <span>To be Determined</span>
+                                        @else
+                                            <span>₦{{ number_format($this->subtotal, 2) }}</span>
+                                        @endif
+                                    </li>
                                 </ul>
                                 <div class="mt-3 border-t pt-3 flex justify-between items-center">
                                     <span class="text-base font-semibold text-slate-900">Total (Tax Incl)</span>
-                                    <span class="text-xl font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
+                                    @if($this->isNegotiableService)
+                                        <span class="text-xl font-extrabold text-slate-900">To be Determined</span>
+                                    @else
+                                        <span class="text-xl font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
+                                    @endif
                                 </div>
                                 <div class="mt-5">
                                     <button wire:click="openConfirm" class="w-full inline-flex items-center justify-center rounded-md h-11 px-4 bg-[#1173d4] text-white text-sm font-bold tracking-wide hover:bg-[#0f63b9] transition-colors">
@@ -214,6 +242,7 @@
             </div>
             <div class="px-5 py-4 text-sm text-slate-700 space-y-2">
                 <p>Please review your trip details before confirming:</p>
+                <p class="text-red-600">{{session('error')}}</p>
                 <ul class="space-y-1">
                     <li class="flex justify-between"><span class="text-slate-500">Car</span><span class="font-medium text-slate-900">{{ $car->name }}</span></li>
                     <li class="flex justify-between"><span class="text-slate-500">Pick-up</span><span class="font-medium text-slate-900">{{ $pickupLocation ?: '—' }}</span></li>
@@ -226,7 +255,11 @@
                     @if($sel)
                         <li class="flex justify-between"><span class="text-slate-500">Service type</span><span class="font-medium text-slate-900">{{ $sel['name'] }} ({{ ucfirst($sel['pricing_type']) }})</span></li>
                     @endif
+                    @if($this->isNegotiableService)
+                        <li class="flex justify-between"><span class="text-slate-500">Total (Tax Incl)</span><span class="font-extrabold text-slate-900">To Be Determined</span></li>
+                    @else
                     <li class="flex justify-between"><span class="text-slate-500">Total (Tax Incl)</span><span class="font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span></li>
+                    @endif
                 </ul>
             </div>
             <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-3">

@@ -84,6 +84,8 @@
         </div>
     </div>
 </header>
+@livewire('pricing-disclaimer')
+
 <script>
 // Mobile menu toggler (isolated per header instance)
 (function(){

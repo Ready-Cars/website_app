@@ -7,6 +7,7 @@ use App\Models\Car;
 use App\Models\Extra;
 use App\Models\ServiceType;
 use App\Models\Setting;
+use App\Services\PaystackService;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -235,6 +236,13 @@ class RentCar extends Component
         return $rate;
     }
 
+    public function getIsNegotiableServiceProperty(): bool
+    {
+        $serviceType = ServiceType::find($this->serviceTypeId);
+
+        return $serviceType && strtolower((string) $serviceType->pricing_type) === 'negotiable';
+    }
+
     protected function resetRentalForm(): void
     {
         // Reset all form fields to their defaults after a successful confirmation
@@ -250,8 +258,10 @@ class RentCar extends Component
 
     public function confirmRent(): void
     {
+
         try {
             $this->validate();
+
         } catch (ValidationException $e) {
             $keys = array_keys($e->validator->errors()->messages());
             $first = $keys[0] ?? null;
@@ -316,10 +326,53 @@ class RentCar extends Component
             }
         }
 
-        // If charge required, ensure balance is sufficient
+        // If charge required and insufficient balance, redirect to Paystack payment
         if ($charge > 0 && $user->wallet_balance < $charge) {
-            session()->flash('wallet_error', 'Insufficient wallet balance. Please fund your wallet to complete the reservation.');
-            $this->redirect(route('wallet.index'), navigate: true);
+
+            // Create booking with "pending payment" status first
+            $booking = \App\Models\Booking::create([
+                'user_id' => $user->id,
+                'car_id' => $this->car->id,
+                'pickup_location' => $this->pickupLocation,
+                'dropoff_location' => $this->dropoffLocation,
+                'start_date' => $this->startDate,
+                'end_date' => $this->endDate,
+                'extras' => $this->extras,
+                'notes' => $this->notes,
+                'subtotal' => $this->subtotal,
+                'taxes' => $this->taxes,
+                'total' => $this->total,
+                'service_type_id' => $this->serviceTypeId,
+                'status' => 'pending payment',
+            ]);
+
+            // Initialize Paystack payment
+            $paystackService = app(PaystackService::class);
+            $amountKobo = (int) ($charge * 100);
+            $callbackUrl = route('booking.payment.callback');
+            $reference = 'BOOKING_'.$booking->id.'_'.time();
+
+            $paymentInit = $paystackService->initialize(
+                $amountKobo,
+                $user->email,
+                $callbackUrl,
+                $reference
+            );
+
+            if (! $paymentInit['status']) {
+
+                // If payment initialization fails, delete the booking and show error
+                $booking->delete();
+                session()->flash('error', 'Failed to initialize payment. Please try again.');
+
+                return;
+            }
+
+            // Store payment reference in booking
+            $booking->update(['payment_reference' => $reference]);
+
+            // Redirect to Paystack payment page
+            $this->redirect($paymentInit['authorization_url']);
 
             return;
         }

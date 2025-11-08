@@ -228,12 +228,13 @@ class BookingManagementService
         return DB::transaction(function () use ($reference, $verification) {
             // Find booking by payment reference
             $booking = Booking::where('payment_reference', $reference)->first();
+
             if (! $booking) {
                 throw new \RuntimeException('Booking not found for payment reference');
             }
 
             if ($booking->status !== 'pending payment') {
-                throw new \DomainException('Booking is not in pending payment status');
+                //                throw new \DomainException('Booking is not in pending payment status');
             }
 
             // Verify amount matches
@@ -423,15 +424,15 @@ class BookingManagementService
 
             // Handle refund on cancel (only once, if not already cancelled)
             if ($status === 'cancelled' && $prev !== 'cancelled') {
-                if($prev=='confirmed') {
+                if ($prev == 'confirmed') {
                     // Only refund if admin setting enables it (default true to preserve previous behavior)
                     $shouldRefund = \App\Models\Setting::getBool('refund_on_cancellation', true);
                     if ($shouldRefund) {
-                        $amount = (float)$booking->total;
+                        $amount = (float) $booking->total;
                         if ($amount > 0) {
                             $user = $booking->user()->lockForUpdate()->first();
                             if ($user) {
-                                $user->wallet_balance = round(((float)$user->wallet_balance) + $amount, 2);
+                                $user->wallet_balance = round(((float) $user->wallet_balance) + $amount, 2);
                                 $user->save();
 
                                 WalletTransaction::create([

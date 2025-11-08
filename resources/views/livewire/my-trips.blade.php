@@ -99,7 +99,8 @@
                             <div class="flex justify-between"><span class="text-slate-500">Pick-up</span><span class="font-medium text-slate-900">{{ $selected->pickup_location }}</span></div>
                             <div class="flex justify-between"><span class="text-slate-500">Drop-off</span><span class="font-medium text-slate-900">{{ $selected->dropoff_location }}</span></div>
                             <div class="flex justify-between"><span class="text-slate-500">Dates</span><span class="font-medium text-slate-900">{{ \Carbon\Carbon::parse($selected->start_date)->format('M d, Y') }} → {{ \Carbon\Carbon::parse($selected->end_date)->format('M d, Y') }}</span></div>
-                            <div class="flex justify-between"><span class="text-slate-500">Total</span><span class="font-extrabold text-slate-900">₦{{ number_format($selected->total, 2) }}</span></div>
+
+                            <div class="flex justify-between"><span class="text-slate-500">Total</span><span class="font-extrabold text-slate-900">₦{{$selected->status=='pending' ? 'To Be Detremine' : number_format($selected->total, 2) }}</span></div>
                             @if($selected->status === 'cancelled' && $selected->cancellation_reason)
                                 <div class="pt-2">
                                     <div class="text-slate-500">Cancellation reason</div>
