@@ -48,6 +48,12 @@
                                                 <span>Download Receipt</span>
                                             </a>
                                         @endif
+                                        @if($trip->status === 'pending payment')
+                                            <button  wire:click="makePayment({{ $trip->id }})" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md h-10 px-4 border border-blue-200 text-blue-700 bg-blue-50 text-sm font-semibold hover:bg-blue-100 transition-colors" aria-label="Make payment">
+                                                <span class="material-symbols-outlined text-base"> payment </span>
+                                                <span>Make Payment</span>
+                                            </button>
+                                        @endif
                                         @if($trip->status !== 'cancelled')
                                             <button wire:click="view({{ $trip->id }})" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md h-10 px-4 border border-red-200 text-red-700 bg-red-50 text-sm font-semibold hover:bg-red-100 transition-colors" aria-label="Cancel booking">
                                                 <span class="material-symbols-outlined text-base"> delete </span>

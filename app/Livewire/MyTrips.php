@@ -3,7 +3,9 @@
 namespace App\Livewire;
 
 use App\Models\Booking;
+use App\Services\PaystackService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 class MyTrips extends Component
@@ -12,8 +14,11 @@ class MyTrips extends Component
 
     // Modal/UI state
     public bool $viewOpen = false;
+
     public bool $cancelOpen = false;
+
     public ?Booking $selected = null;
+
     public string $cancelReason = '';
 
     public function mount(): void
@@ -66,10 +71,12 @@ class MyTrips extends Component
     public function cancelConfirm(): void
     {
         $this->validate([
-            'cancelReason' => ['required','string','min:3','max:500'],
+            'cancelReason' => ['required', 'string', 'min:3', 'max:500'],
         ]);
 
-        if (! $this->selected) return;
+        if (! $this->selected) {
+            return;
+        }
 
         $booking = Booking::query()
             ->whereKey($this->selected->id)
@@ -84,6 +91,7 @@ class MyTrips extends Component
                 if (now()->greaterThan($cutoff)) {
                     session()->flash('error', 'Cancellation period has passed. You can no longer cancel this booking.');
                     $this->cancelOpen = false;
+
                     return;
                 }
             }
@@ -102,6 +110,61 @@ class MyTrips extends Component
 
         $this->cancelOpen = false;
         $this->closeView();
+    }
+
+    public function makePayment(int $bookingId): void
+    {
+        $booking = Booking::query()
+            ->with('car')
+            ->whereKey($bookingId)
+            ->where('user_id', Auth::id())
+            ->where('status', 'pending payment')
+            ->first();
+
+        if (! $booking) {
+            session()->flash('error', 'Booking not found or not eligible for payment.');
+
+            return;
+        }
+
+        try {
+            $paystackService = app(PaystackService::class);
+            $user = Auth::user();
+
+            // Convert total to kobo (multiply by 100 for NGN)
+            $amountKobo = (int) ($booking->total * 100);
+
+            // Generate callback URL for booking payment
+            $callbackUrl = route('booking.payment.callback');
+
+            // Generate reference for booking payment
+            $reference = 'BOOKING_'.$booking->id.'_'.time().'_'.Str::random(8);
+
+            // Initialize Paystack payment
+            $paymentInit = $paystackService->initialize(
+                $amountKobo,
+                $user->email,
+                $callbackUrl,
+                $reference
+            );
+
+            if (! $paymentInit || ! isset($paymentInit['authorization_url'])) {
+                session()->flash('error', 'Failed to initialize payment. Please try again.');
+
+                return;
+            }
+
+            // Store payment reference in booking
+            $booking->update([
+                'payment_reference' => $paymentInit['reference'],
+            ]);
+
+            // Redirect to Paystack payment page
+            $this->redirect($paymentInit['authorization_url']);
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Payment initialization failed: '.$e->getMessage());
+        }
     }
 
     protected function bookings()

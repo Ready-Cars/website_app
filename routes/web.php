@@ -24,7 +24,7 @@ Route::view('/contact', 'contact.index')->name('contact.index');
 Route::view('/cars', 'cars.index')->name('cars.index');
 
 // Rent page - using a blade shell to include Livewire assets consistently
-Route::get('/rent/{car}', function (Car $car) {
+Route::middleware('auth')->get('/rent/{car}', function (Car $car) {
     return view('rent.show', ['car' => $car]);
 })->name('rent.show');
 
