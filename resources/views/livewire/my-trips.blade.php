@@ -7,6 +7,8 @@
                     <div class="flex flex-col gap-2">
                         <h1 class="text-gray-900 text-4xl font-bold leading-tight">My Trips</h1>
                         <p class="text-gray-600 text-lg">Manage your upcoming and past car rentals.</p>
+                       @if(session('rent_success')) <span class="text-md font-semibold px-2.5 py-1 rounded-full bg-green-100 text-yellow-800">{{session('rent_success')}}</span> @endif
+
                     </div>
                     <div class="flex flex-col gap-6">
                         <div class="flex border-b border-gray-200">
