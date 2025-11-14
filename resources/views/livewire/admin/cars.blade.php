@@ -429,7 +429,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Transmission</label>
                                 <select class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="transmission_field">
-                                    <option value="">Select transmission</option>
+                                    <option wire:key="transmissions-empty" value="">Select transmission</option>
                                     @foreach(($options['transmissions'] ?? []) as $t)
                                         <option wire:key="transmissions-{{$t}}" value="{{ $t }}">{{ $t }}</option>
                                     @endforeach
@@ -439,7 +439,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Fuel type</label>
                                 <select class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="fuel_type_field">
-                                    <option value="">Select fuel</option>
+                                    <option value="" wire:key="fuels-empty">Select fuel</option>
                                     @foreach(($options['fuels'] ?? []) as $f)
                                         <option wire:key="fuels-{{$f}}" value="{{ $f }}">{{ $f }}</option>
                                     @endforeach
@@ -449,7 +449,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Location</label>
                                 <select class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="location">
-                                    <option value="">Select location</option>
+                                    <option wire:key="locations-empty" value="">Select location</option>
 
                                     @foreach(($options['locations'] ?? []) as $loc)
                                         <option wire:key="locations-{{$loc}}"  value="{{ $loc }}">{{ $loc }}</option>
