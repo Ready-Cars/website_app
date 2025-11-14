@@ -1,0 +1,24 @@
+ReadyCars Terms and Conditions:
+ReadyCars is a web-based platform for booking transportation services. It acts as an intermediary by transmitting transportation service requests to registered transportation service providers who have been verified by ReadyCars.
+1. About ReadyCars App:
+1.1 The use of ReadyCars platform requires the installation of the software and the registration of a user account. During the installation of the ReadyCars app, the mobile number of the ReadyCars service user is linked to the respective user account and added to the database.
+1.2 When using the ReadyCars platform, the user can choose whether they wish to pay in cash or via in-app payment for the transportation service to the driver. Once a payment option has been selected, the user cannot change it.
+1.3 Any complaints regarding ReadyCars' services can be directed to our support team via email at nigeria@readycars.ng, through the ReadyCars app by using the support button, or by calling our support line at +2349024166944 (available on weekdays from 09.00-17.00 W.A.T).
+2. Bookings Terms and Conditions
+2.2 ReadyCars, a subsidiary of ReadyFlow Services Ltd, provides premium car booking and car hiring services to meet corporate and personal needs in Nigeria.
+2.3 All vehicles provided by ReadyCars come with trained and licensed drivers. Clients are not allowed to drive the vehicles.
+2.4 Clients are required to provide accurate and complete information when booking a car. ReadyCars will not be liable for any delays or errors resulting from incorrect information provided by the client.
+2.5 ReadyCars reserves the right to refuse service to any client without providing a reason.
+2.6 The client is responsible for any damage to the vehicle caused by their negligence, intentional or unintentional actions, and will be required to pay for any damages or repairs necessary.
+2.7 Clients are required to return the vehicle in the same condition in which it was provided. Any damage or loss to the vehicle or its contents will be charged to the client.
+2.8 Clients are required to comply with all applicable laws and regulations when using ReadyCars' services, including but not limited to traffic laws and regulations.
+2.9 ReadyCars reserves the right to cancel any booking without notice in the event of an emergency or force majeure, including but not limited to acts of God, war, or government intervention.
+2.10 ReadyCars will not be liable for any loss, damage, or injury resulting from the use of its services, including but not limited to accidents, theft, or delay.
+2.11 ReadyCars reserves the right to modify or update these terms and conditions at any time without prior notice.
+3. By registering an account with ReadyCars, a customer shall accept the following conditions:
+3.1 ReadyCars shall have the right to add the personal data of the app user to the ReadyCars database and to forward the personal data to transportation service providers in accordance with ReadyCars' Privacy Policy (https://readycars.com/privacy/).
+3.2 ReadyCars shall have the right to make unilateral amendments to the Terms and Conditions and Privacy Policy and to relinquish the database to third parties. We may notify users of changes to the Terms and Conditions and Privacy Policy.
+3.3 ReadyCars shall be entitled to transfer the database of personal data to third parties without prior notification of the app users. In case of a transfer of the business or the database, the rights and conditions arising from this license agreement shall be transferred as well.
+3.4 ReadyCars shall be entitled to forward personal data and bank data to credit card and mobile payment intermediaries.
+3.5 ReadyCars has the right to send marketing messages and authentication codes through SMS messages.
+3.6 ReadyCars only encourages the use of two modes of payment: cash payment and in-app payment (card). ReadyCars bears no liability for damages that may occur outside the outlined acceptable payment methods.

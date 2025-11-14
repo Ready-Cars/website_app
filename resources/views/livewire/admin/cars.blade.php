@@ -450,6 +450,7 @@
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Location</label>
                                 <select class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="location">
                                     <option value="">Select location</option>
+
                                     @foreach(($options['locations'] ?? []) as $loc)
                                         <option value="{{ $loc }}">{{ $loc }}</option>
                                     @endforeach
