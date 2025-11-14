@@ -428,7 +428,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Transmission</label>
-                                <select class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="transmission_field">
+                                <select id="transmissions" class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="transmission_field">
                                     <option wire:key="transmissions-empty" value="">Select transmission</option>
                                     @foreach(($options['transmissions'] ?? []) as $t)
                                         <option wire:key="transmissions-{{$t}}" value="{{ $t }}">{{ $t }}</option>
@@ -438,7 +438,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Fuel type</label>
-                                <select class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="fuel_type_field">
+                                <select id="fuels" class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="fuel_type_field">
                                     <option value="" wire:key="fuels-empty">Select fuel</option>
                                     @foreach(($options['fuels'] ?? []) as $f)
                                         <option wire:key="fuels-{{$f}}" value="{{ $f }}">{{ $f }}</option>
@@ -448,7 +448,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Location</label>
-                                <select class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="location">
+                                <select id="locations" class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="location">
                                     <option wire:key="locations-empty" value="">Select location</option>
 
                                     @foreach(($options['locations'] ?? []) as $loc)
