@@ -431,7 +431,7 @@
                                 <select class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="transmission_field">
                                     <option value="">Select transmission</option>
                                     @foreach(($options['transmissions'] ?? []) as $t)
-                                        <option value="{{ $t }}">{{ $t }}</option>
+                                        <option wire:key="transmissions-{{$t}}" value="{{ $t }}">{{ $t }}</option>
                                     @endforeach
                                 </select>
                                 @error('transmission_field') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
@@ -441,7 +441,7 @@
                                 <select class="form-select w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" wire:model.defer="fuel_type_field">
                                     <option value="">Select fuel</option>
                                     @foreach(($options['fuels'] ?? []) as $f)
-                                        <option value="{{ $f }}">{{ $f }}</option>
+                                        <option wire:key="fuels-{{$f}}" value="{{ $f }}">{{ $f }}</option>
                                     @endforeach
                                 </select>
                                 @error('fuel_type_field') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
@@ -452,7 +452,7 @@
                                     <option value="">Select location</option>
 
                                     @foreach(($options['locations'] ?? []) as $loc)
-                                        <option value="{{ $loc }}">{{ $loc }}</option>
+                                        <option wire:key="locations-{{$loc}}"  value="{{ $loc }}">{{ $loc }}</option>
                                     @endforeach
                                 </select>
                                 @error('location') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
