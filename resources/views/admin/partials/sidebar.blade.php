@@ -10,7 +10,7 @@
             <span class="material-symbols-outlined"> dashboard </span>
             <span>Dashboard</span>
         </a>
-        <a class="{{ $active === 'bookings' ? $activeCls : $inactive }}" href="{{ route('admin.bookings') }}" wire:navigate>
+        <a class="{{ $active === 'bookings' ? $activeCls : $inactive }}" href="{{ route('admin.bookings') }}" >
             <span class="material-symbols-outlined"> book_online </span>
             <span>Booking Management</span>
         </a>
@@ -59,7 +59,7 @@
             <span class="material-symbols-outlined"> dashboard </span>
             <span>Dashboard</span>
         </a>
-        <a class="{{ $active === 'bookings' ? $activeCls : $inactive }}" href="{{ route('admin.bookings') }}" wire:navigate>
+        <a class="{{ $active === 'bookings' ? $activeCls : $inactive }}" href="{{ route('admin.bookings') }}" >
             <span class="material-symbols-outlined"> book_online </span>
             <span>Booking Management</span>
         </a>

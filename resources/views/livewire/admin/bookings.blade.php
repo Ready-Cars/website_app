@@ -277,11 +277,11 @@
         </div>
 
         <!-- View Booking Modal -->
-        <div x-data="bookingModal" x-show="showViewModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
+        <div x-data="bookingModal" x-show="$store.bookingModal.showViewModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
             <div class="absolute inset-0 bg-black/50" @click="closeViewModal()"></div>
             <div class="relative z-10 w-full max-w-2xl rounded-lg bg-white shadow-xl border border-slate-200">
                 <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-slate-900" x-text="'Booking #' + (selectedBooking?.id || '')"></h3>
+                    <h3 class="text-lg font-semibold text-slate-900" x-text="'Booking #' + ($store.bookingModal.selectedBooking?.id || '')"></h3>
                     <button class="p-1 text-slate-500 hover:text-slate-700" @click="closeViewModal()">
                         <span class="material-symbols-outlined">close</span>
                     </button>
@@ -290,35 +290,35 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-3">
                             <div class="rounded-md border border-slate-200 overflow-hidden">
-                                <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" :style="'background-image: url(' + (selectedBooking?.car?.image_url || '') + ');'"></div>
+                                <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" :style="'background-image: url(' + ($store.bookingModal.selectedBooking?.car?.image_url || '') + ');'"></div>
                             </div>
                             <div class="space-y-1">
                                 <div class="text-slate-500">Customer</div>
                                 <div class="font-medium text-slate-900">
-                                    <span x-text="selectedBooking?.user?.name || '—'"></span>
-                                    (<a :href="'mailto:' + (selectedBooking?.user?.email || '')"
-                                        class="text-blue-600 hover:underline" x-text="selectedBooking?.user?.email || ''"></a>,
-                                    <a :href="'https://wa.me/' + (selectedBooking?.user?.phone || '')" target="_blank"
-                                       class="text-blue-600 hover:underline" x-text="selectedBooking?.user?.phone || ''"></a>)
+                                    <span x-text="$store.bookingModal.selectedBooking?.user?.name || '—'"></span>
+                                    (<a :href="'mailto:' + ($store.bookingModal.selectedBooking?.user?.email || '')"
+                                        class="text-blue-600 hover:underline" x-text="$store.bookingModal.selectedBooking?.user?.email || ''"></a>,
+                                    <a :href="'https://wa.me/' + ($store.bookingModal.selectedBooking?.user?.phone || '')" target="_blank"
+                                       class="text-blue-600 hover:underline" x-text="$store.bookingModal.selectedBooking?.user?.phone || ''"></a>)
                                 </div>
                                 <div class="text-slate-500 mt-3">Car</div>
-                                <div class="font-medium text-slate-900" x-text="selectedBooking?.car?.name || '—'"></div>
+                                <div class="font-medium text-slate-900" x-text="$store.bookingModal.selectedBooking?.car?.name || '—'"></div>
                                 <div class="text-slate-500 mt-3">Status</div>
-                                <div class="font-medium text-slate-900" x-text="selectedBooking?.status ? selectedBooking.status.charAt(0).toUpperCase() + selectedBooking.status.slice(1) : ''"></div>
+                                <div class="font-medium text-slate-900" x-text="$store.bookingModal.selectedBooking?.status ? $store.bookingModal.selectedBooking.status.charAt(0).toUpperCase() + $store.bookingModal.selectedBooking.status.slice(1) : ''"></div>
                             </div>
                         </div>
                         <div class="space-y-1">
                             <div class="text-slate-500">Pickup → Dropoff</div>
-                            <div class="font-medium text-slate-900" x-text="(selectedBooking?.pickup_location || '') + ' → ' + (selectedBooking?.dropoff_location || '')"></div>
+                            <div class="font-medium text-slate-900" x-text="($store.bookingModal.selectedBooking?.pickup_location || '') + ' → ' + ($store.bookingModal.selectedBooking?.dropoff_location || '')"></div>
                             <div class="text-slate-500 mt-3">Dates</div>
-                            <div class="font-medium text-slate-900" x-text="(selectedBooking?.start_date || '') + ' — ' + (selectedBooking?.end_date || '')"></div>
+                            <div class="font-medium text-slate-900" x-text="($store.bookingModal.selectedBooking?.start_date || '') + ' — ' + ($store.bookingModal.selectedBooking?.end_date || '')"></div>
                             <div class="text-slate-500 mt-3">Total</div>
-                            <div class="font-extrabold text-slate-900" x-text="'₦' + new Intl.NumberFormat().format(selectedBooking?.total || 0)"></div>
-                            <template x-if="selectedBooking?.payment_evidence">
+                            <div class="font-extrabold text-slate-900" x-text="'₦' + new Intl.NumberFormat().format($store.bookingModal.selectedBooking?.total || 0)"></div>
+                            <template x-if="$store.bookingModal.selectedBooking?.payment_evidence">
                                 <div>
                                     <div class="text-slate-500 mt-3">Payment Evidence</div>
                                     <div class="font-medium">
-                                        <a :href="'/admin/bookings/' + selectedBooking.id + '/payment-evidence/download'"
+                                        <a :href="'/admin/bookings/' + $store.bookingModal.selectedBooking.id + '/payment-evidence/download'"
                                            class="inline-flex items-center gap-2 text-sky-600 hover:text-sky-800 hover:underline"
                                            target="_blank">
                                             <span class="material-symbols-outlined text-base">download</span>
@@ -329,11 +329,11 @@
                             </template>
                         </div>
                     </div>
-                    <template x-if="selectedBooking?.extras && Object.keys(selectedBooking.extras).length > 0">
+                    <template x-if="$store.bookingModal.selectedBooking?.extras && Object.keys($store.bookingModal.selectedBooking.extras).length > 0">
                         <div class="mt-4">
                             <div class="text-slate-500 mb-1">Extras</div>
                             <ul class="list-disc pl-5 text-slate-700">
-                                <template x-for="[key, value] in Object.entries(selectedBooking.extras)" :key="key">
+                                <template x-for="[key, value] in Object.entries($store.bookingModal.selectedBooking.extras)" :key="key">
                                     <template x-if="value">
                                         <li x-text="typeof key === 'string' ? key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ') : key"></li>
                                     </template>
@@ -341,26 +341,26 @@
                             </ul>
                         </div>
                     </template>
-                    <template x-if="selectedBooking?.status === 'cancelled' && selectedBooking?.cancellation_reason">
+                    <template x-if="$store.bookingModal.selectedBooking?.status === 'cancelled' && $store.bookingModal.selectedBooking?.cancellation_reason">
                         <div class="mt-4">
                             <div class="text-slate-500">Cancellation reason</div>
-                            <div class="mt-1 rounded-md border border-slate-200 bg-slate-50 p-2 text-slate-700" x-text="selectedBooking.cancellation_reason"></div>
+                            <div class="mt-1 rounded-md border border-slate-200 bg-slate-50 p-2 text-slate-700" x-text="$store.bookingModal.selectedBooking.cancellation_reason"></div>
                         </div>
                     </template>
                 </div>
                 <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
                     <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" @click="closeViewModal()">Close</button>
-                    <template x-if="selectedBooking?.status === 'pending'">
-                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" @click="$store.bookingModal.confirmBooking(selectedBooking.id)">Confirm</button>
+                    <template x-if="$store.bookingModal.selectedBooking?.status === 'pending'">
+                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" @click="$store.bookingModal.confirmBooking($store.bookingModal.selectedBooking.id)">Confirm</button>
                     </template>
-                    <template x-if="selectedBooking?.status === 'pending payment'">
-                        <button class="rounded-md h-10 px-4 bg-green-600 text-white text-sm font-semibold hover:bg-green-700" @click="$wire.openReceiptUpload(selectedBooking.id)">Upload Receipt & Confirm</button>
+                    <template x-if="$store.bookingModal.selectedBooking?.status === 'pending payment'">
+                        <button class="rounded-md h-10 px-4 bg-green-600 text-white text-sm font-semibold hover:bg-green-700" @click="$wire.openReceiptUpload($store.bookingModal.selectedBooking.id)">Upload Receipt & Confirm</button>
                     </template>
-                    <template x-if="selectedBooking?.status === 'confirmed'">
-                        <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" @click="$wire.openComplete(selectedBooking.id)">Complete</button>
+                    <template x-if="$store.bookingModal.selectedBooking?.status === 'confirmed'">
+                        <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" @click="$wire.openComplete($store.bookingModal.selectedBooking.id)">Complete</button>
                     </template>
-                    <template x-if="selectedBooking?.status !== 'cancelled' && selectedBooking?.status !== 'completed'">
-                        <button class="rounded-md h-10 px-4 bg-red-600 text-white text-sm font-semibold hover:bg-red-700" @click="$wire.openCancel(selectedBooking.id)">Cancel</button>
+                    <template x-if="$store.bookingModal.selectedBooking?.status !== 'cancelled' && $store.bookingModal.selectedBooking?.status !== 'completed'">
+                        <button class="rounded-md h-10 px-4 bg-red-600 text-white text-sm font-semibold hover:bg-red-700" @click="$wire.openCancel($store.bookingModal.selectedBooking.id)">Cancel</button>
                     </template>
                 </div>
             </div>
@@ -598,125 +598,4 @@
     </div>
 </div>
 
-<script>
-// Alpine.js component for handling booking modals with frontend data
-document.addEventListener('alpine:init', () => {
-    // Create a global store for booking modal functionality
-    Alpine.store('bookingModal', {
-        showViewModal: false,
-        selectedBooking: null,
-        bookingsData: @json($bookingsData ?? []),
 
-        init() {
-            // Listen for specific bookings data updates from Livewire
-            window.addEventListener('bookingsDataUpdated', (event) => {
-                this.bookingsData = event.detail[0] || {};
-                window.bookingsData = this.bookingsData;
-            });
-
-            // Fallback: Listen for general Livewire updates
-            window.addEventListener('livewire:updated', () => {
-                if (window.bookingsData) {
-                    this.bookingsData = window.bookingsData;
-                }
-            });
-        },
-
-        openViewModal(bookingId) {
-            this.selectedBooking = this.bookingsData[bookingId] || null;
-            if (this.selectedBooking) {
-                this.showViewModal = true;
-            }
-        },
-
-        closeViewModal() {
-            this.showViewModal = false;
-            this.selectedBooking = null;
-        },
-
-        confirmBooking(bookingId) {
-            // Use Livewire.find to get the component and call the method
-            const wireId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
-            if (wireId && window.Livewire) {
-                const component = window.Livewire.find(wireId);
-                if (component) {
-                    component.call('confirm', bookingId);
-                }
-            }
-        },
-
-        openSettings() {
-            // Use Livewire.find to get the component and call the method
-            const wireId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
-            if (wireId && window.Livewire) {
-                const component = window.Livewire.find(wireId);
-                if (component) {
-                    component.call('openSettings');
-                }
-            }
-        }
-    });
-
-    // Make openViewModal globally accessible
-    window.openViewModal = function(bookingId) {
-        Alpine.store('bookingModal').openViewModal(bookingId);
-    };
-
-    Alpine.data('bookingModal', () => ({
-        get showViewModal() { return Alpine.store('bookingModal').showViewModal; },
-        get selectedBooking() { return Alpine.store('bookingModal').selectedBooking; },
-        closeViewModal() { Alpine.store('bookingModal').closeViewModal(); }
-    }));
-});
-</script>
-
-<script>
-// Accessible dropdowns for action menus
-(function(){
-  function initDropdown(root){
-    if (!root || root.__ddInited) return;
-    root.__ddInited = true;
-    const btn = root.querySelector('[data-dropdown-button]');
-    const menu = root.querySelector('[data-dropdown-menu]');
-    if (!btn || !menu) return;
-
-    function open(){ menu.classList.remove('hidden'); btn.setAttribute('aria-expanded','true'); }
-    function close(){ menu.classList.add('hidden'); btn.setAttribute('aria-expanded','false'); }
-    function toggle(){ (btn.getAttribute('aria-expanded') === 'true') ? close() : open(); }
-
-    btn.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
-    // close on outside click
-    document.addEventListener('click', function(e){
-      if (menu.classList.contains('hidden')) return;
-      if (!root.contains(e.target)) close();
-    });
-    // close on escape
-    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') close(); });
-    // close after any Livewire navigation
-    window.addEventListener('livewire:navigated', close);
-  }
-  function initAll(){ document.querySelectorAll('[data-dropdown]').forEach(initDropdown); }
-
-  // Initial bind
-  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initAll); } else { initAll(); }
-  // Re-init on Livewire SPA navigation
-  window.addEventListener('livewire:navigated', initAll);
-
-  // Re-init when Livewire updates the DOM (via MutationObserver)
-  const mo = new MutationObserver((mutations)=>{
-    let needsInit = false;
-    for (const m of mutations){
-      if (m.addedNodes && m.addedNodes.length){
-        for (const n of m.addedNodes){
-          if (!(n instanceof Element)) continue;
-          if (n.matches && n.matches('[data-dropdown]')) { needsInit = true; break; }
-          if (n.querySelector && n.querySelector('[data-dropdown]')) { needsInit = true; break; }
-        }
-      }
-      if (needsInit) break;
-    }
-    if (needsInit) initAll();
-  });
-  try { mo.observe(document.body, { childList: true, subtree: true }); } catch (e) {}
-})();
-</script>

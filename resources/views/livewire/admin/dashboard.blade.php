@@ -105,7 +105,7 @@
                                 <div>
                                     <h3 class="text-lg font-semibold leading-6">Quick Actions</h3>
                                     <div class="mt-4 flex flex-col space-y-4">
-                                        <a class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md" href="{{ route('admin.bookings') }}" wire:navigate>
+                                        <a class="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md" href="{{ route('admin.bookings') }}" >
                                             <span class="material-symbols-outlined text-2xl text-sky-600">book_online</span>
                                             <span class="font-medium">Manage Bookings</span>
                                         </a>
