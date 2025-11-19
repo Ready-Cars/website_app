@@ -20,6 +20,11 @@ class Settings extends Component
 
     public string $contactDescription = '';
 
+    // Manual Payment Settings properties
+    public string $manualPaymentAccountNumber = '';
+
+    public string $manualPaymentBankName = '';
+
     public function mount(): void
     {
         $this->refundOnCancellation = Setting::getBool('refund_on_cancellation', true);
@@ -30,6 +35,10 @@ class Settings extends Component
         $this->contactPhone = Setting::get('contact_phone', '');
         $this->contactAddress = Setting::get('contact_address', '');
         $this->contactDescription = Setting::get('contact_description', '');
+
+        // Load manual payment settings
+        $this->manualPaymentAccountNumber = Setting::get('manual_payment_account_number', '0123456789');
+        $this->manualPaymentBankName = Setting::get('manual_payment_bank_name', 'Sample Bank');
     }
 
     public function save(): void
@@ -41,6 +50,8 @@ class Settings extends Component
             'contactPhone' => ['nullable', 'string', 'max:50'],
             'contactAddress' => ['nullable', 'string', 'max:500'],
             'contactDescription' => ['nullable', 'string', 'max:1000'],
+            'manualPaymentAccountNumber' => ['required', 'string', 'max:50'],
+            'manualPaymentBankName' => ['required', 'string', 'max:100'],
         ]);
 
         // Save booking settings
@@ -52,6 +63,10 @@ class Settings extends Component
         Setting::setValue('contact_phone', $this->contactPhone);
         Setting::setValue('contact_address', $this->contactAddress);
         Setting::setValue('contact_description', $this->contactDescription);
+
+        // Save manual payment settings
+        Setting::setValue('manual_payment_account_number', $this->manualPaymentAccountNumber);
+        Setting::setValue('manual_payment_bank_name', $this->manualPaymentBankName);
 
         session()->flash('success', 'Settings saved successfully');
     }

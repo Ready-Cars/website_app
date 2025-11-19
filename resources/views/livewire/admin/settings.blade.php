@@ -54,6 +54,25 @@
             </div>
         </div>
 
+        <!-- Manual Payment Settings Section -->
+        <div class="pt-8 border-t border-slate-200">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4">Manual Payment Settings</h2>
+            <p class="text-sm text-slate-600 mb-4">Configure bank account details for manual payment instructions sent to customers.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Account Number</label>
+                    <input type="text" class="form-input w-full max-w-md" wire:model.defer="manualPaymentAccountNumber" placeholder="Enter account number">
+                    @error('manualPaymentAccountNumber') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Bank Name</label>
+                    <input type="text" class="form-input w-full max-w-md" wire:model.defer="manualPaymentBankName" placeholder="Enter bank name">
+                    @error('manualPaymentBankName') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </div>
+
         <div class="pt-6">
             <button wire:click="save" class="inline-flex items-center justify-center gap-2 rounded-md h-10 px-5 bg-[#1173d4] text-white text-sm font-semibold hover:bg-[#0f63b9]">
                 <span class="material-symbols-outlined text-base">save</span>
