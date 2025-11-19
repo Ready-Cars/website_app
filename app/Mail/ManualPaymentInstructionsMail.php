@@ -18,6 +18,7 @@ class ManualPaymentInstructionsMail extends Mailable
     public Booking $booking;
     public string $accountNumber;
     public string $bankName;
+    public string $accountName;
 
     /**
      * Create a new message instance.
@@ -25,6 +26,7 @@ class ManualPaymentInstructionsMail extends Mailable
     public function __construct(Booking $booking)
     {
         $this->booking = $booking;
+        $this->accountName = Setting::get('manual_payment_account_name', 'Ready Cars');
         $this->accountNumber = Setting::get('manual_payment_account_number', '0123456789');
         $this->bankName = Setting::get('manual_payment_bank_name', 'Sample Bank');
     }

@@ -2,10 +2,11 @@
 
 namespace App\Livewire\Admin;
 
+use AllowDynamicProperties;
 use App\Models\Setting;
 use Livewire\Component;
 
-class Settings extends Component
+#[AllowDynamicProperties] class Settings extends Component
 {
     public bool $refundOnCancellation = true;
 
@@ -22,6 +23,7 @@ class Settings extends Component
 
     // Manual Payment Settings properties
     public string $manualPaymentAccountNumber = '';
+    public string $manualPaymentAccountName = '';
 
     public string $manualPaymentBankName = '';
 
@@ -37,6 +39,7 @@ class Settings extends Component
         $this->contactDescription = Setting::get('contact_description', '');
 
         // Load manual payment settings
+        $this->manualPaymentAccountName = Setting::get('manual_payment_account_name', 'ReadyCars');
         $this->manualPaymentAccountNumber = Setting::get('manual_payment_account_number', '0123456789');
         $this->manualPaymentBankName = Setting::get('manual_payment_bank_name', 'Sample Bank');
     }
@@ -65,6 +68,7 @@ class Settings extends Component
         Setting::setValue('contact_description', $this->contactDescription);
 
         // Save manual payment settings
+        Setting::setValue('manual_payment_account_name', $this->manualPaymentAccountName);
         Setting::setValue('manual_payment_account_number', $this->manualPaymentAccountNumber);
         Setting::setValue('manual_payment_bank_name', $this->manualPaymentBankName);
 

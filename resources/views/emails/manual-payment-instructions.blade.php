@@ -110,6 +110,7 @@
             <h3>🏦 Bank Account Details</h3>
             <p class="highlight">Please transfer the exact amount to the following account:</p>
             <ul>
+                <li><strong>Account Name:</strong> {{ $accountName }}</li>
                 <li><strong>Bank Name:</strong> {{ $bankName }}</li>
                 <li><strong>Account Number:</strong> <span class="highlight">{{ $accountNumber }}</span></li>
                 <li><strong>Amount:</strong> <span class="highlight">₦{{ number_format($booking->total, 2) }}</span></li>

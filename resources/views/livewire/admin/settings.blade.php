@@ -60,6 +60,12 @@
             <p class="text-sm text-slate-600 mb-4">Configure bank account details for manual payment instructions sent to customers.</p>
             <div class="space-y-4">
                 <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Account Name</label>
+                    <input type="text" class="form-input w-full max-w-md" wire:model.defer="manualPaymentAccountName" placeholder="Enter account name">
+                    @error('manualPaymentAccountName') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">Account Number</label>
                     <input type="text" class="form-input w-full max-w-md" wire:model.defer="manualPaymentAccountNumber" placeholder="Enter account number">
                     @error('manualPaymentAccountNumber') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
