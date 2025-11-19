@@ -1,5 +1,6 @@
 <x-layouts.main-admin title="Customer Management - {{ config('app.name') }}">
-    <livewire:admin.customers />
     @livewireChartsScripts
+    <livewire:admin.customers />
+
 </x-layouts.main-admin>
 

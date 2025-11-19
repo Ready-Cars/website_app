@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Admin;
 
+use App\Mail\ManualPaymentInstructionsMail;
 use App\Models\Booking;
 use App\Services\BookingManagementService;
 use App\Services\PaystackService;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -18,6 +20,8 @@ class Bookings extends Component
     public bool $confirmPriceOpen = false;
 
     public string $confirmPrice = '';
+
+    public string $paymentMethod = 'paystack';
 
     public $paymentEvidence;
 
@@ -58,6 +62,11 @@ class Bookings extends Component
 
     // Complete confirmation modal
     public bool $completeOpen = false;
+
+    // Receipt upload modal
+    public bool $receiptUploadOpen = false;
+
+    public $receiptFile;
 
     // Settings modal
     public bool $settingsOpen = false;
@@ -169,6 +178,51 @@ class Bookings extends Component
         }
     }
 
+    public function openReceiptUpload(int $id): void
+    {
+        $this->viewingId = $id;
+        $this->receiptUploadOpen = true;
+        $this->receiptFile = null;
+    }
+
+    public function confirmManualPaymentWithReceipt(BookingManagementService $service): void
+    {
+        $this->validate([
+            'receiptFile' => 'required|file|mimes:jpeg,jpg,png,pdf|max:5120', // 5MB max
+        ]);
+
+        $id = $this->viewingId;
+        if (! $id || ! $this->receiptFile) {
+            session()->flash('error', 'Please select a receipt file');
+            return;
+        }
+
+        try {
+            $booking = Booking::findOrFail($id);
+
+            // Check if booking is in pending payment status
+            if (strtolower((string) $booking->status) !== 'pending payment') {
+                session()->flash('error', 'This booking is not awaiting payment confirmation');
+                return;
+            }
+
+            // Store the receipt file
+            $fileName = 'receipt_' . $booking->id . '_' . time() . '.' . $this->receiptFile->getClientOriginalExtension();
+            $filePath = $this->receiptFile->storeAs('payment-evidence', $fileName, 'public');
+
+            // Confirm booking with the receipt evidence path
+            $confirmedBooking = $service->confirmWithPrice($booking, (float) $booking->total, $filePath);
+
+            $this->receiptUploadOpen = false;
+            $this->receiptFile = null;
+
+            session()->flash('success', 'Payment confirmed successfully! Booking #' . $confirmedBooking->id . ' has been confirmed with receipt uploaded.');
+
+        } catch (\Throwable $e) {
+            session()->flash('error', $e->getMessage());
+        }
+    }
+
     public function confirmPendingWithPrice(BookingManagementService $service, PaystackService $paystackService): void
     {
         $id = $this->viewingId;
@@ -183,20 +237,50 @@ class Bookings extends Component
 
             $booking = Booking::findOrFail($id);
 
-            $result = $service->confirmWithWalletCheck($booking, $amount, $paystackService);
+            if ($this->paymentMethod === 'manual') {
+                // Handle manual payment
+                $this->confirmManualPayment($booking, $amount, $service);
+            } else {
+                // Handle Paystack payment (existing flow)
+                $result = $service->confirmWithWalletCheck($booking, $amount, $paystackService);
+
+                if ($result['status'] === 'confirmed') {
+                    session()->flash('success', 'Booking confirmed successfully with wallet payment of ₦'.number_format($amount, 2));
+                } elseif ($result['status'] === 'pending_payment') {
+                    session()->flash('success', 'Insufficient wallet balance. Payment link sent to customer via email.');
+                }
+            }
 
             $this->confirmPriceOpen = false;
             $this->confirmPrice = '';
+            $this->paymentMethod = 'paystack';
             $this->paymentEvidence = null;
 
-            if ($result['status'] === 'confirmed') {
-                session()->flash('success', 'Booking confirmed successfully with wallet payment of ₦'.number_format($amount, 2));
-            } elseif ($result['status'] === 'pending_payment') {
-                session()->flash('success', 'Insufficient wallet balance. Payment link sent to customer via email.');
-            }
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());
         }
+    }
+
+    private function confirmManualPayment(Booking $booking, float $amount, BookingManagementService $service): void
+    {
+        // Update booking with manual payment status
+        $booking->update([
+            'subtotal' => $amount,
+            'taxes' => 0,
+            'total' => $amount,
+            'status' => 'pending payment',
+            'payment_reference' => 'MANUAL_' . $booking->id . '_' . time(),
+        ]);
+
+        // Load the booking with user relationship for email
+        $bookingWithUser = $booking->load(['user', 'car']);
+
+        // Send manual payment instructions email
+        if ($bookingWithUser->user && $bookingWithUser->user->email) {
+            Mail::to($bookingWithUser->user->email)->send(new ManualPaymentInstructionsMail($bookingWithUser));
+        }
+
+        session()->flash('success', 'Booking confirmed for manual payment. Payment instructions sent to customer via email.');
     }
 
     public function openCancel(int $id): void

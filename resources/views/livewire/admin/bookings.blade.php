@@ -353,6 +353,9 @@
                         @if(($selected->status ?? '') === 'pending')
                             <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="confirm({{ $selected->id }})">Confirm</button>
                         @endif
+                        @if(($selected->status ?? '') === 'pending payment')
+                            <button class="rounded-md h-10 px-4 bg-green-600 text-white text-sm font-semibold hover:bg-green-700" wire:click="openReceiptUpload({{ $selected->id }})">Upload Receipt & Confirm</button>
+                        @endif
                         @if(($selected->status ?? '') === 'confirmed')
                             <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" wire:click="openComplete({{ $selected->id }})">Complete</button>
                         @endif
@@ -422,7 +425,29 @@
                         @endif
                         <label class="block text-sm font-medium text-slate-700 mb-1">Final price (₦)</label>
                         <input type="number" min="0" step="0.01" inputmode="decimal" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" placeholder="Enter amount" wire:model.defer="confirmPrice">
-                        <p class="text-xs text-slate-500 mt-1">If customer has sufficient wallet balance, booking will be confirmed immediately. Otherwise, a payment link will be sent to their email.</p>
+
+                        <div class="mt-4 mb-4">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Payment Method</label>
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="radio" name="paymentMethod" value="paystack" wire:model="paymentMethod" class="h-4 w-4 text-sky-600 focus:ring-sky-600 border-gray-300">
+                                    <span class="ml-2 text-sm text-slate-700">
+                                        <strong>Paystack Payment</strong>
+                                        <span class="text-slate-500 block text-xs">Check wallet balance first, then send payment link if insufficient</span>
+                                    </span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="paymentMethod" value="manual" wire:model="paymentMethod" class="h-4 w-4 text-sky-600 focus:ring-sky-600 border-gray-300">
+                                    <span class="ml-2 text-sm text-slate-700">
+                                        <strong>Manual Payment</strong>
+                                        <span class="text-slate-500 block text-xs">Send bank account details via email for manual transfer</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-500 mt-1" x-show="$wire.paymentMethod === 'paystack'">If customer has sufficient wallet balance, booking will be confirmed immediately. Otherwise, a payment link will be sent to their email.</p>
+                        <p class="text-xs text-slate-500 mt-1" x-show="$wire.paymentMethod === 'manual'">Customer will receive an email with bank account details and payment instructions.</p>
                     </div>
                     <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
                         <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('confirmPriceOpen', false)">Close</button>
@@ -462,6 +487,87 @@
                     <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
                         <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('completeOpen', false)">Close</button>
                         <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" wire:click="completeSelected">Confirm complete</button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- Receipt Upload Modal -->
+        @if($receiptUploadOpen && $viewingId)
+            <div class="fixed inset-0 z-50 flex items-center justify-center">
+                <div class="absolute inset-0 bg-black/50" wire:click="$set('receiptUploadOpen', false)"></div>
+                <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
+                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-slate-900">Confirm Manual Payment</h3>
+                        <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="$set('receiptUploadOpen', false)">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="px-5 py-4 text-sm text-slate-700">
+                        @if (session('success'))
+                            <div class="mb-4 rounded-md border border-green-300 bg-green-50 px-4 py-3 text-green-800">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        @if (session('error'))
+                            <div class="mb-4 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-red-800">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+                        @php $bk = \App\Models\Booking::with(['user','car'])->find($viewingId); @endphp
+                        @if($bk)
+                            <div class="mb-4 rounded-md border border-slate-200 bg-slate-50 p-3">
+                                <div class="font-medium text-slate-900">#{{ $bk->id }} • {{ $bk->user->name ?? '—' }}</div>
+                                <div class="text-slate-600 text-sm">{{ $bk->car->name ?? '—' }}</div>
+                                <div class="text-slate-600 text-sm">{{ optional($bk->start_date)->format('M d, Y') }} — {{ optional($bk->end_date)->format('M d, Y') }}</div>
+                                <div class="text-slate-900 font-semibold mt-1">Total: ₦{{ number_format((float)($bk->total ?? 0), 2) }}</div>
+                                <div class="text-slate-600 text-xs mt-1">Status: {{ ucfirst($bk->status ?? '') }}</div>
+                            </div>
+                        @endif
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Payment Receipt</label>
+                            <input type="file" wire:model="receiptFile" accept="image/*,.pdf"
+                                   class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
+                            <p class="text-xs text-slate-500 mt-1">Upload payment receipt (Images or PDF, max 5MB)</p>
+                            @error('receiptFile') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+
+                        @if($receiptFile)
+                            <div wire:loading.remove wire:target="receiptFile" class="mb-4 p-3 border border-green-200 bg-green-50 rounded-md">
+                                <div class="flex items-center text-green-800 text-sm">
+                                    <span class="material-symbols-outlined text-base mr-2">check_circle</span>
+                                    File selected: {{ $receiptFile->getClientOriginalName() }}
+                                </div>
+                            </div>
+                        @endif
+
+                        <div wire:loading wire:target="receiptFile" class="mb-4 p-3 border border-blue-200 bg-blue-50 rounded-md">
+                            <div class="flex items-center text-blue-800 text-sm">
+                                <span class="material-symbols-outlined animate-spin text-base mr-2">refresh</span>
+                                Processing file...
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4">
+                            <div class="flex">
+                                <span class="material-symbols-outlined text-yellow-600 text-base mr-2">info</span>
+                                <div class="text-yellow-800 text-sm">
+                                    <p class="font-medium">Confirm Manual Payment</p>
+                                    <p class="mt-1">By uploading this receipt, you confirm that the customer has paid ₦{{ number_format((float)($bk->total ?? 0), 2) }} for this booking. The booking status will be updated to "confirmed".</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
+                        <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('receiptUploadOpen', false)">Cancel</button>
+                        <button class="rounded-md h-10 px-4 bg-green-600 text-white text-sm font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                wire:click="confirmManualPaymentWithReceipt"
+                                :disabled="!$wire.receiptFile"
+                                wire:loading.attr="disabled">
+                            <span wire:loading.remove wire:target="confirmManualPaymentWithReceipt">Confirm Payment</span>
+                            <span style="display: none" wire:loading wire:target="confirmManualPaymentWithReceipt">Processing...</span>
+                        </button>
                     </div>
                 </div>
             </div>

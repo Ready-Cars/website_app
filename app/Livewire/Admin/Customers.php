@@ -2,10 +2,15 @@
 
 namespace App\Livewire\Admin;
 
+use App\Mail\UserCredentialsMail;
 use App\Models\Booking;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Asantibanez\LivewireCharts\Models\ColumnChartModel;
+use Asantibanez\LivewireCharts\Models\PieChartModel;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -18,6 +23,15 @@ class Customers extends Component
     public bool $banOpen = false;
 
     public ?int $banUserId = null;
+
+    // Create user modal state
+    public bool $createUserOpen = false;
+
+    // Create user form data
+    public string $createName = '';
+    public string $createEmail = '';
+    public string $createPhone = '';
+    public string $createRole = 'customer'; // customer or admin
 
     // Filters
     #[Url(as: 'q')]
@@ -90,6 +104,74 @@ class Customers extends Component
     public function closeView(): void
     {
         $this->viewingId = null;
+    }
+
+    public function openCreateUser(): void
+    {
+        $this->createUserOpen = true;
+        $this->resetCreateUserForm();
+    }
+
+    public function closeCreateUser(): void
+    {
+        $this->createUserOpen = false;
+        $this->resetCreateUserForm();
+    }
+
+    public function resetCreateUserForm(): void
+    {
+        $this->createName = '';
+        $this->createEmail = '';
+        $this->createPhone = '';
+        $this->createRole = 'customer';
+    }
+
+    public function createUser(): void
+    {
+        $this->validate([
+            'createName' => 'required|string|max:255',
+            'createEmail' => 'required|email|unique:users,email',
+            'createPhone' => 'nullable|string|max:20|unique:users,phone',
+            'createRole' => 'required|in:customer,admin',
+        ], [
+            'createName.required' => 'Name is required.',
+            'createEmail.required' => 'Email is required.',
+            'createEmail.email' => 'Please enter a valid email address.',
+            'createEmail.unique' => 'This email address is already registered.',
+            'createPhone.unique' => 'This phone number is already registered.',
+            'createRole.in' => 'Please select a valid role.',
+        ]);
+
+        // Generate a random password
+        $password = Str::random(12);
+
+        // Create the user
+        $user = User::create([
+            'name' => trim($this->createName),
+            'email' => trim($this->createEmail),
+            'phone' => trim($this->createPhone) ?: null,
+            'password' => $password,
+            'is_admin' => $this->createRole === 'admin',
+            'wallet_balance' => 0.00,
+        ]);
+
+        // Send credentials email
+        try {
+            Mail::to($user->email)->send(new UserCredentialsMail(
+                $user,
+                $password,
+                $this->createRole
+            ));
+        } catch (\Throwable $e) {
+            \Log::warning('User credentials email failed: ' . $e->getMessage(), ['user_id' => $user->id]);
+            session()->flash('warning', 'User created but email sending failed. Please manually send credentials.');
+        }
+
+        $this->closeCreateUser();
+        session()->flash('success', "User created successfully as {$this->createRole}. Credentials have been sent to their email.");
+
+        // Reset pagination to show the new user
+        $this->resetPage();
     }
 
     public function ban(int $id): void
@@ -209,20 +291,18 @@ class Customers extends Component
         // Build livewire-charts models if available (prefer Arukompas fork)
         $custColumn = null;
         $custPie = null;
+
         if ($selected) {
             try {
                 $colClass = null;
+
                 $pieClass = null;
-                if (class_exists('Arukompas\\LivewireCharts\\Models\\ColumnChartModel')) {
-                    $colClass = \Arukompas\LivewireCharts\Models\ColumnChartModel::class;
-                } elseif (class_exists('Asantibanez\\LivewireCharts\\Models\\ColumnChartModel')) {
-                    $colClass = \Asantibanez\LivewireCharts\Models\ColumnChartModel::class;
-                }
-                if (class_exists('Arukompas\\LivewireCharts\\Models\\PieChartModel')) {
-                    $pieClass = \Arukompas\LivewireCharts\Models\PieChartModel::class;
-                } elseif (class_exists('Asantibanez\\LivewireCharts\\Models\\PieChartModel')) {
-                    $pieClass = \Asantibanez\LivewireCharts\Models\PieChartModel::class;
-                }
+
+
+                $colClass = ColumnChartModel::class;
+
+                $pieClass = PieChartModel::class;
+
 
                 if ($colClass) {
                     $col = new $colClass;
@@ -244,15 +324,13 @@ class Customers extends Component
                 }
                 if ($pieClass) {
                     $pie = new $pieClass;
-                    if (method_exists($pie, 'setTitle')) {
+
                         $pie = $pie->setTitle('Status Breakdown');
-                    }
-                    if (method_exists($pie, 'legendBottom')) {
+
                         $pie = $pie->legendBottom();
-                    }
-                    if (method_exists($pie, 'setAnimated')) {
+
                         $pie = $pie->setAnimated(true);
-                    }
+
                     foreach (($report['status'] ?? []) as $st => $cnt) {
                         $pie = $pie->addSlice(ucfirst($st), (int) $cnt, match ($st) {
                             'pending' => '#f59e0b', 'confirmed' => '#3b82f6', 'completed' => '#22c55e', 'cancelled' => '#ef4444', default => '#8b5cf6',

@@ -23,14 +23,28 @@
                         ['label' => 'Dashboard', 'url' => route('dashboard')],
                         ['label' => 'Customers', 'url' => null],
                     ]])
-                    <div class="mb-6">
-                        <h2 class="text-3xl font-bold tracking-tight">Customer Management</h2>
-                        <p class="mt-1 text-slate-500">Search, review bookings, track spending, and ban/unban customers.</p>
+                    <div class="mb-6 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-3xl font-bold tracking-tight">Customer Management</h2>
+                            <p class="mt-1 text-slate-500">Search, review bookings, track spending, and ban/unban customers.</p>
+                        </div>
+                        <button type="button"
+                                class="inline-flex items-center gap-2 rounded-md bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-700 focus:ring-2 focus:ring-sky-600 focus:ring-offset-2"
+                                wire:click="openCreateUser">
+                            <span class="material-symbols-outlined text-base">person_add</span>
+                            Create User
+                        </button>
                     </div>
 
                     @if (session('success'))
                         <div class="mb-4 rounded-md border border-green-300 bg-green-50 px-4 py-3 text-green-800">
                             {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if (session('warning'))
+                        <div class="mb-4 rounded-md border border-yellow-300 bg-yellow-50 px-4 py-3 text-yellow-800">
+                            {{ session('warning') }}
                         </div>
                     @endif
 
@@ -232,6 +246,7 @@
                             <div class="flex items-center justify-between">
                                 <h4 class="font-semibold text-slate-900">Bookings Over Time (Bar)</h4>
                             </div>
+
                             @if(!empty($custColumn))
                                 <div style="height: 220px;">
                                     <livewire:livewire-column-chart
@@ -334,6 +349,92 @@
                     <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="closeBan">Cancel</button>
                     <button class="rounded-md h-10 px-4 bg-red-600 text-white text-sm font-semibold hover:bg-red-700" wire:click="confirmBan">Confirm ban</button>
                 </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Create User Modal -->
+    @if($createUserOpen)
+        <div class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/50" wire:click="closeCreateUser"></div>
+            <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
+                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-slate-900">Create New User</h3>
+                    <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="closeCreateUser">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <form wire:submit="createUser" class="px-5 py-4 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                        <input type="text"
+                               wire:model="createName"
+                               class="w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600"
+                               placeholder="Enter full name"
+                               required>
+                        @error('createName') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                        <input type="email"
+                               wire:model="createEmail"
+                               class="w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600"
+                               placeholder="Enter email address"
+                               required>
+                        @error('createEmail') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Phone Number (Optional)</label>
+                        <input type="text"
+                               wire:model="createPhone"
+                               class="w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600"
+                               placeholder="Enter phone number">
+                        @error('createPhone') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                        <select wire:model="createRole"
+                                class="w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600">
+                            <option value="customer">Customer</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                        @error('createRole') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+                        <div class="flex">
+                            <span class="material-symbols-outlined text-blue-600 text-base mr-2">info</span>
+                            <div class="text-sm text-blue-800">
+                                <p class="font-medium">Default Credentials</p>
+                                <p class="mt-1">A random password will be generated and sent to the user's email address along with login instructions.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
+                        <button type="button"
+                                class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50"
+                                wire:click="closeCreateUser">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                wire:loading.attr="disabled"
+                                wire:target="createUser">
+                            <span wire:loading.remove wire:target="createUser">Create User</span>
+                            <span wire:loading wire:target="createUser" class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Creating...
+                            </span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif

@@ -177,6 +177,6 @@ class AdminConfirmPendingBookingTest extends TestCase
 
         $this->assertSame('success', $result['status']);
         $this->assertSame('confirmed', $booking->status);
-        $this->assertStringContains('paystack_payment_', $booking->payment_evidence);
+        $this->assertStringContainsString('paystack_payment_', $booking->payment_evidence);
     }
 }
