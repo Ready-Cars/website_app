@@ -51,7 +51,7 @@
                                 <p class="mt-1 text-slate-500">View, filter, and manage customer bookings.</p>
                             </div>
                             <div class="pt-1">
-                                <button type="button" class="inline-flex items-center gap-2 rounded-md h-10 px-4 bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800" wire:click="openSettings">
+                                <button type="button" class="inline-flex items-center gap-2 rounded-md h-10 px-4 bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800" @click="$store.bookingModal.openSettings()">
                                     <span class="material-symbols-outlined text-base">settings</span>
                                     <span>Settings</span>
                                 </button>
@@ -173,14 +173,7 @@
                                                 <div class="py-1 text-sm flex flex-col items-stretch">
                                                     <button class="w-full text-left px-3 py-2 hover:bg-slate-50" @click="$store.bookingModal.openViewModal({{ $b->id }})">View</button>
                                                     @if($st === 'pending')
-                                                        <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="confirm({{ $b->id }})">
-
-                                                            <span wire:loading.remove wire:target="confirm">Confirm</span>
-                                                            <span style="display: none" wire:loading wire:target="confirm">Processing...</span>
-
-
-
-                                                        </button>
+                                                        <button class="w-full text-left px-3 py-2 hover:bg-slate-50" @click="$store.bookingModal.confirmBooking({{ $b->id }})">Confirm</button>
                                                     @endif
                                                     @if($st === 'confirmed')
                                                         <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openComplete({{ $b->id }})">Complete</button>
@@ -247,7 +240,7 @@
                                                 <div class="py-1 text-sm flex flex-col items-stretch">
                                                     <button class="w-full text-left px-3 py-2 hover:bg-slate-50" @click="$store.bookingModal.openViewModal({{ $b->id }})">View</button>
                                                     @if($st === 'pending')
-                                                        <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="confirm({{ $b->id }})">Confirm</button>
+                                                        <button class="w-full text-left px-3 py-2 hover:bg-slate-50" @click="$store.bookingModal.confirmBooking({{ $b->id }})">Confirm</button>
                                                     @endif
                                                     @if($st === 'confirmed')
                                                         <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openComplete({{ $b->id }})">Complete</button>
@@ -358,7 +351,7 @@
                 <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
                     <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" @click="closeViewModal()">Close</button>
                     <template x-if="selectedBooking?.status === 'pending'">
-                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" @click="$wire.confirm(selectedBooking.id)">Confirm</button>
+                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" @click="$store.bookingModal.confirmBooking(selectedBooking.id)">Confirm</button>
                     </template>
                     <template x-if="selectedBooking?.status === 'pending payment'">
                         <button class="rounded-md h-10 px-4 bg-green-600 text-white text-sm font-semibold hover:bg-green-700" @click="$wire.openReceiptUpload(selectedBooking.id)">Upload Receipt & Confirm</button>
@@ -639,6 +632,28 @@ document.addEventListener('alpine:init', () => {
         closeViewModal() {
             this.showViewModal = false;
             this.selectedBooking = null;
+        },
+
+        confirmBooking(bookingId) {
+            // Use Livewire.find to get the component and call the method
+            const wireId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
+            if (wireId && window.Livewire) {
+                const component = window.Livewire.find(wireId);
+                if (component) {
+                    component.call('confirm', bookingId);
+                }
+            }
+        },
+
+        openSettings() {
+            // Use Livewire.find to get the component and call the method
+            const wireId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
+            if (wireId && window.Livewire) {
+                const component = window.Livewire.find(wireId);
+                if (component) {
+                    component.call('openSettings');
+                }
+            }
         }
     });
 
