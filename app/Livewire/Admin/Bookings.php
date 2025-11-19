@@ -194,6 +194,7 @@ class Bookings extends Component
         $id = $this->viewingId;
         if (! $id || ! $this->receiptFile) {
             session()->flash('error', 'Please select a receipt file');
+
             return;
         }
 
@@ -203,11 +204,12 @@ class Bookings extends Component
             // Check if booking is in pending payment status
             if (strtolower((string) $booking->status) !== 'pending payment') {
                 session()->flash('error', 'This booking is not awaiting payment confirmation');
+
                 return;
             }
 
             // Store the receipt file
-            $fileName = 'receipt_' . $booking->id . '_' . time() . '.' . $this->receiptFile->getClientOriginalExtension();
+            $fileName = 'receipt_'.$booking->id.'_'.time().'.'.$this->receiptFile->getClientOriginalExtension();
             $filePath = $this->receiptFile->storeAs('payment-evidence', $fileName, 'public');
 
             // Confirm booking with the receipt evidence path
@@ -216,7 +218,7 @@ class Bookings extends Component
             $this->receiptUploadOpen = false;
             $this->receiptFile = null;
 
-            session()->flash('success', 'Payment confirmed successfully! Booking #' . $confirmedBooking->id . ' has been confirmed with receipt uploaded.');
+            session()->flash('success', 'Payment confirmed successfully! Booking #'.$confirmedBooking->id.' has been confirmed with receipt uploaded.');
 
         } catch (\Throwable $e) {
             session()->flash('error', $e->getMessage());
@@ -269,7 +271,7 @@ class Bookings extends Component
             'taxes' => 0,
             'total' => $amount,
             'status' => 'pending payment',
-            'payment_reference' => 'MANUAL_' . $booking->id . '_' . time(),
+            'payment_reference' => 'MANUAL_'.$booking->id.'_'.time(),
         ]);
 
         // Load the booking with user relationship for email
@@ -321,9 +323,72 @@ class Bookings extends Component
             $selected = Booking::with(['user', 'car'])->find($this->viewingId);
         }
 
+        // Preload all booking data for frontend use to avoid server round-trips in modals
+        $bookingsData = [];
+        foreach ($bookings as $booking) {
+            $bookingsData[$booking->id] = [
+                'id' => $booking->id,
+                'status' => $booking->status,
+                'total' => $booking->total,
+                'subtotal' => $booking->subtotal,
+                'taxes' => $booking->taxes,
+                'start_date' => $booking->start_date?->format('M d, Y'),
+                'end_date' => $booking->end_date?->format('M d, Y'),
+                'pickup_location' => $booking->pickup_location,
+                'dropoff_location' => $booking->dropoff_location,
+                'extras' => $booking->extras,
+                'cancellation_reason' => $booking->cancellation_reason,
+                'payment_evidence' => $booking->payment_evidence,
+                'user' => $booking->user ? [
+                    'id' => $booking->user->id,
+                    'name' => $booking->user->name,
+                    'email' => $booking->user->email,
+                    'phone' => $booking->user->phone,
+                ] : null,
+                'car' => $booking->car ? [
+                    'id' => $booking->car->id,
+                    'name' => $booking->car->name,
+                    'image_url' => $booking->car->image_url,
+                ] : null,
+            ];
+        }
+
+        // If we have a selected booking that's not in current page, add it to bookingsData
+        if ($selected && ! isset($bookingsData[$selected->id])) {
+            $bookingsData[$selected->id] = [
+                'id' => $selected->id,
+                'status' => $selected->status,
+                'total' => $selected->total,
+                'subtotal' => $selected->subtotal,
+                'taxes' => $selected->taxes,
+                'start_date' => $selected->start_date?->format('M d, Y'),
+                'end_date' => $selected->end_date?->format('M d, Y'),
+                'pickup_location' => $selected->pickup_location,
+                'dropoff_location' => $selected->dropoff_location,
+                'extras' => $selected->extras,
+                'cancellation_reason' => $selected->cancellation_reason,
+                'payment_evidence' => $selected->payment_evidence,
+                'user' => $selected->user ? [
+                    'id' => $selected->user->id,
+                    'name' => $selected->user->name,
+                    'email' => $selected->user->email,
+                    'phone' => $selected->user->phone,
+                ] : null,
+                'car' => $selected->car ? [
+                    'id' => $selected->car->id,
+                    'name' => $selected->car->name,
+                    'image_url' => $selected->car->image_url,
+                ] : null,
+            ];
+        }
+
+        // Dispatch updated bookings data to frontend
+        $this->dispatch('bookingsDataUpdated', $bookingsData);
+
         return view('livewire.admin.bookings', [
             'bookings' => $bookings,
             'selected' => $selected,
+            'bookingsData' => $bookingsData,
         ]);
     }
 }

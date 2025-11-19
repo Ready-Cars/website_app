@@ -171,14 +171,7 @@
                                             </button>
                                             <div class="absolute right-0 mt-2 w-44 origin-top-right rounded-md border border-slate-200 bg-white shadow-lg z-30 hidden" data-dropdown-menu>
                                                 <div class="py-1 text-sm flex flex-col items-stretch">
-                                                    <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="view({{ $b->id }})">
-                                                        <span wire:loading.remove wire:target="view">View</span>
-                                                        <span style="display: none" wire:loading wire:target="view">Processing...</span>
-
-
-
-
-                                                        </button>
+                                                    <button class="w-full text-left px-3 py-2 hover:bg-slate-50" @click="$store.bookingModal.openViewModal({{ $b->id }})">View</button>
                                                     @if($st === 'pending')
                                                         <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="confirm({{ $b->id }})">
 
@@ -252,7 +245,7 @@
                                             </button>
                                             <div class="absolute right-0 mt-2 w-44 origin-top-right rounded-md border border-slate-200 bg-white shadow-lg z-30 hidden" data-dropdown-menu>
                                                 <div class="py-1 text-sm flex flex-col items-stretch">
-                                                    <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="view({{ $b->id }})">View</button>
+                                                    <button class="w-full text-left px-3 py-2 hover:bg-slate-50" @click="$store.bookingModal.openViewModal({{ $b->id }})">View</button>
                                                     @if($st === 'pending')
                                                         <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="confirm({{ $b->id }})">Confirm</button>
                                                     @endif
@@ -291,95 +284,94 @@
         </div>
 
         <!-- View Booking Modal -->
-        @if($selected)
-            <div class="fixed inset-0 z-50 flex items-center justify-center">
-                <div class="absolute inset-0 bg-black/50" wire:click="closeView"></div>
-                <div class="relative z-10 w-full max-w-2xl rounded-lg bg-white shadow-xl border border-slate-200">
-                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-slate-900">Booking #{{ $selected->id }}</h3>
-                        <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="closeView">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                    <div class="px-5 py-4 text-sm text-slate-700">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="space-y-3">
-                                <div class="rounded-md border border-slate-200 overflow-hidden">
-                                    <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="background-image: url('{{ $selected->car->image_url ?? '' }}');"></div>
-                                </div>
-                                <div class="space-y-1">
-                                    <div class="text-slate-500">Customer</div>
-                                    <div class="font-medium text-slate-900">
-                                        {{ $selected->user->name ?? '—' }}
-                                        (<a href="mailto:{{ $selected->user->email }}"
-                                            class="text-blue-600 hover:underline">{{ $selected->user->email }}</a>,
-                                        <a href="https://wa.me/{{ $selected->user->phone }}" target="_blank"
-                                           class="text-blue-600 hover:underline">{{ $selected->user->phone }}</a>)
-                                    </div>
-                                    <div class="text-slate-500 mt-3">Car</div>
-                                    <div class="font-medium text-slate-900">{{ $selected->car->name ?? '—' }}</div>
-                                    <div class="text-slate-500 mt-3">Status</div>
-                                    <div class="font-medium text-slate-900">{{ ucfirst($selected->status ?? '') }}</div>
-                                </div>
+        <div x-data="bookingModal" x-show="showViewModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/50" @click="closeViewModal()"></div>
+            <div class="relative z-10 w-full max-w-2xl rounded-lg bg-white shadow-xl border border-slate-200">
+                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-slate-900" x-text="'Booking #' + (selectedBooking?.id || '')"></h3>
+                    <button class="p-1 text-slate-500 hover:text-slate-700" @click="closeViewModal()">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="px-5 py-4 text-sm text-slate-700">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-3">
+                            <div class="rounded-md border border-slate-200 overflow-hidden">
+                                <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" :style="'background-image: url(' + (selectedBooking?.car?.image_url || '') + ');'"></div>
                             </div>
                             <div class="space-y-1">
-                                <div class="text-slate-500">Pickup → Dropoff</div>
-                                <div class="font-medium text-slate-900">{{ $selected->pickup_location }} → {{ $selected->dropoff_location }}</div>
-                                <div class="text-slate-500 mt-3">Dates</div>
-                                <div class="font-medium text-slate-900">{{ optional($selected->start_date)->format('M d, Y') }} — {{ optional($selected->end_date)->format('M d, Y') }}</div>
-                                <div class="text-slate-500 mt-3">Total</div>
-                                <div class="font-extrabold text-slate-900">₦{{ number_format((float)($selected->total ?? 0), 2) }}</div>
-                                @if($selected->payment_evidence)
+                                <div class="text-slate-500">Customer</div>
+                                <div class="font-medium text-slate-900">
+                                    <span x-text="selectedBooking?.user?.name || '—'"></span>
+                                    (<a :href="'mailto:' + (selectedBooking?.user?.email || '')"
+                                        class="text-blue-600 hover:underline" x-text="selectedBooking?.user?.email || ''"></a>,
+                                    <a :href="'https://wa.me/' + (selectedBooking?.user?.phone || '')" target="_blank"
+                                       class="text-blue-600 hover:underline" x-text="selectedBooking?.user?.phone || ''"></a>)
+                                </div>
+                                <div class="text-slate-500 mt-3">Car</div>
+                                <div class="font-medium text-slate-900" x-text="selectedBooking?.car?.name || '—'"></div>
+                                <div class="text-slate-500 mt-3">Status</div>
+                                <div class="font-medium text-slate-900" x-text="selectedBooking?.status ? selectedBooking.status.charAt(0).toUpperCase() + selectedBooking.status.slice(1) : ''"></div>
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-slate-500">Pickup → Dropoff</div>
+                            <div class="font-medium text-slate-900" x-text="(selectedBooking?.pickup_location || '') + ' → ' + (selectedBooking?.dropoff_location || '')"></div>
+                            <div class="text-slate-500 mt-3">Dates</div>
+                            <div class="font-medium text-slate-900" x-text="(selectedBooking?.start_date || '') + ' — ' + (selectedBooking?.end_date || '')"></div>
+                            <div class="text-slate-500 mt-3">Total</div>
+                            <div class="font-extrabold text-slate-900" x-text="'₦' + new Intl.NumberFormat().format(selectedBooking?.total || 0)"></div>
+                            <template x-if="selectedBooking?.payment_evidence">
+                                <div>
                                     <div class="text-slate-500 mt-3">Payment Evidence</div>
                                     <div class="font-medium">
-                                        <a href="{{ route('admin.bookings.payment-evidence.download', $selected) }}"
+                                        <a :href="'/admin/bookings/' + selectedBooking.id + '/payment-evidence/download'"
                                            class="inline-flex items-center gap-2 text-sky-600 hover:text-sky-800 hover:underline"
                                            target="_blank">
                                             <span class="material-symbols-outlined text-base">download</span>
                                             Download Evidence
                                         </a>
                                     </div>
-                                @endif
-                            </div>
+                                </div>
+                            </template>
                         </div>
-                        @php $extras = (array)($selected->extras ?? []); @endphp
-                        @if(!empty($extras))
-                            <div class="mt-4">
-                                <div class="text-slate-500 mb-1">Extras</div>
-                                <ul class="list-disc pl-5 text-slate-700">
-                                    @foreach($extras as $k => $v)
-                                        @if($v)
-                                            <li>{{ is_string($k) ? ucfirst(str_replace('_',' ',$k)) : (string)$k }}</li>
-                                        @endif
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-                        @if(($selected->status === 'cancelled') && !empty($selected->cancellation_reason))
-                            <div class="mt-4">
-                                <div class="text-slate-500">Cancellation reason</div>
-                                <div class="mt-1 rounded-md border border-slate-200 bg-slate-50 p-2 text-slate-700">{{ $selected->cancellation_reason }}</div>
-                            </div>
-                        @endif
                     </div>
-                    <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
-                        <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="closeView">Close</button>
-                        @if(($selected->status ?? '') === 'pending')
-                            <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="confirm({{ $selected->id }})">Confirm</button>
-                        @endif
-                        @if(($selected->status ?? '') === 'pending payment')
-                            <button class="rounded-md h-10 px-4 bg-green-600 text-white text-sm font-semibold hover:bg-green-700" wire:click="openReceiptUpload({{ $selected->id }})">Upload Receipt & Confirm</button>
-                        @endif
-                        @if(($selected->status ?? '') === 'confirmed')
-                            <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" wire:click="openComplete({{ $selected->id }})">Complete</button>
-                        @endif
-                        @if(($selected->status ?? '') !== 'cancelled' && ($selected->status ?? '') !== 'completed')
-                            <button class="rounded-md h-10 px-4 bg-red-600 text-white text-sm font-semibold hover:bg-red-700" wire:click="openCancel({{ $selected->id }})">Cancel</button>
-                        @endif
-                    </div>
+                    <template x-if="selectedBooking?.extras && Object.keys(selectedBooking.extras).length > 0">
+                        <div class="mt-4">
+                            <div class="text-slate-500 mb-1">Extras</div>
+                            <ul class="list-disc pl-5 text-slate-700">
+                                <template x-for="[key, value] in Object.entries(selectedBooking.extras)" :key="key">
+                                    <template x-if="value">
+                                        <li x-text="typeof key === 'string' ? key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ') : key"></li>
+                                    </template>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                    <template x-if="selectedBooking?.status === 'cancelled' && selectedBooking?.cancellation_reason">
+                        <div class="mt-4">
+                            <div class="text-slate-500">Cancellation reason</div>
+                            <div class="mt-1 rounded-md border border-slate-200 bg-slate-50 p-2 text-slate-700" x-text="selectedBooking.cancellation_reason"></div>
+                        </div>
+                    </template>
+                </div>
+                <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
+                    <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" @click="closeViewModal()">Close</button>
+                    <template x-if="selectedBooking?.status === 'pending'">
+                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" @click="$wire.confirm(selectedBooking.id)">Confirm</button>
+                    </template>
+                    <template x-if="selectedBooking?.status === 'pending payment'">
+                        <button class="rounded-md h-10 px-4 bg-green-600 text-white text-sm font-semibold hover:bg-green-700" @click="$wire.openReceiptUpload(selectedBooking.id)">Upload Receipt & Confirm</button>
+                    </template>
+                    <template x-if="selectedBooking?.status === 'confirmed'">
+                        <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" @click="$wire.openComplete(selectedBooking.id)">Complete</button>
+                    </template>
+                    <template x-if="selectedBooking?.status !== 'cancelled' && selectedBooking?.status !== 'completed'">
+                        <button class="rounded-md h-10 px-4 bg-red-600 text-white text-sm font-semibold hover:bg-red-700" @click="$wire.openCancel(selectedBooking.id)">Cancel</button>
+                    </template>
                 </div>
             </div>
-        @endif
+        </div>
 
         <!-- Cancel Modal -->
         @if($cancelOpen && $viewingId)
@@ -428,12 +420,12 @@
                                 {{ session('error') }}
                             </div>
                         @endif
-                        @php $bk = \App\Models\Booking::with(['user','car'])->find($viewingId); @endphp
-                        @if($bk)
+                        @if($bookingsData[$viewingId] ?? null)
+                            @php $bk = (object) $bookingsData[$viewingId]; @endphp
                             <div class="mb-3 rounded-md border border-slate-200 bg-slate-50 p-3">
-                                <div class="font-medium text-slate-900">#{{ $bk->id }} • {{ $bk->user->name ?? '—' }}</div>
-                                <div class="text-slate-600 text-sm">{{ $bk->car->name ?? '—' }}</div>
-                                <div class="text-slate-600 text-sm">{{ optional($bk->start_date)->format('M d, Y') }} — {{ optional($bk->end_date)->format('M d, Y') }}</div>
+                                <div class="font-medium text-slate-900">#{{ $bk->id }} • {{ $bk->user['name'] ?? '—' }}</div>
+                                <div class="text-slate-600 text-sm">{{ $bk->car['name'] ?? '—' }}</div>
+                                <div class="text-slate-600 text-sm">{{ $bk->start_date }} — {{ $bk->end_date }}</div>
                                 <div class="text-slate-900 text-sm mt-1">Current total: ₦{{ number_format((float)($bk->total ?? 0), 2) }}</div>
                             </div>
                         @endif
@@ -486,13 +478,13 @@
                         </button>
                     </div>
                     <div class="px-5 py-4 text-sm text-slate-700">
-                        @php $bk = \App\Models\Booking::with(['user','car'])->find($viewingId); @endphp
                         <p>You're about to mark this booking as <strong>completed</strong>.</p>
-                        @if($bk)
+                        @if($bookingsData[$viewingId] ?? null)
+                            @php $bk = (object) $bookingsData[$viewingId]; @endphp
                             <div class="mt-3 rounded-md border border-slate-200 bg-slate-50 p-3">
-                                <div class="font-medium text-slate-900">#{{ $bk->id }} • {{ $bk->user->name ?? '—' }}</div>
-                                <div class="text-slate-600 text-sm">{{ $bk->car->name ?? '—' }}</div>
-                                <div class="text-slate-600 text-sm">{{ optional($bk->start_date)->format('M d, Y') }} — {{ optional($bk->end_date)->format('M d, Y') }}</div>
+                                <div class="font-medium text-slate-900">#{{ $bk->id }} • {{ $bk->user['name'] ?? '—' }}</div>
+                                <div class="text-slate-600 text-sm">{{ $bk->car['name'] ?? '—' }}</div>
+                                <div class="text-slate-600 text-sm">{{ $bk->start_date }} — {{ $bk->end_date }}</div>
                                 <div class="text-slate-900 font-semibold mt-1">₦{{ number_format((float)($bk->total ?? 0), 2) }}</div>
                             </div>
                         @endif
@@ -528,12 +520,12 @@
                                 {{ session('error') }}
                             </div>
                         @endif
-                        @php $bk = \App\Models\Booking::with(['user','car'])->find($viewingId); @endphp
-                        @if($bk)
+                        @if($bookingsData[$viewingId] ?? null)
+                            @php $bk = (object) $bookingsData[$viewingId]; @endphp
                             <div class="mb-4 rounded-md border border-slate-200 bg-slate-50 p-3">
-                                <div class="font-medium text-slate-900">#{{ $bk->id }} • {{ $bk->user->name ?? '—' }}</div>
-                                <div class="text-slate-600 text-sm">{{ $bk->car->name ?? '—' }}</div>
-                                <div class="text-slate-600 text-sm">{{ optional($bk->start_date)->format('M d, Y') }} — {{ optional($bk->end_date)->format('M d, Y') }}</div>
+                                <div class="font-medium text-slate-900">#{{ $bk->id }} • {{ $bk->user['name'] ?? '—' }}</div>
+                                <div class="text-slate-600 text-sm">{{ $bk->car['name'] ?? '—' }}</div>
+                                <div class="text-slate-600 text-sm">{{ $bk->start_date }} — {{ $bk->end_date }}</div>
                                 <div class="text-slate-900 font-semibold mt-1">Total: ₦{{ number_format((float)($bk->total ?? 0), 2) }}</div>
                                 <div class="text-slate-600 text-xs mt-1">Status: {{ ucfirst($bk->status ?? '') }}</div>
                             </div>
@@ -613,6 +605,55 @@
     </div>
 </div>
 
+<script>
+// Alpine.js component for handling booking modals with frontend data
+document.addEventListener('alpine:init', () => {
+    // Create a global store for booking modal functionality
+    Alpine.store('bookingModal', {
+        showViewModal: false,
+        selectedBooking: null,
+        bookingsData: @json($bookingsData ?? []),
+
+        init() {
+            // Listen for specific bookings data updates from Livewire
+            window.addEventListener('bookingsDataUpdated', (event) => {
+                this.bookingsData = event.detail[0] || {};
+                window.bookingsData = this.bookingsData;
+            });
+
+            // Fallback: Listen for general Livewire updates
+            window.addEventListener('livewire:updated', () => {
+                if (window.bookingsData) {
+                    this.bookingsData = window.bookingsData;
+                }
+            });
+        },
+
+        openViewModal(bookingId) {
+            this.selectedBooking = this.bookingsData[bookingId] || null;
+            if (this.selectedBooking) {
+                this.showViewModal = true;
+            }
+        },
+
+        closeViewModal() {
+            this.showViewModal = false;
+            this.selectedBooking = null;
+        }
+    });
+
+    // Make openViewModal globally accessible
+    window.openViewModal = function(bookingId) {
+        Alpine.store('bookingModal').openViewModal(bookingId);
+    };
+
+    Alpine.data('bookingModal', () => ({
+        get showViewModal() { return Alpine.store('bookingModal').showViewModal; },
+        get selectedBooking() { return Alpine.store('bookingModal').selectedBooking; },
+        closeViewModal() { Alpine.store('bookingModal').closeViewModal(); }
+    }));
+});
+</script>
 
 <script>
 // Accessible dropdowns for action menus
