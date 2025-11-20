@@ -6,8 +6,13 @@
             // Create a global store for booking modal functionality
             Alpine.store('bookingModal', {
                 showViewModal: false,
+                showConfirmModal: false,
+                showCompleteModal: false,
+                showReceiptModal: false,
                 selectedBooking: null,
                 bookingsData: @json($bookingsData ?? []),
+                confirmPrice: '',
+                paymentMethod: 'paystack',
 
                 init() {
                     // Listen for specific bookings data updates from Livewire
@@ -36,13 +41,94 @@
                     this.selectedBooking = null;
                 },
 
+                openConfirmModal(bookingId) {
+                    this.selectedBooking = this.bookingsData[bookingId] || null;
+                    if (this.selectedBooking) {
+                        this.showConfirmModal = true;
+                        this.confirmPrice = '';
+                        this.paymentMethod = 'paystack';
+                    }
+                },
+
+                closeConfirmModal() {
+                    this.showConfirmModal = false;
+                    this.selectedBooking = null;
+                    this.confirmPrice = '';
+                    this.paymentMethod = 'paystack';
+                },
+
+                openCompleteModal(bookingId) {
+                    this.selectedBooking = this.bookingsData[bookingId] || null;
+                    if (this.selectedBooking) {
+                        this.showCompleteModal = true;
+                    }
+                },
+
+                closeCompleteModal() {
+                    this.showCompleteModal = false;
+                    this.selectedBooking = null;
+                },
+
+                openReceiptModal(bookingId) {
+                    this.selectedBooking = this.bookingsData[bookingId] || null;
+                    if (this.selectedBooking) {
+                        this.showReceiptModal = true;
+                    }
+                },
+
+                closeReceiptModal() {
+                    this.showReceiptModal = false;
+                    this.selectedBooking = null;
+                },
+
                 confirmBooking(bookingId) {
-                    // Use Livewire.find to get the component and call the method
+                    // Check if booking is pending and needs price confirmation
+                    const booking = this.bookingsData[bookingId];
+                    if (booking && booking.status?.toLowerCase() === 'pending') {
+                        this.openConfirmModal(bookingId);
+                        return;
+                    }
+
+                    // For non-pending bookings, call Livewire directly
                     const wireId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
                     if (wireId && window.Livewire) {
                         const component = window.Livewire.find(wireId);
                         if (component) {
                             component.call('confirm', bookingId);
+                        }
+                    }
+                },
+
+                confirmWithPrice() {
+                    if (!this.selectedBooking || !this.confirmPrice) return;
+
+                    const wireId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
+                    if (wireId && window.Livewire) {
+                        const component = window.Livewire.find(wireId);
+                        if (component) {
+                            // Set the Livewire properties first
+                            component.set('viewingId', this.selectedBooking.id);
+                            component.set('confirmPrice', this.confirmPrice);
+                            component.set('paymentMethod', this.paymentMethod);
+                            // Call the method
+                            component.call('confirmPendingWithPrice').then(() => {
+                                this.closeConfirmModal();
+                            });
+                        }
+                    }
+                },
+
+                completeBooking() {
+                    if (!this.selectedBooking) return;
+
+                    const wireId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
+                    if (wireId && window.Livewire) {
+                        const component = window.Livewire.find(wireId);
+                        if (component) {
+                            component.set('viewingId', this.selectedBooking.id);
+                            component.call('completeSelected').then(() => {
+                                this.closeCompleteModal();
+                            });
                         }
                     }
                 },

@@ -357,7 +357,7 @@
                         <button class="rounded-md h-10 px-4 bg-green-600 text-white text-sm font-semibold hover:bg-green-700" @click="$wire.openReceiptUpload($store.bookingModal.selectedBooking.id)">Upload Receipt & Confirm</button>
                     </template>
                     <template x-if="$store.bookingModal.selectedBooking?.status === 'confirmed'">
-                        <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" @click="$wire.openComplete($store.bookingModal.selectedBooking.id)">Complete</button>
+                        <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" @click="$store.bookingModal.openCompleteModal($store.bookingModal.selectedBooking.id)">Complete</button>
                     </template>
                     <template x-if="$store.bookingModal.selectedBooking?.status !== 'cancelled' && $store.bookingModal.selectedBooking?.status !== 'completed'">
                         <button class="rounded-md h-10 px-4 bg-red-600 text-white text-sm font-semibold hover:bg-red-700" @click="$wire.openCancel($store.bookingModal.selectedBooking.id)">Cancel</button>
@@ -391,105 +391,88 @@
         @endif
 
         <!-- Confirm with Price Modal -->
-        @if($confirmPriceOpen && $viewingId)
-            <div class="fixed inset-0 z-50 flex items-center justify-center">
-                <div class="absolute inset-0 bg-black/50" wire:click="$set('confirmPriceOpen', false)"></div>
-                <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
-                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-slate-900">Confirm booking and set price</h3>
-                        <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="$set('confirmPriceOpen', false)">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                    <div class="px-5 py-4 text-sm text-slate-700">
-
-                        @if (session('success'))
-                            <div class="mb-4 rounded-md border border-green-300 bg-green-50 px-4 py-3 text-green-800">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                        @if (session('error'))
-                            <div class="mb-4 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-red-800">
-                                {{ session('error') }}
-                            </div>
-                        @endif
-                        @if($bookingsData[$viewingId] ?? null)
-                            @php $bk = (object) $bookingsData[$viewingId]; @endphp
-                            <div class="mb-3 rounded-md border border-slate-200 bg-slate-50 p-3">
-                                <div class="font-medium text-slate-900">#{{ $bk->id }} • {{ $bk->user['name'] ?? '—' }}</div>
-                                <div class="text-slate-600 text-sm">{{ $bk->car['name'] ?? '—' }}</div>
-                                <div class="text-slate-600 text-sm">{{ $bk->start_date }} — {{ $bk->end_date }}</div>
-                                <div class="text-slate-900 text-sm mt-1">Current total: ₦{{ number_format((float)($bk->total ?? 0), 2) }}</div>
-                            </div>
-                        @endif
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Final price (₦)</label>
-                        <input type="number" min="0" step="0.01" inputmode="decimal" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" placeholder="Enter amount" wire:model.defer="confirmPrice">
-
-                        <div class="mt-4 mb-4">
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Payment Method</label>
-                            <div class="space-y-2">
-                                <label class="flex items-center">
-                                    <input type="radio" name="paymentMethod" value="paystack" wire:model="paymentMethod" class="h-4 w-4 text-sky-600 focus:ring-sky-600 border-gray-300">
-                                    <span class="ml-2 text-sm text-slate-700">
-                                        <strong>Paystack Payment</strong>
-                                        <span class="text-slate-500 block text-xs">Check wallet balance first, then send payment link if insufficient</span>
-                                    </span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="paymentMethod" value="manual" wire:model="paymentMethod" class="h-4 w-4 text-sky-600 focus:ring-sky-600 border-gray-300">
-                                    <span class="ml-2 text-sm text-slate-700">
-                                        <strong>Manual Payment</strong>
-                                        <span class="text-slate-500 block text-xs">Send bank account details via email for manual transfer</span>
-                                    </span>
-                                </label>
-                            </div>
+        <div x-show="$store.bookingModal.showConfirmModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/50" @click="$store.bookingModal.closeConfirmModal()"></div>
+            <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
+                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-slate-900">Confirm booking and set price</h3>
+                    <button class="p-1 text-slate-500 hover:text-slate-700" @click="$store.bookingModal.closeConfirmModal()">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="px-5 py-4 text-sm text-slate-700">
+                    <template x-if="$store.bookingModal.selectedBooking">
+                        <div class="mb-3 rounded-md border border-slate-200 bg-slate-50 p-3">
+                            <div class="font-medium text-slate-900" x-text="'#' + $store.bookingModal.selectedBooking?.id + ' • ' + ($store.bookingModal.selectedBooking?.user?.name || '—')"></div>
+                            <div class="text-slate-600 text-sm" x-text="$store.bookingModal.selectedBooking?.car?.name || '—'"></div>
+                            <div class="text-slate-600 text-sm" x-text="($store.bookingModal.selectedBooking?.start_date || '—') + ' — ' + ($store.bookingModal.selectedBooking?.end_date || '—')"></div>
+                            <div class="text-slate-900 text-sm mt-1" x-text="'Current total: ₦' + new Intl.NumberFormat().format($store.bookingModal.selectedBooking?.total || 0)"></div>
                         </div>
+                    </template>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Final price (₦)</label>
+                    <input type="number" min="0" step="0.01" inputmode="decimal" class="form-input w-full rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" placeholder="Enter amount" x-model="$store.bookingModal.confirmPrice">
 
-                        <p class="text-xs text-slate-500 mt-1" x-show="$wire.paymentMethod === 'paystack'">If customer has sufficient wallet balance, booking will be confirmed immediately. Otherwise, a payment link will be sent to their email.</p>
-                        <p class="text-xs text-slate-500 mt-1" x-show="$wire.paymentMethod === 'manual'">Customer will receive an email with bank account details and payment instructions.</p>
+                    <div class="mt-4 mb-4">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Payment Method</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="paymentMethodModal" value="paystack" x-model="$store.bookingModal.paymentMethod" class="h-4 w-4 text-sky-600 focus:ring-sky-600 border-gray-300">
+                                <span class="ml-2 text-sm text-slate-700">
+                                    <strong>Paystack Payment</strong>
+                                    <span class="text-slate-500 block text-xs">Check wallet balance first, then send payment link if insufficient</span>
+                                </span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="paymentMethodModal" value="manual" x-model="$store.bookingModal.paymentMethod" class="h-4 w-4 text-sky-600 focus:ring-sky-600 border-gray-300">
+                                <span class="ml-2 text-sm text-slate-700">
+                                    <strong>Manual Payment</strong>
+                                    <span class="text-slate-500 block text-xs">Send bank account details via email for manual transfer</span>
+                                </span>
+                            </label>
+                        </div>
                     </div>
-                    <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
-                        <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('confirmPriceOpen', false)">Close</button>
-                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="confirmPendingWithPrice">Confirm & Charge</button>
-                    </div>
+
+                    <p class="text-xs text-slate-500 mt-1" x-show="$store.bookingModal.paymentMethod === 'paystack'">If customer has sufficient wallet balance, booking will be confirmed immediately. Otherwise, a payment link will be sent to their email.</p>
+                    <p class="text-xs text-slate-500 mt-1" x-show="$store.bookingModal.paymentMethod === 'manual'">Customer will receive an email with bank account details and payment instructions.</p>
+                </div>
+                <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
+                    <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" @click="$store.bookingModal.closeConfirmModal()">Close</button>
+                    <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" @click="$store.bookingModal.confirmWithPrice()">Confirm & Charge</button>
                 </div>
             </div>
-        @endif
+        </div>
 
 
         <!-- Success Message Modal -->
 
         <!-- Complete Modal -->
-        @if($completeOpen && $viewingId)
-            <div class="fixed inset-0 z-50 flex items-center justify-center">
-                <div class="absolute inset-0 bg-black/50" wire:click="$set('completeOpen', false)"></div>
-                <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
-                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-slate-900">Mark as completed</h3>
-                        <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="$set('completeOpen', false)">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                    <div class="px-5 py-4 text-sm text-slate-700">
-                        <p>You're about to mark this booking as <strong>completed</strong>.</p>
-                        @if($bookingsData[$viewingId] ?? null)
-                            @php $bk = (object) $bookingsData[$viewingId]; @endphp
-                            <div class="mt-3 rounded-md border border-slate-200 bg-slate-50 p-3">
-                                <div class="font-medium text-slate-900">#{{ $bk->id }} • {{ $bk->user['name'] ?? '—' }}</div>
-                                <div class="text-slate-600 text-sm">{{ $bk->car['name'] ?? '—' }}</div>
-                                <div class="text-slate-600 text-sm">{{ $bk->start_date }} — {{ $bk->end_date }}</div>
-                                <div class="text-slate-900 font-semibold mt-1">₦{{ number_format((float)($bk->total ?? 0), 2) }}</div>
-                            </div>
-                        @endif
-                        <p class="text-xs text-slate-500 mt-3">This action signifies the trip has been completed. It does not alter wallet balances.</p>
-                    </div>
-                    <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
-                        <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="$set('completeOpen', false)">Close</button>
-                        <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" wire:click="completeSelected">Confirm complete</button>
-                    </div>
+        <div x-show="$store.bookingModal.showCompleteModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/50" @click="$store.bookingModal.closeCompleteModal()"></div>
+            <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
+                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-slate-900">Mark as completed</h3>
+                    <button class="p-1 text-slate-500 hover:text-slate-700" @click="$store.bookingModal.closeCompleteModal()">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="px-5 py-4 text-sm text-slate-700">
+                    <p>You're about to mark this booking as <strong>completed</strong>.</p>
+                    <template x-if="$store.bookingModal.selectedBooking">
+                        <div class="mt-3 rounded-md border border-slate-200 bg-slate-50 p-3">
+                            <div class="font-medium text-slate-900" x-text="'#' + $store.bookingModal.selectedBooking?.id + ' • ' + ($store.bookingModal.selectedBooking?.user?.name || '—')"></div>
+                            <div class="text-slate-600 text-sm" x-text="$store.bookingModal.selectedBooking?.car?.name || '—'"></div>
+                            <div class="text-slate-600 text-sm" x-text="($store.bookingModal.selectedBooking?.start_date || '—') + ' — ' + ($store.bookingModal.selectedBooking?.end_date || '—')"></div>
+                            <div class="text-slate-900 font-semibold mt-1" x-text="'₦' + new Intl.NumberFormat().format($store.bookingModal.selectedBooking?.total || 0)"></div>
+                        </div>
+                    </template>
+                    <p class="text-xs text-slate-500 mt-3">This action signifies the trip has been completed. It does not alter wallet balances.</p>
+                </div>
+                <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
+                    <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" @click="$store.bookingModal.closeCompleteModal()">Close</button>
+                    <button class="rounded-md h-10 px-4 bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700" @click="$store.bookingModal.completeBooking()">Confirm complete</button>
                 </div>
             </div>
-        @endif
+        </div>
 
         <!-- Receipt Upload Modal -->
         @if($receiptUploadOpen && $viewingId)
