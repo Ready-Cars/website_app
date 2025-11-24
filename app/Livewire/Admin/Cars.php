@@ -13,8 +13,6 @@ class Cars extends Component
 {
     use WithFileUploads, WithPagination;
 
-    // Save confirmation modal state
-    public bool $saveConfirmOpen = false;
 
     // Filters
     #[Url(as: 'q')]
@@ -51,6 +49,9 @@ class Cars extends Component
     public bool $showAdvanced = false;
 
     public array $options = [];
+
+    // Preloaded cars data for instant access
+    public array $carsData = [];
 
     // Create/Edit modal state
     public bool $editOpen = false;
@@ -216,6 +217,21 @@ class Cars extends Component
         $this->images = array_values((array) ($car->images ?? []));
     }
 
+    protected function loadCarIntoFormFromArray(array $carData): void
+    {
+        $this->name = (string) ($carData['name'] ?? '');
+        $this->category_field = (string) ($carData['category'] ?? '');
+        $this->description = (string) ($carData['description'] ?? '');
+        $this->image_url = (string) ($carData['image_url'] ?? '');
+        $this->daily_price = (string) ($carData['daily_price'] ?? '');
+        $this->seats_field = (string) ($carData['seats'] ?? '');
+        $this->transmission_field = (string) ($carData['transmission'] ?? '');
+        $this->fuel_type_field = (string) ($carData['fuel_type'] ?? '');
+        $this->featured_field = (bool) ($carData['featured'] ?? false);
+        $this->location = (string) ($carData['location'] ?? '');
+        $this->images = array_values((array) ($carData['images'] ?? []));
+    }
+
     public function resetForm(): void
     {
         $this->editingId = null;
@@ -240,28 +256,18 @@ class Cars extends Component
 
     public function openEdit(int $id): void
     {
-        $car = Car::findOrFail($id);
-        $this->editingId = $car->id;
-        $this->loadCarIntoForm($car);
+        $carData = $this->carsData[$id] ?? null;
+        if (!$carData) {
+            // Fallback to database if not preloaded (shouldn't happen in normal flow)
+            $car = Car::findOrFail($id);
+            $carData = $car->toArray();
+        }
+
+        $this->editingId = $id;
+        $this->loadCarIntoFormFromArray($carData);
         $this->editOpen = true;
     }
 
-    public function openSaveConfirm(): void
-    {
-        $this->saveConfirmOpen = true;
-    }
-
-    public function closeSaveConfirm(): void
-    {
-        $this->saveConfirmOpen = false;
-    }
-
-    public function confirmSave(CarManagementService $service): void
-    {
-        // Delegate to existing save logic
-        $this->save($service);
-        $this->saveConfirmOpen = false;
-    }
 
     public function save(CarManagementService $service): void
     {
@@ -288,13 +294,20 @@ class Cars extends Component
             // Merge gallery uploads with any URL entries in images
             $data['images'] = array_values(array_filter(array_merge($data['images'] ?? [], $storedGallery)));
 
+            $savedCar = null;
             if ($this->editingId) {
-                $service->updateCar(Car::findOrFail($this->editingId), $data);
+                $savedCar = $service->updateCar(Car::findOrFail($this->editingId), $data);
                 session()->flash('success', 'Car updated successfully');
             } else {
-                $service->createCar($data);
+                $savedCar = $service->createCar($data);
                 session()->flash('success', 'Car created successfully');
             }
+
+            // Refresh $carsData to keep frontend data in sync
+            if ($savedCar) {
+                $this->carsData[$savedCar->id] = $savedCar->toArray();
+            }
+
             $this->editOpen = false;
             $this->resetForm();
         } catch (\Throwable $e) {
@@ -431,6 +444,13 @@ class Cars extends Component
             'perPage' => $this->perPage,
         ];
         $cars = $service->queryCars($filters, $this->perPage);
+
+        // Preload all car data for instant modal access
+        $this->carsData = [];
+        foreach ($cars->getCollection() as $car) {
+            $this->carsData[$car->id] = $car->toArray();
+        }
+
         // Build availability map for current page
         $ids = $cars->getCollection()->pluck('id')->all();
         $availability = $service->availabilityForCars($ids);

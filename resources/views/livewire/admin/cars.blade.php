@@ -1,4 +1,35 @@
-<div x-data="{ editOpen :@entangle('editOpen')}">
+<div x-data="{
+    editOpen: @entangle('editOpen'),
+    saveConfirmOpen: false,
+    toggleOpen: @entangle('toggleOpen'),
+    editingId: @entangle('editingId'),
+    toggleId: @entangle('toggleId'),
+    toggleMode: @entangle('toggleMode'),
+    carsData: @js($carsData ?? []),
+    openEditLocal(carId) {
+        const carData = this.carsData[carId];
+        if (carData) {
+            this.editingId = carId;
+            $wire.name = carData.name || '';
+            $wire.category_field = carData.category || '';
+            $wire.description = carData.description || '';
+            $wire.image_url = carData.image_url || '';
+            $wire.daily_price = carData.daily_price || '';
+            $wire.seats_field = carData.seats || '';
+            $wire.transmission_field = carData.transmission || '';
+            $wire.fuel_type_field = carData.fuel_type || '';
+            $wire.featured_field = !!carData.featured;
+            $wire.location = carData.location || '';
+            $wire.images = carData.images || [];
+            this.editOpen = true;
+        }
+    },
+    openDisableLocal(carId) {
+        this.toggleId = carId;
+        this.toggleMode = 'disable';
+        this.toggleOpen = true;
+    }
+}">
     <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-slate-50 text-slate-900" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
         <div class="layout-container flex h-full grow flex-col">
             <header class="sticky top-0 z-10 flex items-center justify-between whitespace-nowrap border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur-sm sm:px-6 lg:px-8">
@@ -211,10 +242,10 @@
                                         </button>
                                         <div class="absolute right-0 mt-2 w-44 origin-top-right rounded-md border border-slate-200 bg-white shadow-lg z-30 hidden" data-dropdown-menu>
                                             <div class="py-1 text-sm flex flex-col items-stretch">
-                                                <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openEdit({{ $car->id }})" >Edit</button>
-                                                <a class="w-full text-left px-3 py-2 hover:bg-slate-50 text-left" href="{{ route('admin.bookings', ['car' => $car->id]) }}" wire:navigate>Manage bookings</a>
+                                                <button class="w-full text-left px-3 py-2 hover:bg-slate-50" x-on:click="openEditLocal({{ $car->id }})" >Edit</button>
+                                                <a class="w-full text-left px-3 py-2 hover:bg-slate-50 text-left" href="{{ route('admin.bookings', ['car' => $car->id]) }}" >Manage bookings</a>
                                                 @if($car->is_active)
-                                                    <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openDisable({{ $car->id }})">Disable</button>
+                                                    <button class="w-full text-left px-3 py-2 hover:bg-slate-50" x-on:click="openDisableLocal({{ $car->id }})">Disable</button>
                                                 @else
                                                     <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openEnable({{ $car->id }})">Enable</button>
                                                 @endif
@@ -274,10 +305,10 @@
                                             </button>
                                             <div class="absolute right-0 mt-2 w-44 origin-top-right rounded-md border border-slate-200 bg-white shadow-lg z-30 hidden" data-dropdown-menu>
                                                 <div class="py-1 text-sm flex flex-col items-stretch">
-                                                    <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openEdit({{ $car->id }})">Edit</button>
-                                                    <a class="w-full text-left px-3 py-2 hover:bg-slate-50 text-left" href="{{ route('admin.bookings', ['car' => $car->id]) }}" wire:navigate>Manage bookings</a>
+                                                    <button class="w-full text-left px-3 py-2 hover:bg-slate-50" x-on:click="openEditLocal({{ $car->id }})">Edit</button>
+                                                    <a class="w-full text-left px-3 py-2 hover:bg-slate-50 text-left" href="{{ route('admin.bookings', ['car' => $car->id]) }}" >Manage bookings</a>
                                                     @if($car->is_active)
-                                                        <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openDisable({{ $car->id }})">Disable</button>
+                                                        <button class="w-full text-left px-3 py-2 hover:bg-slate-50" x-on:click="openDisableLocal({{ $car->id }})">Disable</button>
                                                     @else
                                                         <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="openEnable({{ $car->id }})">Enable</button>
                                                     @endif
@@ -344,44 +375,64 @@
                                 @error('description') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                             </div>
 
-                            @if($editingId)
-                                @php
-                                    $adminGallery = array_values(array_filter(array_merge([
-                                        ($image_url ?? '') !== '' ? $image_url : null,
-                                    ], (array)($images ?? []))));
-                                    if (empty($adminGallery)) {
-                                        $adminGallery = ['https://via.placeholder.com/1280x720?text=No+Image'];
+                            <div x-show="editingId" class="md:col-span-2" x-data="{
+                                currentImageIndex: 0,
+                                get adminGallery() {
+                                    const gallery = [];
+                                    if ($wire.image_url && $wire.image_url !== '') {
+                                        gallery.push($wire.image_url);
                                     }
-                                @endphp
-                                <div class="md:col-span-2">
-                                    <label class="block text-sm font-medium text-slate-700 mb-2">Existing images</label>
-                                    <div class="rounded-lg overflow-hidden bg-white border border-slate-200">
-                                        <div class="relative">
-                                            <img id="admin-edit-main-image" src="{{ $adminGallery[0] }}" alt="Existing image" class="w-full aspect-video object-cover" />
-                                            @if(count($adminGallery) > 1)
-                                                <button type="button" class="absolute left-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 w-8 h-8" data-admin-gal-prev aria-label="Previous image">
+                                    if ($wire.images && Array.isArray($wire.images)) {
+                                        gallery.push(...$wire.images.filter(img => img && img !== ''));
+                                    }
+                                    return gallery.length > 0 ? gallery : ['https://via.placeholder.com/1280x720?text=No+Image'];
+                                },
+                                get currentImage() {
+                                    return this.adminGallery[this.currentImageIndex] || 'https://via.placeholder.com/1280x720?text=No+Image';
+                                },
+                                nextImage() {
+                                    if (this.currentImageIndex < this.adminGallery.length - 1) {
+                                        this.currentImageIndex++;
+                                    }
+                                },
+                                prevImage() {
+                                    if (this.currentImageIndex > 0) {
+                                        this.currentImageIndex--;
+                                    }
+                                },
+                                selectImage(index) {
+                                    this.currentImageIndex = index;
+                                }
+                            }" x-init="$watch('editingId', () => currentImageIndex = 0)">
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Existing images</label>
+                                <div class="rounded-lg overflow-hidden bg-white border border-slate-200">
+                                    <div class="relative">
+                                        <img :src="currentImage" alt="Existing image" class="w-full aspect-video object-cover" />
+                                        <template x-if="adminGallery.length > 1">
+                                            <div>
+                                                <button type="button" class="absolute left-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 w-8 h-8" @click="prevImage()" :disabled="currentImageIndex === 0" aria-label="Previous image">
                                                     <span class="material-symbols-outlined text-sm">chevron_left</span>
                                                 </button>
-                                                <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 w-8 h-8" data-admin-gal-next aria-label="Next image">
+                                                <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 w-8 h-8" @click="nextImage()" :disabled="currentImageIndex === adminGallery.length - 1" aria-label="Next image">
                                                     <span class="material-symbols-outlined text-sm">chevron_right</span>
                                                 </button>
-                                            @endif
-                                        </div>
-                                        @if(count($adminGallery) > 1)
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <template x-if="adminGallery.length > 1">
                                         <div class="p-2 border-t border-slate-200">
-                                            <div class="flex gap-2 overflow-x-auto" id="admin-edit-thumbs" aria-label="Existing image thumbnails">
-                                                @foreach($adminGallery as $i => $src)
-                                                    <button type="button" class="shrink-0 rounded-md overflow-hidden border {{ $i === 0 ? 'ring-2 ring-sky-600 border-sky-200' : 'border-slate-200' }}" data-admin-gal-thumb data-index="{{ $i }}" aria-label="Show image {{ $i + 1 }}">
-                                                        <img src="{{ $src }}" alt="Existing image {{ $i + 1 }}" class="w-16 h-12 object-cover" />
+                                            <div class="flex gap-2 overflow-x-auto" aria-label="Existing image thumbnails">
+                                                <template x-for="(src, index) in adminGallery" :key="index">
+                                                    <button type="button" class="shrink-0 rounded-md overflow-hidden border" :class="index === currentImageIndex ? 'ring-2 ring-sky-600 border-sky-200' : 'border-slate-200'" @click="selectImage(index)" :aria-label="'Show image ' + (index + 1)">
+                                                        <img :src="src" :alt="'Existing image ' + (index + 1)" class="w-16 h-12 object-cover" />
                                                     </button>
-                                                @endforeach
+                                                </template>
                                             </div>
                                         </div>
-                                        @endif
-                                    </div>
-                                    <p class="mt-2 text-xs text-slate-500">These are the currently saved images for this car. Upload new images below to replace/add.</p>
+                                    </template>
                                 </div>
-                            @endif
+                                <p class="mt-2 text-xs text-slate-500">These are the currently saved images for this car. Upload new images below to replace/add.</p>
+                            </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Primary image</label>
@@ -506,34 +557,32 @@
                     </div>
                     <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
                         <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" x-on:click="editOpen=false">Close</button>
-                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="openSaveConfirm">Save</button>
+                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" x-on:click="saveConfirmOpen = true">Save</button>
                     </div>
                 </div>
             </div>
 
 
         <!-- Save confirm modal -->
-        @if($saveConfirmOpen)
-            <div class="fixed inset-0 z-50 flex items-center justify-center">
-                <div class="absolute inset-0 bg-black/50" wire:click="closeSaveConfirm"></div>
-                <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
-                    <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-slate-900">Confirm save</h3>
-                        <button class="p-1 text-slate-500 hover:text-slate-700" wire:click="closeSaveConfirm">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                    <div class="px-5 py-4 text-sm text-slate-700">
-                        <p>Are you sure you want to {{ $editingId ? 'update this car' : 'create this car' }} with the current details?</p>
-                        <p class="text-xs text-slate-500 mt-2">You can edit these details later if needed.</p>
-                    </div>
-                    <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
-                        <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" wire:click="closeSaveConfirm">Cancel</button>
-                        <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" wire:click="confirmSave">Confirm save</button>
-                    </div>
+        <div x-show="saveConfirmOpen" class="fixed inset-0 z-50 flex items-center justify-center" x-cloak>
+            <div class="absolute inset-0 bg-black/50" x-on:click="saveConfirmOpen = false"></div>
+            <div class="relative z-10 w-full max-w-md rounded-lg bg-white shadow-xl border border-slate-200">
+                <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-slate-900">Confirm save</h3>
+                    <button class="p-1 text-slate-500 hover:text-slate-700" x-on:click="saveConfirmOpen = false">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="px-5 py-4 text-sm text-slate-700">
+                    <p>Are you sure you want to {{ $editingId ? 'update this car' : 'create this car' }} with the current details?</p>
+                    <p class="text-xs text-slate-500 mt-2">You can edit these details later if needed.</p>
+                </div>
+                <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-2">
+                    <button class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50" x-on:click="saveConfirmOpen = false">Cancel</button>
+                    <button class="rounded-md h-10 px-4 bg-sky-600 text-white text-sm font-semibold hover:bg-sky-700" x-on:click="saveConfirmOpen = false" wire:click="save">Confirm save</button>
                 </div>
             </div>
-        @endif
+        </div>
 
         <!-- Delete confirm modal -->
         @if($deleteOpen && $deleteId)

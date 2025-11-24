@@ -139,7 +139,7 @@
                                             <div class="absolute right-0 mt-2 w-48 origin-top-right rounded-md border border-slate-200 bg-white shadow-lg z-30 hidden" data-dropdown-menu>
                                                 <div class="py-1 text-sm flex flex-col items-stretch">
                                                     <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="view({{ $u->id }})">View</button>
-                                                    <a class="w-full text-left px-3 py-2 hover:bg-slate-50" href="{{ route('admin.bookings', ['q' => $u->email]) }}" wire:navigate title="View all bookings for {{ $u->name }}">All bookings</a>
+                                                    <a class="w-full text-left px-3 py-2 hover:bg-slate-50" href="{{ route('admin.bookings', ['q' => $u->email]) }}" title="View all bookings for {{ $u->name }}">All bookings</a>
                                                     @if($isBanned)
                                                         <button class="w-full text-left px-3 py-2 text-green-700 hover:bg-green-50" wire:click="unban({{ $u->id }})">Unban</button>
                                                     @else
@@ -181,7 +181,7 @@
                                             <div class="absolute right-0 mt-2 w-44 origin-top-right rounded-md border border-slate-200 bg-white shadow-lg z-30 hidden" data-dropdown-menu>
                                                 <div class="py-1 text-sm flex flex-col items-stretch">
                                                     <button class="w-full text-left px-3 py-2 hover:bg-slate-50" wire:click="view({{ $u->id }})">View</button>
-                                                    <a class="w-full text-left px-3 py-2 hover:bg-slate-50" href="{{ route('admin.bookings', ['q' => $u->email]) }}" wire:navigate>All bookings</a>
+                                                    <a class="w-full text-left px-3 py-2 hover:bg-slate-50" href="{{ route('admin.bookings', ['q' => $u->email]) }}" >All bookings</a>
                                                     @if($isBanned)
                                                         <button class="w-full text-left px-3 py-2 text-green-700 hover:bg-green-50" wire:click="unban({{ $u->id }})">Unban</button>
                                                     @else
@@ -311,7 +311,7 @@
                     </div>
 
                     <div class="mt-6 flex items-center justify-between gap-2">
-                        <a class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 inline-flex items-center" href="{{ route('admin.bookings', ['q' => $selected->email]) }}" wire:navigate title="View all bookings for {{ $selected->name }}">
+                        <a class="rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 inline-flex items-center" href="{{ route('admin.bookings', ['q' => $selected->email]) }}" title="View all bookings for {{ $selected->name }}">
                             <span class="material-symbols-outlined text-base mr-1">book_online</span>
                             <span>View all bookings</span>
                         </a>
