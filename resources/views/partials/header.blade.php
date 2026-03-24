@@ -3,6 +3,7 @@
         cursor: pointer;
     }
 </style>
+@if(!session('is_from_app'))
 <header class="sticky top-0 z-50 bg-[#0e1133] flex items-center justify-between whitespace-nowrap border-b border-solid border-transparent px-4 sm:px-6 lg:px-10 py-4" data-mobile-menu-root>
     <div class="flex items-center gap-3">
         <a href="{{ route('home') }}" class="inline-flex items-center" aria-label="{{ config('app.name') }}" wire:navigate>
@@ -90,6 +91,7 @@
     </div>
 </header>
 @livewire('pricing-disclaimer')
+@endif
 
 <script>
 // Mobile menu toggler (isolated per header instance)

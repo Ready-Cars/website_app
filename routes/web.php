@@ -112,4 +112,7 @@ Route::middleware(['auth', CustomerOnly::class])->group(function () {
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 });
 
+Route::get('/auth/remote-login', [\App\Http\Controllers\Auth\SSOController::class, 'remoteLogin'])->name('auth.remote-login');
+
+
 require __DIR__.'/auth.php';

@@ -1,3 +1,4 @@
+@if(!session('is_from_app'))
 <footer class="bg-slate-100 border-t border-slate-200">
     <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -76,3 +77,4 @@
         </div>
     </div>
 </footer>
+@endif

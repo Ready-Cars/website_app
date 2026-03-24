@@ -266,6 +266,7 @@ class RentCar extends Component
             $keys = array_keys($e->validator->errors()->messages());
             $first = $keys[0] ?? null;
             if ($first) {
+                $this->confirmOpen = false;
                 // Tell the browser to scroll to the first invalid field
                 $this->dispatch('scroll-to-field', field: $first);
             }
