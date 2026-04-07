@@ -17,6 +17,9 @@ Route::view('/book-online', 'home.index')->name('home2');
 // Terms and Conditions page
 Route::view('/terms', 'terms.index')->name('terms.index');
 
+Route::get('/privacy-policy', function () {
+    return redirect('https://instantride.readycars.ng/privacy-policy');
+})->name('privacy-policy.index');
 // Contact Us page
 Route::view('/contact', 'contact.index')->name('contact.index');
 
@@ -53,6 +56,7 @@ Route::middleware(['auth', CustomerOnly::class])->group(function () {
     Route::post('/wallet/paystack/init', [WalletFundingController::class, 'init'])->name('wallet.paystack.init');
     Route::get('/wallet/paystack/callback', [WalletFundingController::class, 'callback'])->name('wallet.paystack.callback');
 });
+
 
 // Booking payment callback (public access for Paystack)
 Route::get('/booking/payment/callback', [BookingPaymentController::class, 'callback'])->name('booking.payment.callback');
@@ -115,4 +119,4 @@ Route::middleware(['auth', CustomerOnly::class])->group(function () {
 Route::get('/auth/remote-login', [\App\Http\Controllers\Auth\SSOController::class, 'remoteLogin'])->name('auth.remote-login');
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
