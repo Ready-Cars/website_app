@@ -24,7 +24,7 @@ class SSOController extends Controller
 
         $secret = env('SSO_SECRET');
         $expectedSig = hash('sha256', $request->email . $secret);
-
+        dd($request->sig . ' ' . $expectedSig);
         if ($request->sig !== $expectedSig) {
             return response()->json([
                 'success' => false,
