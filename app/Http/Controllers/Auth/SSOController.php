@@ -22,23 +22,30 @@ class SSOController extends Controller
             'sig' => 'required|string',
         ]);
 
-        $secret = env('SSO_SECRET');
-        $expectedSig = hash('sha256', $request->email . $secret);
-        dd($request->sig . ' ' . $expectedSig);
+        $secret = config('services.sso.secret');
+        // Normalize email for consistent signature verification
+        $email = strtolower(trim($request->email));
+        $expectedSig = hash('sha256', $email . $secret);
+
         if ($request->sig !== $expectedSig) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid signature.',
+                'debug' => [
+                    'received' => $request->sig,
+                    'expected' => $expectedSig,
+                    'email_used' => $email
+                ]
             ], 403);
         }
 
         // Find or create the user
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $email)->first();
 
         if (!$user) {
             $user = User::create([
                 'name' => $request->name,
-                'email' => $request->email,
+                'email' => $email,
                 'phone' => $request->phone ?? '',
                 'password' => Hash::make(Str::random(16)),
                 'is_admin' => false,
@@ -51,7 +58,22 @@ class SSOController extends Controller
         // Login the user
         Auth::login($user, true);
 
-        // Redirect to the booking entry point
-        return redirect()->to('/cars');
+        // Redirect to requested path or default to /cars
+        $redirectPath = $request->query('redirect', '/cars');
+        
+        // Security: Only allow internal redirects
+        if (str_starts_with($redirectPath, 'http')) {
+             $appUrl = config('app.url');
+             $appHost = parse_url($appUrl, PHP_URL_HOST);
+             $redirectHost = parse_url($redirectPath, PHP_URL_HOST);
+             
+             if ($redirectHost !== $appHost) {
+                 $redirectPath = '/cars';
+             }
+        } elseif (!str_starts_with($redirectPath, '/')) {
+            $redirectPath = '/cars';
+        }
+
+        return redirect()->to($redirectPath);
     }
 }
