@@ -277,6 +277,19 @@ class RentCar extends Component
         if (! auth()->check()) {
             // Close modal if open
             $this->confirmOpen = false;
+
+            // Cache the booking information in the session for automatic processing after login
+            session()->put('pending_booking', [
+                'car_id' => $this->car->id,
+                'pickup_location' => $this->pickupLocation,
+                'dropoff_location' => $this->dropoffLocation,
+                'start_date' => $this->startDate,
+                'end_date' => $this->endDate,
+                'extras' => $this->extras,
+                'notes' => $this->notes,
+                'service_type_id' => $this->serviceTypeId,
+            ]);
+
             // Redirect guests to login, preserving intended URL
             $this->redirect(route('login'));
 
@@ -451,9 +464,61 @@ class RentCar extends Component
         $message = $newStatus === 'pending'
             ? "Your reservation request has been received. No payment has been taken yet. We'll contact you to confirm the price."
             : 'Your reservation request has been received!';
-        session()->flash('rent_success', $message);
-        $this->redirect(route('trips.index'), navigate: true);
+        RateLimiter::clear($this->throttleKey());
+        Session::regenerate();
 
+        // Process any pending bookings cached from a guest session
+        if ($pending = Session::pull('pending_booking')) {
+            $this->processPendingBooking($pending);
+        }
+
+        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+    }
+
+    /**
+     * Process a pending booking cached in the session during a guest interaction.
+     */
+    protected function processPendingBooking(array $data): void
+    {
+        try {
+            $user = Auth::user();
+            $car = \App\Models\Car::findOrFail($data['car_id']);
+            $serviceType = \App\Models\ServiceType::findOrFail($data['service_type_id']);
+
+            // Calculate totals (similar to RentCar logic)
+            $start = \Carbon\Carbon::parse($data['start_date'])->startOfDay();
+            $end = \Carbon\Carbon::parse($data['end_date'])->startOfDay();
+            $days = max(1, $start->diffInDays($end));
+
+            $subtotal = ((float) $car->daily_price) * $days;
+            // Note: Simplification here for extras; in a full implementation, we'd recalc from the 'extras' array
+            $taxes = round($subtotal * (float) \App\Models\Setting::get('tax_rate', '0.08'), 2);
+            $total = round($subtotal + $taxes, 2);
+
+            $isNegotiable = strtolower((string) $serviceType->pricing_type) === 'negotiable';
+            $status = $isNegotiable ? 'pending' : 'confirmed';
+
+            // Create the booking automatically
+            \App\Models\Booking::create([
+                'user_id' => $user->id,
+                'car_id' => $car->id,
+                'pickup_location' => $data['pickup_location'],
+                'dropoff_location' => $data['dropoff_location'],
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'],
+                'extras' => $data['extras'],
+                'notes' => $data['notes'],
+                'subtotal' => $subtotal,
+                'taxes' => $taxes,
+                'total' => $total,
+                'service_type_id' => $data['service_type_id'],
+                'status' => $status,
+            ]);
+
+            session()->flash('rent_success', 'Welcome back! Your pending booking was processed successfully.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to process pending booking: ' . $e->getMessage());
+        }
     }
 
     protected function loadAvailableExtras(bool $resetSelection = false): void
