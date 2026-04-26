@@ -85,8 +85,8 @@
                         @endif
                         <a href="{{ route('cars.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                             wire:navigate>Car catalog</a>
-                        <a class="{{ request()->routeIs('trips.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}"
-                            href="{{ route('trips.index') }}" wire:navigate>My trips</a>
+                        <a class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" href="{{ route('trips.index') }}"
+                            wire:navigate>My trips</a>
                         <a href="{{ route('profile.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                             wire:navigate>Profile</a>
                         <a href="{{ route('wallet.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
