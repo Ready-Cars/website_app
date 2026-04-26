@@ -64,6 +64,9 @@
                     style="display: none;">
 
                     @guest
+                        <a href="{{ route('cars.index') }}"
+                            class="block px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 border-b border-slate-50"
+                            wire:navigate>Car catalog</a>
                         <a href="{{ route('login') }}"
                             class="block px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50" wire:navigate>Log
                             in</a>
@@ -80,6 +83,10 @@
                                 class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-semibold" wire:navigate>Admin
                                 Dashboard</a>
                         @endif
+                        <a href="{{ route('cars.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                            wire:navigate>Car catalog</a>
+                        <a class="{{ request()->routeIs('trips.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}"
+                            href="{{ route('trips.index') }}" wire:navigate>My trips</a>
                         <a href="{{ route('profile.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                             wire:navigate>Profile</a>
                         <a href="{{ route('wallet.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"

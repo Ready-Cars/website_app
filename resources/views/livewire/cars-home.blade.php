@@ -47,16 +47,19 @@
             <!-- Search Bar Overlay -->
             <div class="absolute bottom-10 left-1/2 -translate-x-1/2 w-[94%] md:w-full max-w-5xl">
                 <div class="bg-white rounded-2xl shadow-2xl p-2 flex flex-col md:flex-row items-stretch md:items-center gap-1 md:gap-0 border border-slate-200/50 backdrop-blur-sm">
-                    <!-- Where -->
+                    <!-- Where (Location Dropdown) -->
                     <div class="flex-[1.5] px-8 md:px-10 py-5 flex flex-col justify-center transition-all hover:bg-slate-50 cursor-pointer rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none md:border-r md:border-slate-100 group">
                         <label class="block text-[11px] md:text-[12px] font-black text-[#0e1133] uppercase tracking-widest mb-2 group-hover:text-[#1173d4] transition-colors flex items-center gap-2">
                             <span class="material-symbols-outlined text-base">location_on</span>
                             Where
                         </label>
-                        <input wire:model.debounce.400ms="q"
-                               type="text"
-                               placeholder="Airport, city, or address"
-                               class="w-full border-0 p-0 text-lg font-bold text-slate-900 placeholder:text-slate-400 focus:ring-0 bg-transparent" />
+                        <select wire:model.live="location"
+                                class="w-full border-0 p-0 text-lg font-bold text-slate-900 focus:ring-0 bg-transparent cursor-pointer appearance-none">
+                            <option value="">Anywhere</option>
+                            @foreach(($options['locations'] ?? []) as $loc)
+                                <option value="{{ $loc }}">{{ $loc }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <!-- Date Picker Trigger -->
@@ -178,11 +181,11 @@
                 <div class="relative">
                 <div class="relative">
                     <!-- Loading State (Skeletons) -->
-                    <div wire:loading wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, gotoPage, nextPage, previousPage" style="display: none;">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div wire:loading wire:target="refreshSearch, category, q, startDate, endDate, resetFilters" class="w-full" style="display: none;">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
                             @for($i = 0; $i < 4; $i++)
-                                <div class="animate-pulse">
-                                    <div class="aspect-[4/3] bg-slate-100 rounded-2xl mb-4"></div>
+                                <div class="animate-pulse w-full">
+                                    <div class="aspect-[4/3] bg-slate-100 rounded-2xl mb-4 w-full"></div>
                                     <div class="h-5 bg-slate-100 rounded w-3/4 mb-2"></div>
                                     <div class="h-4 bg-slate-50 rounded w-1/2 mb-3"></div>
                                     <div class="h-6 bg-slate-100 rounded w-1/4"></div>
@@ -191,7 +194,7 @@
                         </div>
                     </div>
 
-                    <div wire:loading.remove wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, gotoPage, nextPage, previousPage">
+                    <div wire:loading.remove wire:target="refreshSearch, category, q, startDate, endDate, resetFilters" class="w-full">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             @forelse($featured as $car)
                                 <a href="{{ route('rent.show', $car) }}" class="group block" wire:navigate>
@@ -229,18 +232,15 @@
             <section id="catalog-section">
                 <div class="flex items-center justify-between mb-8">
                     <h2 class="text-3xl font-black text-[#0e1133] tracking-tight">Available Cars</h2>
-                    <div class="flex items-center gap-2">
-                        @include('partials.car-filter')
-                    </div>
                 </div>
 
                 <div class="relative">
                     <!-- Loading State (Skeletons) -->
-                    <div wire:loading wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, gotoPage, nextPage, previousPage" style="display: none;">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
+                    <div wire:loading wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, loadMore" class="w-full" style="display: none;">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 w-full">
                             @for($i = 0; $i < 8; $i++)
-                                <div class="animate-pulse">
-                                    <div class="aspect-video bg-slate-100 rounded-3xl mb-4"></div>
+                                <div class="animate-pulse w-full">
+                                    <div class="aspect-video bg-slate-100 rounded-3xl mb-4 w-full"></div>
                                     <div class="px-1 space-y-3">
                                         <div class="flex justify-between items-center">
                                             <div class="h-6 bg-slate-100 rounded w-1/2"></div>
@@ -258,7 +258,7 @@
                         </div>
                     </div>
 
-                    <div wire:loading.remove wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, gotoPage, nextPage, previousPage">
+                    <div wire:loading.remove wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, loadMore" class="w-full">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
                             @forelse($catalog as $car)
                             <a href="{{ route('rent.show', $car) }}" class="group flex flex-col" wire:navigate>
