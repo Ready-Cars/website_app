@@ -1,125 +1,103 @@
 <style>
-    button{
+    button {
         cursor: pointer;
     }
 </style>
+
 @if(!session('is_from_app'))
-<header class="sticky top-0 z-50 bg-[#0e1133] flex items-center justify-between whitespace-nowrap border-b border-solid border-transparent px-4 sm:px-6 lg:px-10 py-4" data-mobile-menu-root>
-    <div class="flex items-center gap-3">
-        <a href="{{ route('home') }}" class="inline-flex items-center" aria-label="{{ config('app.name') }}" wire:navigate>
-            <img src="{{asset('img.png')}}" alt="{{ config('app.name') }} logo" class="h-8 md:h-9 w-auto object-contain" />
-        </a>
-    </div>
 
-    <nav class="hidden lg:flex items-center gap-8">
-        @php
-            $linkBase = 'text-sm font-medium transition-colors pb-2';
-            $activeClasses = 'text-white border-b-2 border-[#1173d4]';
-            $inactiveClasses = 'text-white/90 hover:text-white';
-        @endphp
-        <a class="{{ request()->routeIs('cars.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('cars.index') }}" wire:navigate>Car catalog</a>
-        <a class="{{ request()->routeIs('contact.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('contact.index') }}" wire:navigate>Contact</a>
-{{--        <a class="{{ request()->routeIs('terms.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('terms.index') }}" wire:navigate>Terms & Conditions</a>--}}
-        @auth
-            <a class="{{ request()->routeIs('trips.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('trips.index') }}" wire:navigate>My trips</a>
-            <a class="{{ request()->routeIs('notifications.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('notifications.index') }}" wire:navigate>Notifications</a>
-            <a class="{{ request()->routeIs('wallet.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('wallet.index') }}" wire:navigate>Wallet</a>
-            @if(auth()->user()->is_admin ?? false)
-                <a class="{{ request()->routeIs('dashboard') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('dashboard') }}" wire:navigate>Dashboard</a>
-                <a class="{{ request()->routeIs('admin.profile') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('admin.profile') }}" wire:navigate>Profile</a>
-            @else
-                <a class="{{ request()->routeIs('profile.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}" href="{{ route('profile.index') }}" wire:navigate>Profile</a>
-            @endif
-        @endauth
-    </nav>
-
-    <div class="flex items-center gap-2">
-        <button class="lg:hidden p-2" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false" data-mobile-menu-button>
-            <span class="material-symbols-outlined text-white">menu</span>
-        </button>
-        @guest
-            <a href="{{ route('register') }}" class="hidden sm:flex min-w-[84px] max-w-[480px] items-center justify-center overflow-hidden rounded-md h-10 px-4 bg-[#1173d4] text-white text-sm font-bold tracking-wide hover:bg-[#0f63b9] transition-colors" wire:navigate>
-                <span class="truncate">Register</span>
+    <header
+        class="sticky top-0 z-50 bg-[#0e1133] flex items-center justify-between whitespace-nowrap px-4 sm:px-6 lg:px-10 py-4"
+        data-mobile-menu-root>
+        <div class="flex items-center gap-6">
+            <a href="{{ route('home') }}" class="inline-flex items-center" aria-label="{{ config('app.name') }}"
+                wire:navigate>
+                <img src="{{ asset('img.png') }}" alt="{{ config('app.name') }} logo"
+                    class="h-8 md:h-10 w-auto object-contain" />
             </a>
-            <a href="{{ route('login') }}" class="hidden sm:flex min-w-[84px] max-w-[480px] items-center justify-center overflow-hidden rounded-md h-10 px-4 bg-slate-200 text-slate-900 text-sm font-bold tracking-wide hover:bg-slate-300 transition-colors" wire:navigate>
-                <span class="truncate">Login</span>
-            </a>
-        @else
 
-            @auth
-
-                <form method="POST" action="{{ route('logout') }}" class="hidden sm:flex">
-                    @csrf
-                    <button type="submit" class="min-w-[84px] max-w-[240px] items-center justify-center overflow-hidden rounded-md h-10 px-4 bg-rose-100 text-rose-700 text-sm font-bold tracking-wide hover:bg-rose-200 transition-colors">
-                        Logout
-                    </button>
-                </form>
-            @endauth
-        @endguest
-    </div>
-
-    <!-- Mobile dropdown menu -->
-    <div id="mobile-menu" class="lg:hidden absolute left-0 right-0 top-full z-40 bg-[#0e1133] border-b border-transparent shadow-sm hidden" data-mobile-menu-panel>
-        <div class="px-4 sm:px-6 py-3 flex flex-col gap-2">
-            @php
-                $mActive = 'text-[#1173d4] font-semibold';
-                $mInactive = 'text-white/90 hover:text-white';
-                $mBase = 'block py-2 text-sm font-medium';
-            @endphp
-            <a class="{{ request()->routeIs('cars.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('cars.index') }}" wire:navigate>Car catalog</a>
-            <a class="{{ request()->routeIs('contact.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('contact.index') }}" wire:navigate>Contact</a>
-            <a class="{{ request()->routeIs('terms.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('terms.index') }}" wire:navigate>Terms & Conditions</a>
-            @auth
-                <a class="{{ request()->routeIs('trips.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('trips.index') }}" wire:navigate>My trips</a>
-                <a class="{{ request()->routeIs('wallet.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('wallet.index') }}" wire:navigate>Wallet</a>
-                <a class="{{ request()->routeIs('notifications.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('notifications.index') }}" wire:navigate>Notifications</a>
-                @if(auth()->user()->is_admin ?? false)
-                    <a class="{{ request()->routeIs('dashboard') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('dashboard') }}" wire:navigate>Dashboard</a>
-                    <a class="{{ request()->routeIs('admin.profile') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('admin.profile') }}" wire:navigate>Profile</a>
-                @else
-                    <a class="{{ request()->routeIs('profile.index') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('profile.index') }}" wire:navigate>Profile</a>
-                @endif
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="block w-full text-left py-2 text-rose-300 hover:text-rose-200 text-sm font-medium">Logout</button>
-                </form>
-            @else
-                <a class="{{ request()->routeIs('login') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('login') }}" wire:navigate>Login</a>
-                <a class="{{ request()->routeIs('register') ? $mActive : $mInactive }} {{ $mBase }}" href="{{ route('register') }}" wire:navigate>Register</a>
-            @endauth
+            <nav class="hidden xl:flex items-center gap-8 ml-4">
+                @php
+                    $linkBase = 'text-sm font-semibold transition-colors';
+                    $activeClasses = 'text-white border-b-2 border-white';
+                    $inactiveClasses = 'text-white/70 hover:text-white';
+                @endphp
+                <a class="{{ request()->routeIs('cars.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}"
+                    href="{{ route('cars.index') }}" wire:navigate>Car catalog</a>
+                <a class="{{ request()->routeIs('contact.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}"
+                    href="{{ route('contact.index') }}" wire:navigate>Contact</a>
+                @auth
+                    <a class="{{ request()->routeIs('trips.index') ? "$activeClasses" : "$inactiveClasses" }} {{ $linkBase }}"
+                        href="{{ route('trips.index') }}" wire:navigate>My trips</a>
+                @endauth
+            </nav>
         </div>
-    </div>
-</header>
-@livewire('pricing-disclaimer')
+
+        <div class="flex items-center gap-4">
+            <a href="#"
+                class="hidden md:block text-sm font-semibold text-white/90 hover:text-white px-4 py-2 rounded-full transition-colors">
+                Why choose {{ config('app.name') }}
+            </a>
+
+            <!-- Pill User Menu -->
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" @click.away="open = false"
+                    class="flex items-center gap-2 border border-white/20 rounded-full p-2 pl-3 hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-white">menu</span>
+                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden">
+                        @auth
+                            <span class="text-xs font-bold text-white">{{ substr(auth()->user()->name, 0, 1) }}</span>
+                        @else
+                            <span class="material-symbols-outlined text-slate-300 text-xl">account_circle</span>
+                        @endauth
+                    </div>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                    x-transition:enter-start="transform opacity-0 scale-95"
+                    x-transition:enter-end="transform opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-75"
+                    x-transition:leave-start="transform opacity-100 scale-100"
+                    x-transition:leave-end="transform opacity-0 scale-95"
+                    class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-2"
+                    style="display: none;">
+
+                    @guest
+                        <a href="{{ route('login') }}"
+                            class="block px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50" wire:navigate>Log
+                            in</a>
+                        <a href="{{ route('register') }}" class="block px-4 py-3 text-sm text-slate-600 hover:bg-slate-50"
+                            wire:navigate>Sign up</a>
+                        <div class="h-px bg-slate-100 my-1"></div>
+                        <a href="#" class="block px-4 py-3 text-sm text-slate-600 hover:bg-slate-50">Become a host</a>
+                    @else
+                        <div class="px-4 py-2 mb-1">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Account</p>
+                        </div>
+                        @if(auth()->user()->is_admin ?? false)
+                            <a href="{{ route('dashboard') }}"
+                                class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-semibold" wire:navigate>Admin
+                                Dashboard</a>
+                        @endif
+                        <a href="{{ route('profile.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                            wire:navigate>Profile</a>
+                        <a href="{{ route('wallet.index') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                            wire:navigate>Wallet</a>
+                        <a href="{{ route('notifications.index') }}"
+                            class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" wire:navigate>Notifications</a>
+
+                        <div class="h-px bg-slate-100 my-2"></div>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                class="block w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50">Log out</button>
+                        </form>
+                    @endguest
+                </div>
+            </div>
+        </div>
+    </header>
+    @livewire('pricing-disclaimer')
 @endif
-
-<script>
-// Mobile menu toggler (isolated per header instance)
-(function(){
-    function initHeader(root){
-        if (!root || root.__mobileMenuInited) return; // avoid duplicate binding
-        const btn = root.querySelector('[data-mobile-menu-button]');
-        const panel = root.querySelector('[data-mobile-menu-panel]');
-        if (!btn || !panel) return;
-        root.__mobileMenuInited = true;
-
-        function open(){ panel.classList.remove('hidden'); btn.setAttribute('aria-expanded','true'); }
-        function close(){ panel.classList.add('hidden'); btn.setAttribute('aria-expanded','false'); }
-        function toggle(){ const isOpen = btn.getAttribute('aria-expanded') === 'true'; isOpen ? close() : open(); }
-
-        btn.addEventListener('click', (e)=>{ e.stopPropagation(); toggle(); });
-        // Click outside closes
-        document.addEventListener('click', (e)=>{
-            if (panel.classList.contains('hidden')) return;
-            if (!root.contains(e.target)) close();
-        });
-        // Escape closes
-        document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') close(); });
-        // Close after Livewire SPA navigation
-        window.addEventListener('livewire:navigated', close);
-    }
-    function initAll(){ document.querySelectorAll('[data-mobile-menu-root]').forEach(initHeader); }
-    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initAll); } else { initAll(); }
-    window.addEventListener('livewire:navigated', initAll);
-})();
-</script>

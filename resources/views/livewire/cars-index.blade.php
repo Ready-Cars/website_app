@@ -45,7 +45,33 @@
                         @endforelse
                     </div>
                     <div class="flex items-center justify-center pt-8">
-                        {{ $cars->onEachSide(1)->links() }}
+                        <!-- Infinite Scroll Sentinel -->
+                        @if($cars->hasMorePages())
+                            <div x-data="{
+                                    init() {
+                                        let observer = new IntersectionObserver((entries) => {
+                                            entries.forEach(entry => {
+                                                if (entry.isIntersecting) {
+                                                    @this.call('loadMore')
+                                                }
+                                            })
+                                        }, {
+                                            rootMargin: '200px'
+                                        })
+                                        observer.observe($el)
+                                    }
+                                }" class="py-10 flex flex-col items-center justify-center">
+                                <div wire:loading wire:target="loadMore" class="flex flex-col items-center">
+                                    <div class="w-8 h-8 border-4 border-slate-200 border-t-[#1173d4] rounded-full animate-spin"></div>
+                                    <p class="mt-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Loading more cars...</p>
+                                </div>
+                                <div wire:loading.remove wire:target="loadMore" class="h-8"></div>
+                            </div>
+                        @else
+                            <div class="py-10 text-center">
+                                <p class="text-slate-400 font-medium text-sm">No more cars to show.</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </main>

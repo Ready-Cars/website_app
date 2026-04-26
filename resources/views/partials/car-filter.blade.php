@@ -1,9 +1,9 @@
 
 <div x-data="{ showAdvanced: false }">
     <div class="-mt-1" >
-        <button type="button" x-on:click="showAdvanced = !showAdvanced"
+                <button type="button" x-on:click="showAdvanced = !showAdvanced"
                 x-bind:aria-expanded="showAdvanced"
-                class="inline-flex items-center gap-2 text-sm font-medium text-[#1173d4] hover:text-[#0f63b9]">
+                class="inline-flex items-center gap-2 text-sm font-bold text-[#0e1133] hover:text-black">
                                 <span class="material-symbols-outlined text-base"
                                       x-text="showAdvanced ? 'expand_less' :  'tune'"></span>
             <span x-text="showAdvanced ? 'Hide advanced filters' : 'Show advanced filters'"></span>

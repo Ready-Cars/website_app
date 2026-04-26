@@ -1,156 +1,340 @@
-<div>
-    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-        <div class="layout-container flex h-full grow flex-col">
+<div class="bg-white min-h-screen">
+    <main class="px-4 sm:px-6 lg:px-20 pb-20">
+        <div class="mx-auto max-w-[1400px]">
 
-            <main class="flex-1 px-4 sm:px-6 lg:px-24 pt-0 pb-12">
-                <div class="mx-auto max-w-5xl">
+    <!-- Hero Section -->
+    <section class="relative mt-4 mb-20 px-2 sm:px-0" x-data="{
+        initFlatpickr() {
+            flatpickr($refs.datepicker, {
+                mode: 'range',
+                minDate: 'today',
+                dateFormat: 'Y-m-d',
+                nextArrow: '<span class=\'material-symbols-outlined\'>chevron_right</span>',
+                prevArrow: '<span class=\'material-symbols-outlined\'>chevron_left</span>',
+                onChange: (selectedDates) => {
+                    if (selectedDates.length === 2) {
+                        @this.set('startDate', flatpickr.formatDate(selectedDates[0], 'Y-m-d'));
+                        @this.set('endDate', flatpickr.formatDate(selectedDates[1], 'Y-m-d'));
+                    }
+                },
+                onOpen: [
+                    function(selectedDates, dateStr, instance) {
+                        instance.calendarContainer.classList.add('premium-calendar');
+                    }
+                ]
+            });
+        }
+    }" x-init="initFlatpickr">
+        <div class="relative h-[70vh] min-h-[550px] w-full rounded-[2.5rem] overflow-hidden shadow-2xl">
+            <!-- Hero Image -->
+            <div class="absolute inset-0 bg-center bg-no-repeat bg-cover transform hover:scale-105 transition-transform duration-1000"
+                 style="background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2000&auto=format&fit=crop');">
+            </div>
 
+            <!-- Overlay for Legibility -->
+            <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/70"></div>
 
-                    <!-- Full-Width Hero Carousel -->
-                    <section class="relative -mx-4 sm:-mx-6 lg:-mx-24 mb-6" x-data="{
-                            current: 0,
-                            slides: [
-                              { image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2000&auto=format&fit=crop', title: 'Luxury, On Your Terms', tagline: 'Premium cars. Clear pricing. Total flexibility.' },
+            <!-- Hero Content -->
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-4 pb-32">
+                <h1 class="text-5xl md:text-8xl font-black text-white mb-6 tracking-tighter drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
+                    Ready. Set. Go.
+                </h1>
+                <p class="text-xl md:text-2xl text-white/95 font-bold max-w-2xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]">
+                    Premium rentals for your next adventure
+                </p>
+            </div>
 
-                                { image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2000&auto=format&fit=crop', title: 'Find Your Perfect Ride', tagline: 'Rent a car for your next adventure with ease.' },
-                                { image: 'https://images.unsplash.com/photo-1580414057403-c5f451f30e1c?q=80&w=2000&auto=format&fit=crop', title: 'Drive Your Story', tagline: 'From city zips to cross‑country trips.' },
-                                        ],
-                            next() { this.current = (this.current + 1) % this.slides.length; },
-                            prev() { this.current = (this.current - 1 + this.slides.length) % this.slides.length; }
-                        }" x-init="setInterval(() => next(), 6000)">
-                        <div class="relative h-[58vh] min-h-[360px] w-screen left-1/2 right-1/2 -translate-x-1/2 overflow-hidden">
-                            <!-- Slides -->
-                            <template x-for="(slide, i) in slides" :key="i">
-                                <div class="absolute inset-0 transition-opacity duration-700 ease-in-out"
-                                     x-show="current === i"
-                                     x-transition:enter="opacity-0" x-transition:enter-end="opacity-100"
-                                     x-transition:leave="opacity-100" x-transition:leave-end="opacity-0">
-                                    <div class="h-full w-full bg-center bg-no-repeat bg-cover" :style="`background-image: url('${slide.image}')`"></div>
-                                </div>
-                            </template>
+            <!-- Search Bar Overlay -->
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 w-[94%] md:w-full max-w-5xl">
+                <div class="bg-white rounded-2xl shadow-2xl p-2 flex flex-col md:flex-row items-stretch md:items-center gap-1 md:gap-0 border border-slate-200/50 backdrop-blur-sm">
+                    <!-- Where -->
+                    <div class="flex-[1.5] px-8 md:px-10 py-5 flex flex-col justify-center transition-all hover:bg-slate-50 cursor-pointer rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none md:border-r md:border-slate-100 group">
+                        <label class="block text-[11px] md:text-[12px] font-black text-[#0e1133] uppercase tracking-widest mb-2 group-hover:text-[#1173d4] transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-base">location_on</span>
+                            Where
+                        </label>
+                        <input wire:model.debounce.400ms="q"
+                               type="text"
+                               placeholder="Airport, city, or address"
+                               class="w-full border-0 p-0 text-lg font-bold text-slate-900 placeholder:text-slate-400 focus:ring-0 bg-transparent" />
+                    </div>
 
-                            <!-- Gradient overlay -->
-                            <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/40 pointer-events-none"></div>
-
-                            <!-- Content overlay -->
-                            <div class="absolute inset-0 flex items-center">
-                                <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-24 w-full">
-                                    <div class="text-center select-none">
-                                        <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-3 tracking-tight" x-text="slides[current].title"></h1>
-                                        <p class="text-lg text-white/90" x-text="slides[current].tagline"></p>
-                                    </div>
-                                    <div class="mt-6 max-w-3xl mx-auto">
-                                        <div class="relative">
-                                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/70">search</span>
-                                            <input wire:model.debounce.400ms="q" class="form-input w-full rounded-full border-white/30 bg-white/90 backdrop-blur py-4 pl-12 pr-28 text-base text-slate-900 shadow-sm focus:border-sky-600 focus:ring-sky-600 placeholder:text-slate-500" placeholder="Search by name, category or location" type="text" />
-                                            <button wire:click="refreshSearch" class="absolute right-2 top-1/2 -translate-y-1/2 flex min-w-[84px] max-w-[480px] items-center justify-center overflow-hidden rounded-full h-10 px-6 bg-[#1173d4] text-white text-sm font-bold tracking-wide hover:bg-[#0f63b9] transition-colors" type="button">
-                                                <span class="truncate">Search</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Controls -->
-                            <button type="button" @click="prev()" aria-label="Previous slide" class="absolute left-4 top-1/2 -translate-y-1/2 inline-flex items-center justify-center h-10 w-10 rounded-full bg-black/40 text-white hover:bg-black/60">
-                                <span class="material-symbols-outlined">chevron_left</span>
-                            </button>
-                            <button type="button" @click="next()" aria-label="Next slide" class="absolute right-4 top-1/2 -translate-y-1/2 inline-flex items-center justify-center h-10 w-10 rounded-full bg-black/40 text-white hover:bg-black/60">
-                                <span class="material-symbols-outlined">chevron_right</span>
-                            </button>
-
-                            <!-- Indicators -->
-                            <div class="absolute bottom-5 inset-x-0 flex items-center justify-center gap-2">
-                                <template x-for="(slide, i) in slides" :key="i">
-                                    <button type="button" class="h-2.5 rounded-full transition-all" :class="current === i ? 'bg-white w-6' : 'bg-white/60 w-2.5'" @click="current = i" :aria-label="'Go to slide ' + (i + 1)"></button>
-                                </template>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Advanced filters toggle just below hero -->
-                    @include('partials.car-filter')
-
-                    @if($showFeatured)
-                    <section class="mb-16">
-                        <h2 class="text-3xl font-bold text-slate-900 mb-8 tracking-tight">Featured Cars</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            @forelse($featured as $car)
-                                <div class="flex flex-col gap-4 rounded-lg overflow-hidden bg-white shadow-md hover:shadow-xl transition-shadow duration-300">
-                                    <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="background-image: url('{{ $car->image_url }}');"></div>
-                                    <div class="p-5">
-                                        <h3 class="text-lg font-bold text-slate-900">{{ $car->name }}</h3>
-                                        <p class="text-slate-600 text-sm">{{ $car->location ? $car->location.' • ' : '' }}{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
-                                        <div class="mt-3 flex justify-between items-center">
-                                            <p class="text-lg font-bold text-slate-900">From ₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
-                                            <flux:tooltip content="Instant booking" position="top">
-                                                <flux:button
-                                                    href="{{ route('rent.show', $car) }}"
-                                                    variant="primary"
-                                                    size="sm"
-                                                    class="rounded-full"
-                                                    icon:trailing="arrow-right"
-                                                    aria-label="Rent {{ $car->name }} now"
-                                                    wire:navigate
-                                                >
-                                                    Rent Now
-                                                </flux:button>
-                                            </flux:tooltip>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <p class="text-slate-600">No featured cars yet.</p>
-                            @endforelse
-                        </div>
-                    </section>
-                    @endif
-
-                    <section>
-                        <div class="flex justify-between items-center mb-8">
-                            <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Explore Our Catalog</h2>
-                            <a href="{{ route('cars.index') }}" class="flex min-w-[84px] max-w-[480px] items-center justify-center overflow-hidden rounded-md h-10 px-4 bg-slate-200 text-slate-900 text-sm font-bold tracking-wide hover:bg-slate-300 transition-colors" wire:navigate>
-                                <span class="truncate">View all cars</span>
-                            </a>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            @forelse($catalog as $car)
-                                <div class="flex flex-col gap-3 group rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                    <div class="w-full bg-center bg-no-repeat aspect-video bg-cover" style="background-image: url('{{ $car->image_url }}');"></div>
-                                    <div class="p-4 pt-3">
-                                        <h3 class="text-base font-bold text-slate-900">{{ $car->name }}</h3>
-                                        <p class="text-slate-600 text-sm">{{ $car->location ? $car->location.' • ' : '' }}{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats</p>
-                                        <div class="mt-3 flex justify-between items-center">
-                                            <p class="text-lg font-bold text-slate-900">From ₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
-                                            <flux:tooltip content="Instant booking" position="top">
-                                                <flux:button
-                                                    href="{{ route('rent.show', $car) }}"
-                                                    variant="primary"
-                                                    size="sm"
-                                                    class="rounded-full"
-                                                    icon:trailing="arrow-right"
-                                                    aria-label="Rent {{ $car->name }} now"
-                                                    wire:navigate
-                                                >
-                                                    Rent Now
-                                                </flux:button>
-                                            </flux:tooltip>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <p class="text-slate-600">No cars match your search.</p>
-                            @endforelse
+                    <!-- Date Picker Trigger -->
+                    <div class="flex-[2] flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-slate-100">
+                        <div class="flex-1 px-8 md:px-10 py-5 transition-all hover:bg-slate-50 cursor-pointer flex flex-col justify-center relative group"
+                             @click="$refs.datepicker.click()">
+                            <label class="block text-[11px] md:text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2 group-hover:text-slate-600 transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">calendar_today</span>
+                                From
+                            </label>
+                            <span class="text-base md:text-lg font-bold text-slate-800" x-text="$wire.startDate || 'Add dates'"></span>
+                            <input x-ref="datepicker" class="absolute inset-0 opacity-0 cursor-pointer" readonly />
                         </div>
 
-                        <div class="mt-6">
-                            {{ $catalog->onEachSide(1)->links() }}
+                        <div class="flex-1 px-8 md:px-10 py-5 transition-all hover:bg-slate-50 cursor-pointer flex flex-col justify-center group"
+                             @click="$refs.datepicker.click()">
+                            <label class="block text-[11px] md:text-[12px] font-black text-slate-400 uppercase tracking-widest mb-2 group-hover:text-slate-600 transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">calendar_month</span>
+                                Until
+                            </label>
+                            <span class="text-base md:text-lg font-bold text-slate-800" x-text="$wire.endDate || 'Add dates'"></span>
                         </div>
-                    </section>
+                    </div>
+
+                    <!-- Search Button -->
+                    <div class="p-2">
+                        <button wire:click="refreshSearch"
+                                @click="document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })"
+                                class="w-full md:w-20 h-14 md:h-20 bg-[#0e1133] hover:bg-black rounded-xl md:rounded-2xl flex items-center justify-center text-white transition-all shadow-lg active:scale-95 group">
+                            <span class="material-symbols-outlined text-3xl md:text-4xl font-bold group-hover:scale-110 transition-transform">search</span>
+                        </button>
+                    </div>
                 </div>
-            </main>
-
-         @include('partials.footer')
+            </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Flatpickr CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <style>
+        .premium-calendar {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+            border: 1px solid #f1f5f9 !important;
+            border-radius: 1.5rem !important;
+            padding: 1rem !important;
+            background: white !important;
+            font-family: inherit !important;
+        }
+        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange {
+            background: #0e1133 !important;
+            border-color: #0e1133 !important;
+            border-radius: 0.5rem !important;
+        }
+        .flatpickr-day.inRange {
+            background: rgba(14, 17, 51, 0.05) !important;
+            box-shadow: none !important;
+        }
+    </style>
+
+
+            <!-- Quick Filters (Categories) -->
+            <section class="mb-14 px-2">
+                <div class="flex items-center justify-start md:justify-center gap-2 md:gap-8 overflow-x-auto no-scrollbar pb-2">
+                    @php
+                        $catIcons = [
+                            'SUV' => 'directions_car',
+                            'Sedan' => 'minor_crash',
+                            'Luxury' => 'diamond',
+                            'Sport' => 'speed',
+                            'Truck' => 'local_shipping',
+                            'Van' => 'airport_shuttle',
+                            'Electric' => 'electric_car',
+                        ];
+                    @endphp
+
+                    <button class="flex-shrink-0 flex flex-col items-center gap-1 group"
+                            wire:click="$set('category', '')">
+                        <div class="w-14 h-10 flex items-center justify-center rounded-lg transition-all {{ !$category ? 'bg-[#0e1133] shadow-md' : 'bg-slate-50 hover:bg-slate-100' }}">
+                            <span class="material-symbols-outlined text-[20px] {{ !$category ? 'text-white' : 'text-slate-500' }}">apps</span>
+                        </div>
+                        <span class="text-[9px] font-black uppercase tracking-widest leading-none {{ !$category ? 'text-[#0e1133] border-b-2 border-[#0e1133]' : 'text-slate-400 group-hover:text-slate-700' }}">All</span>
+                    </button>
+
+                    @foreach(($options['categories'] ?? []) as $cat)
+                        <button class="flex-shrink-0 flex flex-col items-center gap-1 group"
+                                wire:click="$set('category', '{{ $cat }}')">
+                            <div class="w-14 h-10 flex items-center justify-center rounded-lg transition-all {{ $category == $cat ? 'bg-[#0e1133] shadow-md' : 'bg-slate-50 hover:bg-slate-100' }}">
+                                <span class="material-symbols-outlined text-[20px] {{ $category == $cat ? 'text-white' : 'text-slate-500 group-hover:text-slate-800' }}">
+                                    {{ $catIcons[$cat] ?? 'directions_car' }}
+                                </span>
+                            </div>
+                            <span class="text-[9px] font-black uppercase tracking-widest leading-none {{ $category == $cat ? 'text-[#0e1133] border-b-2 border-[#0e1133]' : 'text-slate-400 group-hover:text-slate-700' }}">
+                                {{ $cat }}
+                            </span>
+                        </button>
+                    @endforeach
+                </div>
+            </section>
+
+            <!-- Featured Cars Section -->
+            @if($showFeatured)
+            <section class="mb-20">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-3xl font-black text-[#0e1133] tracking-tight">Best daily deals</h2>
+                        <p class="text-slate-500 font-medium mt-1">Exceptional value, vetted hosts</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm">
+                            <span class="material-symbols-outlined text-slate-600">chevron_left</span>
+                        </button>
+                        <button class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm">
+                            <span class="material-symbols-outlined text-slate-600">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative">
+                <div class="relative">
+                    <!-- Loading State (Skeletons) -->
+                    <div wire:loading wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, gotoPage, nextPage, previousPage" style="display: none;">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            @for($i = 0; $i < 4; $i++)
+                                <div class="animate-pulse">
+                                    <div class="aspect-[4/3] bg-slate-100 rounded-2xl mb-4"></div>
+                                    <div class="h-5 bg-slate-100 rounded w-3/4 mb-2"></div>
+                                    <div class="h-4 bg-slate-50 rounded w-1/2 mb-3"></div>
+                                    <div class="h-6 bg-slate-100 rounded w-1/4"></div>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+
+                    <div wire:loading.remove wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, gotoPage, nextPage, previousPage">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            @forelse($featured as $car)
+                                <a href="{{ route('rent.show', $car) }}" class="group block" wire:navigate>
+                                    <div class="relative aspect-[4/3] rounded-2xl overflow-hidden mb-3">
+                                        <img src="{{ $car->image_url }}" alt="{{ $car->name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        <div class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-slate-900 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span class="material-symbols-outlined text-lg">favorite</span>
+                                        </div>
+                                    </div>
+                                    <h3 class="text-lg font-black text-slate-900 leading-tight">{{ $car->name }}</h3>
+                                    <div class="flex items-center gap-1.5 mt-1 text-sm text-slate-500">
+                                        <span class="font-bold text-slate-700">{{ $car->year ?? '2023' }}</span>
+                                        <span>•</span>
+                                        <div class="flex items-center">
+                                            <span class="material-symbols-outlined text-xs text-amber-500 font-bold">star</span>
+                                            <span class="font-bold text-slate-700 ml-0.5">5.0</span>
+                                            <span class="ml-0.5 text-slate-400 font-normal">(12)</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="text-lg font-black text-[#0e1133]">₦{{ number_format($car->daily_price, 0) }}</span>
+                                        <span class="text-sm font-medium text-slate-500">/day</span>
+                                    </div>
+                                </a>
+                            @empty
+                                <p class="text-slate-400">No deals available right now.</p>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </section>
+            @endif
+
+            <!-- Main Catalog -->
+            <section id="catalog-section">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-3xl font-black text-[#0e1133] tracking-tight">Available Cars</h2>
+                    <div class="flex items-center gap-2">
+                        @include('partials.car-filter')
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <!-- Loading State (Skeletons) -->
+                    <div wire:loading wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, gotoPage, nextPage, previousPage" style="display: none;">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
+                            @for($i = 0; $i < 8; $i++)
+                                <div class="animate-pulse">
+                                    <div class="aspect-video bg-slate-100 rounded-3xl mb-4"></div>
+                                    <div class="px-1 space-y-3">
+                                        <div class="flex justify-between items-center">
+                                            <div class="h-6 bg-slate-100 rounded w-1/2"></div>
+                                            <div class="h-6 bg-slate-100 rounded w-1/4"></div>
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <div class="h-4 bg-slate-50 rounded w-12"></div>
+                                            <div class="h-4 bg-slate-50 rounded w-12"></div>
+                                            <div class="h-4 bg-slate-50 rounded w-12"></div>
+                                        </div>
+                                        <div class="h-4 bg-slate-50 rounded w-1/3"></div>
+                                    </div>
+                                </div>
+                            @endfor
+                        </div>
+                    </div>
+
+                    <div wire:loading.remove wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, gotoPage, nextPage, previousPage">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
+                            @forelse($catalog as $car)
+                            <a href="{{ route('rent.show', $car) }}" class="group flex flex-col" wire:navigate>
+                                <div class="relative aspect-video rounded-3xl overflow-hidden mb-4 bg-slate-100">
+                                    <img src="{{ $car->image_url }}" alt="{{ $car->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                    <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
+                                    <div class="absolute bottom-4 left-4">
+                                        <span class="px-3 py-1 rounded-full bg-white/90 backdrop-blur-sm text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-sm">
+                                            {{ $car->category }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex-1 px-1">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <h3 class="text-lg font-black text-slate-900">{{ $car->name }}</h3>
+                                        <span class="text-lg font-black text-[#0e1133]">₦{{ number_format($car->daily_price, 0) }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-sm font-medium text-slate-50">
+                                        <div class="flex items-center gap-1 text-slate-500">
+                                            <span class="material-symbols-outlined text-base">airline_seat_recline_normal</span>
+                                            <span>{{ $car->seats }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1 text-slate-500">
+                                            <span class="material-symbols-outlined text-base">settings</span>
+                                            <span>{{ $car->transmission }}</span>
+                                        </div>
+                                        <div class="flex items-center gap-1 text-slate-500">
+                                            <span class="material-symbols-outlined text-base">local_gas_station</span>
+                                            <span>{{ $car->fuel_type ?? 'Gas' }}</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs font-bold text-[#0e1133] mt-2 group-hover:underline underline-offset-4 decoration-2">Rent this car →</p>
+                                </div>
+                            </a>
+                            @empty
+                                <div class="col-span-full py-20 text-center bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+                                    <span class="material-symbols-outlined text-6xl text-slate-300 mb-4">search_off</span>
+                                    <p class="text-slate-500 font-bold text-xl">No cars found matching your search</p>
+                                    <button wire:click="resetFilters" class="mt-4 text-[#0e1133] font-bold hover:underline">Clear all filters</button>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Infinite Scroll Sentinel -->
+                @if($catalog->hasMorePages())
+                    <div x-data="{
+                            init() {
+                                let observer = new IntersectionObserver((entries) => {
+                                    entries.forEach(entry => {
+                                        if (entry.isIntersecting) {
+                                            @this.call('loadMore')
+                                        }
+                                    })
+                                }, {
+                                    rootMargin: '200px'
+                                })
+                                observer.observe($el)
+                            }
+                        }" class="py-20 flex flex-col items-center justify-center">
+                        <div wire:loading wire:target="loadMore" class="flex flex-col items-center">
+                            <div class="w-10 h-10 border-4 border-slate-200 border-t-[#0e1133] rounded-full animate-spin"></div>
+                            <p class="mt-4 text-sm font-bold text-slate-500 uppercase tracking-widest">Discovering more cars...</p>
+                        </div>
+                        <div wire:loading.remove wire:target="loadMore" class="h-10"></div>
+                    </div>
+                @else
+                    <div class="py-20 text-center">
+                        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">You've reached the end of the road. No more cars to show.</p>
+                    </div>
+                @endif
+            </section>
+        </div>
+    </main>
+
+    @include('partials.footer')
 </div>
+

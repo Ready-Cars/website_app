@@ -31,6 +31,8 @@ class CarsIndex extends Component
     #[Url]
     public ?string $sort = 'newest';
 
+    public int $perPage = 12;
+
     // UI state
     public bool $showAdvanced = false;
 
@@ -50,12 +52,19 @@ class CarsIndex extends Component
 
     public function updating($name, $value): void
     {
+        $this->perPage = 12;
         $this->resetPage();
+    }
+
+    public function loadMore(): void
+    {
+        $this->perPage += 12;
     }
 
     public function refreshSearch(): void
     {
         // Explicitly trigger re-render and reset pagination when user clicks Search
+        $this->perPage = 12;
         $this->resetPage();
     }
 
@@ -90,6 +99,7 @@ class CarsIndex extends Component
         $this->transmission = null;
         $this->fuelType = null;
         $this->sort = 'newest';
+        $this->perPage = 12;
         $this->resetPage();
     }
 
@@ -98,7 +108,7 @@ class CarsIndex extends Component
         $options = $this->service()->options();
 
         return view('livewire.cars-index', [
-            'cars' => $this->service()->paginate($this->params(), 12),
+            'cars' => $this->service()->paginate($this->params(), $this->perPage),
             'options' => $options,
         ]);
     }
