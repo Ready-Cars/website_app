@@ -291,7 +291,7 @@ class RentCar extends Component
             ]);
 
             // Redirect guests to login, preserving intended URL
-            $this->redirect(route('login'));
+            $this->redirectIntended(route('login'));
 
             return;
         }
@@ -470,6 +470,9 @@ class RentCar extends Component
         // Process any pending bookings cached from a guest session
         if ($pending = Session::pull('pending_booking')) {
             $this->processPendingBooking($pending);
+            // After processing a pending booking, redirect specifically to the car page
+            $this->redirect(route('rent.show', ['car' => $pending['car_id']]), navigate: true);
+            return;
         }
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
