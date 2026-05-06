@@ -268,7 +268,7 @@
                 <div class="relative">
                     <!-- Loading State (Skeletons) -->
                     <div wire:loading
-                        wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, loadMore"
+                        wire:target="refreshSearch, category, q, startDate, endDate, resetFilters"
                         class="w-full" style="display: none;">
                         <div
                             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 w-full">
@@ -293,11 +293,11 @@
                     </div>
 
                     <div wire:loading.remove
-                        wire:target="refreshSearch, category, q, startDate, endDate, resetFilters, loadMore"
+                        wire:target="refreshSearch, category, q, startDate, endDate, resetFilters"
                         class="w-full">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
                             @forelse($catalog as $car)
-                                <a href="{{ route('rent.show', $car) }}" class="group flex flex-col" wire:navigate>
+                                <a wire:key="car-{{ $car->id }}" href="{{ route('rent.show', $car) }}" class="group flex flex-col" wire:navigate>
                                     <div class="relative aspect-video rounded-3xl overflow-hidden mb-4 bg-slate-100">
                                         <img src="{{ $car->image_url }}" alt="{{ $car->name }}"
                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
@@ -352,30 +352,33 @@
 
                 <!-- Infinite Scroll Sentinel -->
                 @if($catalog->hasMorePages())
-                    <div x-data="{
-                                            init() {
-                                                let observer = new IntersectionObserver((entries) => {
-                                                    entries.forEach(entry => {
-                                                        if (entry.isIntersecting) {
-                                                            @this.call('loadMore')
-                                                        }
-                                                    })
-                                                }, {
-                                                    rootMargin: '200px'
-                                                })
-                                                observer.observe($el)
-                                            }
-                                        }" class="py-20 flex flex-col items-center justify-center">
+                    <div wire:key="sentinel" x-data="{
+                                             isLoading: false,
+                                             init() {
+                                                 let observer = new IntersectionObserver((entries) => {
+                                                     entries.forEach(entry => {
+                                                         if (entry.isIntersecting && !this.isLoading) {
+                                                             this.isLoading = true;
+                                                             @this.call('loadMore').then(() => {
+                                                                 setTimeout(() => { this.isLoading = false; }, 500);
+                                                             })
+                                                         }
+                                                     })
+                                                 }, {
+                                                     rootMargin: '100px'
+                                                 })
+                                                 observer.observe($el)
+                                             }
+                                         }" class="py-20 flex flex-col items-center justify-center min-h-[160px]">
                         <div wire:loading wire:target="loadMore" class="flex flex-col items-center">
                             <div class="w-10 h-10 border-4 border-slate-200 border-t-[#0e1133] rounded-full animate-spin">
                             </div>
                             <p class="mt-4 text-sm font-bold text-slate-500 uppercase tracking-widest">Discovering more
                                 cars...</p>
                         </div>
-                        <div wire:loading.remove wire:target="loadMore" class="h-10"></div>
                     </div>
                 @else
-                    <div class="py-20 text-center">
+                    <div wire:key="sentinel-end" class="py-20 text-center">
                         <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">You've reached the end of the
                             road. No more cars to show.</p>
                     </div>
