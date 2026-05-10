@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../../../../customer_app"
+		},
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../ready_api_backend"
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "automatic"
+	}
+}

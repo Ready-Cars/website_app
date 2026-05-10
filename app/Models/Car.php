@@ -77,4 +77,9 @@ class Car extends Model
             default => $query->latest('id'),
         };
     }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
 }

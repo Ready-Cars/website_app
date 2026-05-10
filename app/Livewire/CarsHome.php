@@ -29,7 +29,13 @@ class CarsHome extends Component
     #[Url]
     public ?string $fuelType = null;
     #[Url]
+    public ?string $startDate = null;
+    #[Url]
+    public ?string $endDate = null;
+    #[Url]
     public ?string $sort = 'newest';
+
+    public int $perPage = 8;
 
     // UI state
     public bool $showAdvanced = false;
@@ -50,13 +56,20 @@ class CarsHome extends Component
 
     public function updating($name, $value): void
     {
-        // Reset page on any filter change
+        // Reset page and count on any filter change
+        $this->perPage = 8;
         $this->resetPage();
+    }
+
+    public function loadMore(): void
+    {
+        $this->perPage += 8;
     }
 
     public function refreshSearch(): void
     {
         // Explicitly trigger re-render and reset pagination when user clicks Search
+        $this->perPage = 8;
         $this->resetPage();
     }
 
@@ -76,6 +89,8 @@ class CarsHome extends Component
             'seats' => $this->seats,
             'transmission' => $this->transmission,
             'fuelType' => $this->fuelType,
+            'startDate' => $this->startDate,
+            'endDate' => $this->endDate,
             'sort' => $this->sort,
         ];
     }
@@ -90,7 +105,10 @@ class CarsHome extends Component
         $this->seats = null;
         $this->transmission = null;
         $this->fuelType = null;
+        $this->startDate = null;
+        $this->endDate = null;
         $this->sort = 'newest';
+        $this->perPage = 8;
         $this->resetPage();
     }
 
@@ -103,7 +121,9 @@ class CarsHome extends Component
             || ($this->maxPrice !== null && $this->maxPrice !== '')
             || !empty($this->seats)
             || !empty($this->transmission)
-            || !empty($this->fuelType);
+            || !empty($this->fuelType)
+            || !empty($this->startDate)
+            || !empty($this->endDate);
     }
 
     public function render()
@@ -113,7 +133,7 @@ class CarsHome extends Component
 
         return view('livewire.cars-home', [
             'featured' => $showFeatured ? $this->service()->featured(3) : collect(),
-            'catalog' => $this->service()->paginate($this->params(), 8),
+            'catalog' => $this->service()->paginate($this->params(), $this->perPage),
             'options' => $options,
             'showFeatured' => $showFeatured,
         ]);

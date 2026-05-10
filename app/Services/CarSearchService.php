@@ -22,10 +22,23 @@ class CarSearchService
                 'transmission' => $params['transmission'] ?? null,
                 'fuel_type' => $params['fuelType'] ?? $params['fuel_type'] ?? null,
                 'featured' => $params['featured'] ?? null,
-            ])
-            ->sort($params['sort'] ?? null);
+            ]);
 
-        return $q;
+        // Availability filtering
+        if (!empty($params['startDate']) && !empty($params['endDate'])) {
+            $start = $params['startDate'];
+            $end = $params['endDate'];
+
+            $q->whereDoesntHave('bookings', function ($query) use ($start, $end) {
+                $query->where(function ($sub) use ($start, $end) {
+                    $sub->where('start_date', '<=', $end)
+                        ->where('end_date', '>=', $start);
+                })
+                ->whereIn('status', ['confirmed', 'paid', 'approved', 'active']);
+            });
+        }
+
+        return $q->sort($params['sort'] ?? null);
     }
 
     public function paginate(array $params, int $perPage = 12): LengthAwarePaginator
