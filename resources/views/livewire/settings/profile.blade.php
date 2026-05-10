@@ -5,7 +5,7 @@
         <div class="my-6 w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left card: Avatar and email info -->
             <div class="col-span-1">
-                <div class="rounded-xl border border-slate-200 p-6 bg-white shadow-sm">
+                <div class="rounded-2xl border border-slate-200 p-6 bg-white shadow-sm">
                     <div class="flex items-center gap-4">
                         <div class="h-14 w-14 rounded-full bg-[#1173d4] text-white flex items-center justify-center text-xl font-bold">
                             {{ auth()->user()->initials() }}
@@ -34,7 +34,7 @@
             </div>
             <!-- Right card: Editable fields -->
             <div class="col-span-1 lg:col-span-2">
-                <form wire:submit="updateProfileInformation" class="rounded-xl border border-slate-200 p-6 bg-white shadow-sm space-y-6">
+                <form wire:submit="updateProfileInformation" class="rounded-2xl border border-slate-200 p-6 bg-white shadow-sm space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <flux:input wire:model="name" :label="__('Full name')" type="text" required autofocus autocomplete="name" />
                         <flux:input wire:model="phone" :label="__('Phone number')" type="tel" required autocomplete="tel" placeholder="e.g., +234 801 234 5678" />

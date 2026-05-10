@@ -1,5 +1,5 @@
 <div>
-    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
         <div class="layout-container flex h-full grow flex-col">
 
             <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8 w-full max-w-6xl mx-auto pb-24 md:pb-8">
@@ -17,7 +17,7 @@
                         </div>
                         <div class="grid grid-cols-1 gap-6">
                             @forelse($trips as $trip)
-                                <div class="flex flex-col sm:flex-row items-start gap-6 p-6 bg-white rounded-xl shadow-md border border-gray-200">
+                                <div class="flex flex-col sm:flex-row items-start gap-6 p-6 bg-white rounded-2xl shadow-md border border-gray-200">
                                     <img alt="Car image" class="aspect-video sm:aspect-square w-full sm:w-40 h-auto rounded-lg object-cover" src="{{ $trip->car->image_url }}"/>
                                     <div class="flex-1 flex flex-col gap-2">
                                         <div class="flex justify-between items-start">

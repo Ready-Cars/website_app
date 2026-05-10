@@ -5,8 +5,8 @@
             <main class="flex-1 px-4 sm:px-6 lg:px-24 py-10">
                 <div class="mx-auto max-w-6xl">
                     <div class="mb-8">
-                        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Rent {{ $car->name }}</h1>
-                        <p class="text-slate-600">Plan your trip and confirm your reservation below.</p>
+                        <h1 class="text-3xl md:text-4xl font-semibold text-slate-900 tracking-tight">Rent {{ $car->name }}</h1>
+                        <p class="text-slate-600 font-normal">Plan your trip and confirm your reservation below.</p>
                     </div>
 
                     @if (session('rent_success') && !$successOpen)

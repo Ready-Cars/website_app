@@ -6,7 +6,7 @@
     <title>Booking Receipt</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Work Sans', sans-serif;
             margin: 0;
             padding: 20px;
             color: #333;

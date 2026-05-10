@@ -6,7 +6,7 @@
     <title>Your Account Credentials</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Work Sans', sans-serif;
             line-height: 1.6;
             color: #333;
             max-width: 600px;
@@ -49,7 +49,7 @@
         }
         .credential-value {
             font-size: 16px;
-            font-family: 'Courier New', monospace;
+            font-family: 'Work Sans', sans-serif;
             color: #1f2937;
             margin-top: 5px;
         }

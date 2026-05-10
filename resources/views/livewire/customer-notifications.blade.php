@@ -1,5 +1,5 @@
 <div>
-    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
         <div class="layout-container flex h-full grow flex-col">
 
             <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8 w-full max-w-4xl mx-auto pb-24 md:pb-8">
@@ -20,7 +20,7 @@
                         <button class="px-4 py-3 text-base font-semibold {{ $tab==='all' ? 'border-b-2 border-[#1173d4] text-[#1173d4]' : 'text-gray-500 hover:text-gray-700' }}" wire:click="switch('all')">All</button>
                     </div>
 
-                    <div class="flex flex-col divide-y rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <div class="flex flex-col divide-y rounded-2xl border border-gray-200 bg-white shadow-sm">
                         @forelse($items as $n)
                             @php $data = $n->data ?? []; @endphp
                             <div class="flex items-start gap-4 p-4 {{ $n->read_at ? 'bg-white' : 'bg-blue-50/40' }}">
