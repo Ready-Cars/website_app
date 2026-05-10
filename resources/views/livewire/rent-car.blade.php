@@ -5,8 +5,8 @@
             <main class="flex-1 px-4 sm:px-6 lg:px-24 py-10">
                 <div class="mx-auto max-w-6xl">
                     <div class="mb-8">
-                        <h1 class="text-3xl md:text-4xl font-semibold text-slate-900 tracking-tight">Rent {{ $car->name }}</h1>
-                        <p class="text-slate-600 font-normal">Plan your trip and confirm your reservation below.</p>
+                        <h1 class="text-2xl font-semibold text-slate-900 tracking-tight">Rent {{ $car->name }}</h1>
+                        <p class="text-slate-600 text-md font-normal">Plan your trip and confirm your reservation below.</p>
                     </div>
 
                     @if (session('rent_success') && !$successOpen)
@@ -139,9 +139,9 @@
                                     <div class="text-base">
                                         <span class="text-slate-600">Total (Tax Incl)</span>
                                         @if($this->isNegotiableService)
-                                            <span class="ml-2 text-xl font-extrabold text-slate-900">To be Determined</span>
+                                            <span class="ml-2 text-xl font-bold text-slate-900">To be Determined</span>
                                         @else
-                                            <span class="ml-2 text-xl font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
+                                            <span class="ml-2 text-xl font-bold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
                                         @endif
                                     </div>
                                     <button wire:click="openConfirm" class="inline-flex items-center justify-center rounded-md h-11 px-5 bg-[#1173d4] text-white text-sm font-bold tracking-wide hover:bg-[#0f63b9] transition-colors">
@@ -190,9 +190,9 @@
                                 <div class="mt-3 border-t pt-3 flex justify-between items-center">
                                     <span class="text-base font-semibold text-slate-900">Total (Tax Incl)</span>
                                     @if($this->isNegotiableService)
-                                        <span class="text-xl font-extrabold text-slate-900">To be Determined</span>
+                                        <span class="text-xl font-bold text-slate-900">To be Determined</span>
                                     @else
-                                        <span class="text-xl font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
+                                        <span class="text-xl font-bold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
                                     @endif
                                 </div>
                                 <div class="mt-5">
@@ -256,9 +256,9 @@
                         <li class="flex justify-between"><span class="text-slate-500">Service type</span><span class="font-medium text-slate-900">{{ $sel['name'] }} ({{ ucfirst($sel['pricing_type']) }})</span></li>
                     @endif
                     @if($this->isNegotiableService)
-                        <li class="flex justify-between"><span class="text-slate-500">Total (Tax Incl)</span><span class="font-extrabold text-slate-900">To Be Determined</span></li>
+                        <li class="flex justify-between"><span class="text-slate-500">Total (Tax Incl)</span><span class="font-bold text-slate-900">To Be Determined</span></li>
                     @else
-                    <li class="flex justify-between"><span class="text-slate-500">Total (Tax Incl)</span><span class="font-extrabold text-slate-900">₦{{ number_format($this->total, 2) }}</span></li>
+                    <li class="flex justify-between"><span class="text-slate-500">Total (Tax Incl)</span><span class="font-bold text-slate-900">₦{{ number_format($this->total, 2) }}</span></li>
                     @endif
                 </ul>
             </div>
