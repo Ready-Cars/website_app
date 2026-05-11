@@ -14,24 +14,34 @@ class CarsHome extends Component
     // Search and filters synced to URL
     #[Url]
     public string $q = '';
+
     #[Url]
     public ?string $category = null;
+
     #[Url]
     public ?string $location = null;
+
     #[Url]
     public ?string $minPrice = null;
+
     #[Url]
     public ?string $maxPrice = null;
+
     #[Url]
     public ?int $seats = null;
+
     #[Url]
     public ?string $transmission = null;
+
     #[Url]
     public ?string $fuelType = null;
+
     #[Url]
     public ?string $startDate = null;
+
     #[Url]
     public ?string $endDate = null;
+
     #[Url]
     public ?string $sort = 'newest';
 
@@ -115,27 +125,73 @@ class CarsHome extends Component
     protected function isSearching(): bool
     {
         return trim((string) $this->q) !== ''
-            || !empty($this->category)
-            || !empty($this->location)
+            || ! empty($this->category)
+            || ! empty($this->location)
             || ($this->minPrice !== null && $this->minPrice !== '')
             || ($this->maxPrice !== null && $this->maxPrice !== '')
-            || !empty($this->seats)
-            || !empty($this->transmission)
-            || !empty($this->fuelType)
-            || !empty($this->startDate)
-            || !empty($this->endDate);
+            || ! empty($this->seats)
+            || ! empty($this->transmission)
+            || ! empty($this->fuelType)
+            || ! empty($this->startDate)
+            || ! empty($this->endDate);
+    }
+
+    protected function activeFilterCount(): int
+    {
+        $count = 0;
+
+        if (trim((string) $this->q) !== '') {
+            $count++;
+        }
+
+        if (! empty($this->category)) {
+            $count++;
+        }
+
+        if (! empty($this->location)) {
+            $count++;
+        }
+
+        if ($this->minPrice !== null && $this->minPrice !== '') {
+            $count++;
+        }
+
+        if ($this->maxPrice !== null && $this->maxPrice !== '') {
+            $count++;
+        }
+
+        if (! empty($this->seats)) {
+            $count++;
+        }
+
+        if (! empty($this->transmission)) {
+            $count++;
+        }
+
+        if (! empty($this->fuelType)) {
+            $count++;
+        }
+
+        if (! empty($this->startDate) || ! empty($this->endDate)) {
+            $count++;
+        }
+
+        return $count;
     }
 
     public function render()
     {
         $options = $this->service()->options();
-        $showFeatured = ! $this->isSearching();
+        $isSearching = $this->isSearching();
+        $showFeatured = ! $isSearching;
 
         return view('livewire.cars-home', [
             'featured' => $showFeatured ? $this->service()->featured(3) : collect(),
             'catalog' => $this->service()->paginate($this->params(), $this->perPage),
             'options' => $options,
             'showFeatured' => $showFeatured,
+            'isSearching' => $isSearching,
+            'activeFilterCount' => $this->activeFilterCount(),
         ]);
     }
 }

@@ -6,7 +6,7 @@
     <title>Payment Required - Booking #{{ $booking->id }}</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Work Sans', sans-serif;
             line-height: 1.6;
             color: #333;
             max-width: 600px;

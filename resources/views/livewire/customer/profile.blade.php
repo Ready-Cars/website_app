@@ -1,5 +1,5 @@
 <div>
-    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden" style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
         <div class="layout-container flex h-full grow flex-col">
 
             <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8 w-full max-w-6xl mx-auto pb-24 md:pb-8">
@@ -12,7 +12,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <!-- Left: Avatar and email -->
                         <div class="col-span-1">
-                            <div class="rounded-xl border border-slate-200 p-6 bg-white shadow-sm">
+                            <div class="rounded-2xl border border-slate-200 p-6 bg-white shadow-sm">
                                 <div class="flex items-center gap-4">
                                     <div class="h-14 w-14 rounded-full bg-[#1173d4] text-white flex items-center justify-center text-xl font-bold">
                                         {{ auth()->user()->initials() }}
@@ -39,7 +39,7 @@
 
                         <!-- Right: Editable form -->
                         <div class="col-span-1 lg:col-span-2">
-                            <form wire:submit="updateProfileInformation" class="rounded-xl border border-slate-200 p-6 bg-white shadow-sm space-y-6">
+                            <form wire:submit="updateProfileInformation" class="rounded-2xl border border-slate-200 p-6 bg-white shadow-sm space-y-6">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label for="name" class="block text-sm font-medium text-slate-700">Full name</label>

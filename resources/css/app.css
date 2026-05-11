@@ -9,7 +9,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Work Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
@@ -37,6 +37,54 @@
 }
 
 @layer base {
+    html {
+        font-size: 16px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    body {
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        line-height: 1.6;
+        letter-spacing: -0.01em;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        font-weight: 700;
+    }
+
+    h1 {
+        font-size: clamp(1.875rem, 1.25rem + 2vw, 2.75rem);
+    }
+
+    h2 {
+        font-size: clamp(1.5rem, 1.125rem + 1.2vw, 2.125rem);
+    }
+
+    h3 {
+        font-size: clamp(1.25rem, 1.05rem + 0.7vw, 1.625rem);
+    }
+
+    p,
+    li,
+    td,
+    th,
+    label,
+    input,
+    select,
+    textarea,
+    button {
+        line-height: 1.55;
+    }
 
     *,
     ::after,
