@@ -47,6 +47,19 @@
     <link as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Work+Sans:wght@400;500;700;900" onload="this.rel='stylesheet'" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GDT2SKSLK2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag()
+        {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+        gtag('config', 'G-GDT2SKSLK2');
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     {{ $meta ?? '' }}
     @stack('meta')
