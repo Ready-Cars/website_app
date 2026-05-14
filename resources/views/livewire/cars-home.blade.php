@@ -34,17 +34,20 @@
             }
         }
     }" x-init="initFlatpickr">
-                <div data-dropdown-boundary class="relative h-[44vh] min-h-[320px] md:h-[44vh] md:min-h-[340px] w-full rounded-none sm:rounded-2xl overflow-hidden shadow-xl">
+                <div data-dropdown-boundary
+                    class="relative h-[44vh] min-h-[320px] md:h-[44vh] md:min-h-[340px] w-full rounded-none sm:rounded-2xl overflow-hidden shadow-xl">
                     <!-- Hero Image -->
                     <div class="absolute inset-0 bg-center bg-no-repeat bg-cover"
                         style="background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2000&auto=format&fit=crop'); background-position: center 42%;">
                     </div>
 
                     <!-- Overlay for Legibility -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-[#0e1133]/24 via-[#1d4ed8]/16 to-[#dc2626]/44"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-[#0e1133]/24 via-[#1d4ed8]/16 to-[#dc2626]/44">
+                    </div>
 
                     <!-- Hero Content (Desktop) -->
-                    <div class="absolute inset-0 hidden md:flex flex-col items-center justify-center text-center px-4 pb-24 md:pb-28">
+                    <div
+                        class="absolute inset-0 hidden md:flex flex-col items-center justify-center text-center px-4 pb-24 md:pb-28">
                         <h1
                             class="text-4xl sm:text-5xl md:text-6xl font-semibold text-white mb-3 tracking-tight drop-shadow-[0_4px_4px_rgba(0,0,0,0.45)]">
                             Ready. Set. Go.
@@ -56,11 +59,14 @@
                     </div>
 
                     <!-- Hero Content (Mobile) -->
-                    <div class="absolute inset-0 md:hidden flex flex-col items-center justify-center text-center px-5 pb-24">
-                        <h1 class="text-5xl font-semibold text-white leading-[0.96] tracking-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.45)]">
+                    <div
+                        class="absolute inset-0 md:hidden flex flex-col items-center justify-center text-center px-5 pb-24">
+                        <h1
+                            class="text-5xl font-semibold text-white leading-[0.96] tracking-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.45)]">
                             Ready. Set. Go.
                         </h1>
-                        <p class="mt-3 text-base text-white/95 leading-snug max-w-[19rem] drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]">
+                        <p
+                            class="mt-3 text-base text-white/95 leading-snug max-w-[19rem] drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]">
                             Premium rentals for your next adventure
                         </p>
                     </div>
@@ -70,8 +76,7 @@
                         <div
                             class="bg-white/95 rounded-2xl shadow-xl p-2 md:p-2.5 flex flex-col md:flex-row items-stretch md:items-center md:gap-0 border border-slate-200/80 backdrop-blur-sm">
                             <!-- Where (Location Dropdown) -->
-                            <div
-                                x-data="{
+                            <div x-data="{
                                     locationOpen: false,
                                     locationDropdownPosition: 'up',
                                     setLocationDropdownPosition() {
@@ -92,8 +97,7 @@
                                         }
                                         this.locationOpen = !this.locationOpen;
                                     }
-                                }"
-                                @click.outside="locationOpen = false"
+                                }" @click.outside="locationOpen = false"
                                 class="relative flex-[1.5] px-5 md:px-7 py-3.5 md:py-4 flex flex-col justify-center transition-all duration-200 hover:bg-slate-50 cursor-pointer rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none md:border-r md:border-slate-100 group">
                                 <label
                                     class="block text-[10px] md:text-[11px] font-semibold text-slate-500/90 uppercase tracking-[0.14em] mb-1.5 group-hover:text-[#1173d4] transition-colors flex items-center gap-1.5">
@@ -103,7 +107,8 @@
                                 <button type="button" @click="toggleLocationDropdown()"
                                     class="w-full flex items-center justify-between text-left text-[1.02rem] md:text-[1.06rem] font-semibold text-slate-900 leading-tight">
                                     <span x-text="$wire.location || 'Anywhere'"></span>
-                                    <span class="material-symbols-outlined text-base text-slate-400 transition-transform"
+                                    <span
+                                        class="material-symbols-outlined text-base text-slate-400 transition-transform"
                                         :class="{ 'rotate-180': locationOpen }">expand_more</span>
                                 </button>
 
@@ -117,7 +122,8 @@
                                             Anywhere
                                         </button>
                                         @foreach(($options['locations'] ?? []) as $loc)
-                                            <button type="button" @click="$wire.set('location', @js($loc)); locationOpen = false"
+                                            <button type="button"
+                                                @click="$wire.set('location', @js($loc)); locationOpen = false"
                                                 class="mt-1 w-full rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors"
                                                 :class="$wire.location === @js($loc) ? 'bg-slate-100 text-slate-900' : 'text-slate-700 hover:bg-slate-50'">
                                                 {{ $loc }}
@@ -137,10 +143,11 @@
                                         <span class="material-symbols-outlined text-[15px]">calendar_today</span>
                                         From
                                     </label>
-                                    <span class="text-[1.02rem] md:text-[1.06rem] font-semibold text-slate-800 leading-tight"
+                                    <span
+                                        class="text-[1.02rem] md:text-[1.06rem] font-semibold text-slate-800 leading-tight"
                                         x-text="$wire.startDate || 'Add dates'"></span>
-                                    <input x-ref="datepickerDesktop" class="absolute inset-0 opacity-0 pointer-events-none"
-                                        readonly />
+                                    <input x-ref="datepickerDesktop"
+                                        class="absolute inset-0 opacity-0 pointer-events-none" readonly />
                                 </div>
 
                                 <div class="flex-1 px-5 md:px-7 py-3.5 md:py-4 transition-all duration-200 hover:bg-slate-50 cursor-pointer flex flex-col justify-center group"
@@ -150,7 +157,8 @@
                                         <span class="material-symbols-outlined text-[15px]">calendar_month</span>
                                         Until
                                     </label>
-                                    <span class="text-[1.02rem] md:text-[1.06rem] font-semibold text-slate-800 leading-tight"
+                                    <span
+                                        class="text-[1.02rem] md:text-[1.06rem] font-semibold text-slate-800 leading-tight"
                                         x-text="$wire.endDate || 'Add dates'"></span>
                                 </div>
                             </div>
@@ -206,11 +214,11 @@
 
                         <div x-show="mobileSearchOpen" x-transition.opacity class="fixed inset-0 z-[85] bg-black/45"
                             @click="closeMobileSearch()"></div>
-                        <div x-show="mobileSearchOpen" x-transition
-                            @keydown.escape.window="closeMobileSearch()"
+                        <div x-show="mobileSearchOpen" x-transition @keydown.escape.window="closeMobileSearch()"
                             class="fixed inset-x-0 bottom-0 z-[90] rounded-t-[1.8rem] bg-white px-5 pb-5 pt-4 shadow-2xl md:hidden max-h-[84vh] overflow-auto">
                             <div class="mx-auto mb-4 h-1.5 w-12 rounded-full bg-slate-200"></div>
-                            <button type="button" class="absolute right-5 top-4 text-slate-500" @click="closeMobileSearch()">
+                            <button type="button" class="absolute right-5 top-4 text-slate-500"
+                                @click="closeMobileSearch()">
                                 <span class="material-symbols-outlined text-2xl">close</span>
                             </button>
 
@@ -219,7 +227,8 @@
                                     <div>
                                         <h3 class="text-lg font-semibold text-slate-900">Find your car</h3>
                                         @if($activeFilterCount > 0)
-                                            <p class="text-xs font-medium text-slate-500">{{ $activeFilterCount }} active filter{{ $activeFilterCount > 1 ? 's' : '' }}</p>
+                                            <p class="text-xs font-medium text-slate-500">{{ $activeFilterCount }} active
+                                                filter{{ $activeFilterCount > 1 ? 's' : '' }}</p>
                                         @endif
                                     </div>
                                     @if($isSearching)
@@ -232,39 +241,42 @@
 
                                 <div class="space-y-3">
                                     <div class="w-full rounded-2xl border border-slate-200 p-3 text-left">
-                                        <span class="block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">Where</span>
+                                        <span
+                                            class="block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">Where</span>
                                         <div class="mt-1.5">
-                                        <select wire:model.live="location"
-                                            class="w-full border-0 bg-transparent p-0 text-base font-semibold text-slate-800 focus:outline-none focus:ring-0 appearance-none">
-                                            <option value="">Anywhere</option>
-                                            @foreach(($options['locations'] ?? []) as $loc)
-                                                <option value="{{ $loc }}">{{ $loc }}</option>
-                                            @endforeach
-                                        </select>
+                                            <select wire:model.live="location"
+                                                class="w-full border-0 bg-transparent p-0 text-base font-semibold text-slate-800 focus:outline-none focus:ring-0 appearance-none">
+                                                <option value="">Anywhere</option>
+                                                @foreach(($options['locations'] ?? []) as $loc)
+                                                    <option value="{{ $loc }}">{{ $loc }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
 
                                     <div class="w-full rounded-2xl border border-slate-200 p-3 text-left">
-                                        <span class="block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">From</span>
+                                        <span
+                                            class="block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">From</span>
                                         <div class="mt-1.5">
-                                        <input type="date" wire:model.live="startDate"
-                                            class="w-full border-0 bg-transparent p-0 text-base font-semibold text-slate-800 focus:outline-none focus:ring-0" />
+                                            <input type="date" wire:model.live="startDate"
+                                                class="w-full border-0 bg-transparent p-0 text-base font-semibold text-slate-800 focus:outline-none focus:ring-0" />
+                                        </div>
                                     </div>
-                                </div>
 
                                     <div class="w-full rounded-2xl border border-slate-200 p-3 text-left">
-                                        <span class="block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">Until</span>
+                                        <span
+                                            class="block text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500">Until</span>
                                         <div class="mt-1.5">
-                                        <input type="date" wire:model.live="endDate"
-                                            class="w-full border-0 bg-transparent p-0 text-base font-semibold text-slate-800 focus:outline-none focus:ring-0" />
+                                            <input type="date" wire:model.live="endDate"
+                                                class="w-full border-0 bg-transparent p-0 text-base font-semibold text-slate-800 focus:outline-none focus:ring-0" />
+                                        </div>
                                     </div>
-                                </div>
 
-                                    <div class="sticky bottom-0 -mx-5 mt-5 border-t border-slate-200 bg-white/95 px-5 pt-3 pb-1 backdrop-blur">
+                                    <div
+                                        class="sticky bottom-0 -mx-5 mt-5 border-t border-slate-200 bg-white/95 px-5 pt-3 pb-1 backdrop-blur">
                                         <div class="flex items-center gap-2">
                                             @if($isSearching)
-                                                <button type="button" wire:click="resetFilters"
-                                                    @click="closeMobileSearch()"
+                                                <button type="button" wire:click="resetFilters" @click="closeMobileSearch()"
                                                     class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700">
                                                     Clear
                                                 </button>
@@ -339,6 +351,7 @@
                     </button>
 
                     @foreach(($options['categories'] ?? []) as $cat)
+
                         <button class="flex-shrink-0 snap-start flex flex-col items-center gap-1 group"
                             wire:click="$set('category', '{{ $cat }}')">
                             <div
@@ -362,17 +375,20 @@
                 <section class="mb-14 md:mb-16">
                     <div class="flex justify-between items-center mb-5 md:mb-6">
                         <div>
-                            <h2 class="text-base md:text-[1.4rem] font-semibold text-[#0e1133] tracking-tight">Best daily deals</h2>
+                            <h2 class="text-base md:text-[1.4rem] font-semibold text-[#0e1133] tracking-tight">Best daily
+                                deals</h2>
                             <p class="text-xs md:text-sm font-medium text-slate-500">Exceptional value, vetted hosts</p>
                         </div>
                         <div class="flex gap-2">
                             <button
                                 class="w-9 h-9 md:w-10 md:h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm">
-                                <span class="material-symbols-outlined text-[18px] md:text-[20px] text-slate-600">chevron_left</span>
+                                <span
+                                    class="material-symbols-outlined text-[18px] md:text-[20px] text-slate-600">chevron_left</span>
                             </button>
                             <button
                                 class="w-9 h-9 md:w-10 md:h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm">
-                                <span class="material-symbols-outlined text-[18px] md:text-[20px] text-slate-600">chevron_right</span>
+                                <span
+                                    class="material-symbols-outlined text-[18px] md:text-[20px] text-slate-600">chevron_right</span>
                             </button>
                         </div>
                     </div>
@@ -407,13 +423,14 @@
                                                     <span class="material-symbols-outlined text-lg">favorite</span>
                                                 </div>
                                             </div>
-                                            <h3 class="text-[1.1rem] font-semibold text-slate-900 leading-snug tracking-tight">{{ $car->name }}</h3>
+                                            <h3 class="text-[1.1rem] font-semibold text-slate-900 leading-snug tracking-tight">
+                                                {{ $car->name }}
+                                            </h3>
                                             <div class="flex items-center gap-1.5 mt-1 text-[0.92rem] text-slate-500">
                                                 <span class="font-semibold text-slate-700">{{ $car->year ?? '2023' }}</span>
                                                 <span>•</span>
                                                 <div class="flex items-center">
-                                                    <span
-                                                        class="material-symbols-outlined text-xs text-amber-500">star</span>
+                                                    <span class="material-symbols-outlined text-xs text-amber-500">star</span>
                                                     <span class="font-semibold text-slate-700 ml-0.5">5.0</span>
                                                     <span class="ml-0.5 text-slate-400 font-normal">(12)</span>
                                                 </div>
@@ -438,9 +455,11 @@
             <section id="catalog-section" class="pt-1 md:pt-2">
                 <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h2 class="text-base md:text-[1.45rem] font-semibold text-[#0e1133] tracking-tight">Available Cars</h2>
+                        <h2 class="text-base md:text-[1.45rem] font-semibold text-[#0e1133] tracking-tight">Available
+                            Cars</h2>
                         @if($isSearching && $activeFilterCount > 0)
-                            <p class="mt-1 text-xs font-medium text-slate-500">{{ $activeFilterCount }} active filter{{ $activeFilterCount > 1 ? 's' : '' }}</p>
+                            <p class="mt-1 text-xs font-medium text-slate-500">{{ $activeFilterCount }} active
+                                filter{{ $activeFilterCount > 1 ? 's' : '' }}</p>
                         @endif
                     </div>
                     @if($isSearching)
@@ -454,8 +473,7 @@
 
                 <div class="relative">
                     <!-- Loading State (Skeletons) -->
-                    <div wire:loading
-                        wire:target="refreshSearch, category, q, startDate, endDate, resetFilters"
+                    <div wire:loading wire:target="refreshSearch, category, q, startDate, endDate, resetFilters"
                         class="w-full" style="display: none;">
                         <div
                             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12 w-full">
@@ -479,14 +497,13 @@
                         </div>
                     </div>
 
-                    <div wire:loading.remove
-                        wire:target="refreshSearch, category, q, startDate, endDate, resetFilters"
+                    <div wire:loading.remove wire:target="refreshSearch, category, q, startDate, endDate, resetFilters"
                         class="w-full">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10 md:gap-y-12">
+                        <div
+                            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10 md:gap-y-12">
                             @forelse($catalog as $car)
                                 <a wire:key="car-{{ $car->id }}" href="{{ route('rent.show', $car) }}"
-                                    class="group block overflow-hidden rounded-2xl bg-white"
-                                    wire:navigate>
+                                    class="group block overflow-hidden rounded-2xl bg-white" wire:navigate>
                                     <div class="relative aspect-video overflow-hidden bg-slate-100">
                                         <img src="{{ $car->image_url }}" alt="{{ $car->name }}"
                                             class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
@@ -501,33 +518,44 @@
 
                                     <div class="space-y-2.5 px-2 pt-3.5 pb-3">
                                         <div class="flex items-start justify-between gap-3">
-                                            <h3 class="text-[1.12rem] font-semibold leading-snug tracking-tight text-slate-900">
+                                            <h3
+                                                class="text-[1.12rem] font-semibold leading-snug tracking-tight text-slate-900">
                                                 {{ $car->name }}
                                             </h3>
                                             <div class="text-right">
-                                                <p class="text-[1.35rem] font-semibold leading-none tracking-tight text-slate-900">
+                                                <p
+                                                    class="text-[1.35rem] font-semibold leading-none tracking-tight text-slate-900">
                                                     ₦{{ number_format($car->daily_price, 0) }}
                                                 </p>
-                                                <p class="mt-1 text-[0.7rem] font-medium uppercase tracking-wide leading-none text-slate-500">per day</p>
+                                                <p
+                                                    class="mt-1 text-[0.7rem] font-medium uppercase tracking-wide leading-none text-slate-500">
+                                                    per day</p>
                                             </div>
                                         </div>
 
                                         <div class="grid grid-cols-3 gap-2 text-[0.83rem] text-slate-600">
-                                            <div class="flex items-center justify-center gap-1 rounded-2xl bg-slate-50/70 px-2 py-1.5">
-                                                <span class="material-symbols-outlined text-[13px] text-slate-400">airline_seat_recline_normal</span>
+                                            <div
+                                                class="flex items-center justify-center gap-1 rounded-2xl bg-slate-50/70 px-2 py-1.5">
+                                                <span
+                                                    class="material-symbols-outlined text-[13px] text-slate-400">airline_seat_recline_normal</span>
                                                 <span class="font-medium leading-none">{{ $car->seats }}</span>
                                             </div>
-                                            <div class="flex items-center justify-center gap-1 rounded-2xl bg-slate-50/70 px-2 py-1.5">
-                                                <span class="material-symbols-outlined text-[13px] text-slate-400">settings</span>
+                                            <div
+                                                class="flex items-center justify-center gap-1 rounded-2xl bg-slate-50/70 px-2 py-1.5">
+                                                <span
+                                                    class="material-symbols-outlined text-[13px] text-slate-400">settings</span>
                                                 <span class="font-medium leading-none">{{ $car->transmission }}</span>
                                             </div>
-                                            <div class="flex items-center justify-center gap-1 rounded-2xl bg-slate-50/70 px-2 py-1.5">
-                                                <span class="material-symbols-outlined text-[13px] text-slate-400">local_gas_station</span>
+                                            <div
+                                                class="flex items-center justify-center gap-1 rounded-2xl bg-slate-50/70 px-2 py-1.5">
+                                                <span
+                                                    class="material-symbols-outlined text-[13px] text-slate-400">local_gas_station</span>
                                                 <span class="font-medium leading-none">{{ $car->fuel_type ?? 'Gas' }}</span>
                                             </div>
                                         </div>
 
-                                        <div class="inline-flex items-center gap-1.5 text-[0.95rem] font-medium text-slate-700 transition-colors group-hover:text-[#0e1133]">
+                                        <div
+                                            class="inline-flex items-center gap-1.5 text-[0.95rem] font-medium text-slate-700 transition-colors group-hover:text-[#0e1133]">
                                             <span>Rent this car</span>
                                             <span
                                                 class="material-symbols-outlined leading-none transition-transform group-hover:translate-x-1"
@@ -551,23 +579,24 @@
                 <!-- Infinite Scroll Sentinel -->
                 @if($catalog->hasMorePages())
                     <div wire:key="sentinel" x-data="{
-                                             isLoading: false,
-                                             init() {
-                                                 let observer = new IntersectionObserver((entries) => {
-                                                     entries.forEach(entry => {
-                                                         if (entry.isIntersecting && !this.isLoading) {
-                                                             this.isLoading = true;
-                                                             @this.call('loadMore').then(() => {
-                                                                 setTimeout(() => { this.isLoading = false; }, 500);
+                                                         isLoading: false,
+                                                         init() {
+                                                             let observer = new IntersectionObserver((entries) => {
+                                                                 entries.forEach(entry => {
+                                                                     if (entry.isIntersecting && !this.isLoading) {
+                                                                         this.isLoading = true;
+                                                                         @this.call('loadMore').then(() => {
+                                                                             setTimeout(() => { this.isLoading = false; }, 500);
+                                                                         })
+                                                                     }
+                                                                 })
+                                                             }, {
+                                                                 rootMargin: '100px'
                                                              })
+                                                             observer.observe($el)
                                                          }
-                                                     })
-                                                 }, {
-                                                     rootMargin: '100px'
-                                                 })
-                                                 observer.observe($el)
-                                             }
-                                         }" class="py-20 flex flex-col items-center justify-center min-h-[160px]">
+                                                     }"
+                        class="py-20 flex flex-col items-center justify-center min-h-[160px]">
                         <div wire:loading wire:target="loadMore" class="flex flex-col items-center">
                             <div class="w-10 h-10 border-4 border-slate-200 border-t-[#0e1133] rounded-full animate-spin">
                             </div>
@@ -587,8 +616,7 @@
 
     @include('partials.footer')
 
-    <div
-        x-data="{
+    <div x-data="{
             showScrollTop: false,
             updateScrollTopVisibility() {
                 this.showScrollTop = window.innerWidth >= 1024 && window.scrollY > 500;
@@ -598,12 +626,8 @@
                 window.addEventListener('scroll', () => this.updateScrollTopVisibility());
                 window.addEventListener('resize', () => this.updateScrollTopVisibility());
             }
-        }"
-        class="pointer-events-none fixed bottom-8 right-8 z-50 hidden lg:block">
-        <button
-            type="button"
-            x-show="showScrollTop"
-            x-transition.opacity.scale
+        }" class="pointer-events-none fixed bottom-8 right-8 z-50 hidden lg:block">
+        <button type="button" x-show="showScrollTop" x-transition.opacity.scale
             @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
             class="pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#0e1133] text-white shadow-lg transition hover:bg-black focus:outline-none focus:ring-2 focus:ring-[#0e1133]/30"
             aria-label="Scroll to top">

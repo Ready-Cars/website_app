@@ -240,10 +240,10 @@
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <div class="px-5 py-4 text-sm text-slate-700 space-y-2">
+            <div class="px-5 py-4 text-sm text-slate-700 space-y-4">
                 <p>Please review your trip details before confirming:</p>
                 <p class="text-red-600">{{session('error')}}</p>
-                <ul class="space-y-1">
+                <ul class="space-y-1 bg-slate-50 p-3 rounded-lg border border-slate-100">
                     <li class="flex justify-between"><span class="text-slate-500">Car</span><span class="font-medium text-slate-900">{{ $car->name }}</span></li>
                     <li class="flex justify-between"><span class="text-slate-500">Pick-up</span><span class="font-medium text-slate-900">{{ $pickupLocation ?: '—' }}</span></li>
                     <li class="flex justify-between"><span class="text-slate-500">Drop-off</span><span class="font-medium text-slate-900">{{ $dropoffLocation ?: '—' }}</span></li>
@@ -261,11 +261,39 @@
                     <li class="flex justify-between"><span class="text-slate-500">Total (Tax Incl)</span><span class="font-bold text-slate-900">₦{{ number_format($this->total, 2) }}</span></li>
                     @endif
                 </ul>
+
+                <!-- Disclaimer Section -->
+                <div class="space-y-3 pt-2">
+                    <h4 class="font-semibold text-slate-900 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-amber-500 text-lg">warning</span>
+                        Important Pricing Information
+                    </h4>
+                    <div class="text-[13px] text-slate-600 space-y-2">
+                        <p>Please note the following before proceeding:</p>
+                        <ul class="list-disc list-inside space-y-1 pl-1">
+                            <li><strong>Indicative Pricing:</strong> All prices displayed on this website are for indication purposes only and do not represent the final booking price.</li>
+                            <li><strong>Price Negotiation:</strong> Our support staff will reach out to you after your booking to discuss and negotiate the final pricing based on your specific requirements.</li>
+                            <li><strong>Final Confirmation:</strong> The actual rental price will be confirmed during our consultation call with you.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-t border-slate-100">
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <div class="flex items-center h-5 pt-0.5">
+                                <input type="checkbox" wire:model.live="agreedToDisclaimer" class="h-4 w-4 rounded border-slate-300 text-[#1173d4] focus:ring-[#1173d4] transition-all cursor-pointer">
+                            </div>
+                            <span class="text-sm text-slate-700 leading-snug group-hover:text-slate-900 transition-colors">
+                                I acknowledge that I have read and accept these pricing terms and conditions.
+                            </span>
+                        </label>
+                        @error('agreedToDisclaimer') <p class="text-xs text-red-600 mt-1 ml-7">{{ $message }}</p> @enderror
+                    </div>
+                </div>
             </div>
-            <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-3">
-                <button wire:click="cancelConfirm" class="inline-flex items-center justify-center rounded-md h-10 px-4 border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50" wire:loading.attr="disabled" wire:target="confirmRent">Cancel</button>
-                <button wire:click="confirmRent" class="inline-flex items-center justify-center rounded-md h-10 px-5 bg-[#1173d4] text-white text-sm font-bold hover:bg-[#0f63b9] disabled:opacity-50 disabled:cursor-not-allowed" wire:loading.attr="disabled" wire:target="confirmRent">
-                    <span wire:loading.remove wire:target="confirmRent">Confirm</span>
+            <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-3 bg-slate-50 rounded-b-lg">
+                <button wire:click="cancelConfirm" class="inline-flex items-center justify-center rounded-md h-10 px-4 border border-slate-300 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors" wire:loading.attr="disabled" wire:target="confirmRent">Cancel</button>
+                <button wire:click="confirmRent" @if(!$agreedToDisclaimer) disabled @endif class="inline-flex items-center justify-center rounded-md h-10 px-6 bg-[#1173d4] text-white text-sm font-bold hover:bg-[#0f63b9] disabled:opacity-50 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition-all" wire:loading.attr="disabled" wire:target="confirmRent">
+                    <span wire:loading.remove wire:target="confirmRent">Confirm booking</span>
                     <span wire:loading wire:target="confirmRent" style="display: none;">
                         <span class="flex items-center">
                             <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

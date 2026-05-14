@@ -54,6 +54,9 @@ class RentCar extends Component
     public bool $successOpen = false;
 
     public string $successMessage = '';
+    
+    public bool $agreedToDisclaimer = false;
+
 
     public function mount(Car $car): void
     {
@@ -101,6 +104,7 @@ class RentCar extends Component
 
     public function openConfirm(): void
     {
+        $this->agreedToDisclaimer = false;
         $this->confirmOpen = true;
     }
 
@@ -156,6 +160,7 @@ class RentCar extends Component
                 Rule::exists('service_types', 'id')->where(fn ($q) => $q->where('is_active', true)),
             ],
             'notes' => ['nullable', 'string', 'max:500'],
+            'agreedToDisclaimer' => ['accepted'],
         ];
     }
 
@@ -254,6 +259,7 @@ class RentCar extends Component
         // Reset dates to today/tomorrow
         $this->startDate = Carbon::today()->toDateString();
         $this->endDate = Carbon::tomorrow()->toDateString();
+        $this->agreedToDisclaimer = false;
     }
 
     public function confirmRent(): void
