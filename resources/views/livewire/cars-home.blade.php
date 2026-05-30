@@ -437,7 +437,7 @@
                                             </div>
                                             <div class="mt-2">
                                                 <span
-                                                    class="text-xl font-semibold text-[#0e1133] tracking-tight">₦{{ number_format($car->daily_price, 0) }}</span>
+                                                    class="text-xl font-semibold text-[#0e1133] tracking-tight">From ₦{{ number_format($car->daily_price, 0) }}</span>
                                                 <span class="text-sm font-medium text-slate-500">/day</span>
                                             </div>
                                         </a>
@@ -525,7 +525,7 @@
                                             <div class="text-right">
                                                 <p
                                                     class="text-[1.35rem] font-semibold leading-none tracking-tight text-slate-900">
-                                                    ₦{{ number_format($car->daily_price, 0) }}
+                                                    From ₦{{ number_format($car->daily_price, 0) }}
                                                 </p>
                                                 <p
                                                     class="mt-1 text-[0.7rem] font-medium uppercase tracking-wide leading-none text-slate-500">
