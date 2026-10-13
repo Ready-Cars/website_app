@@ -51,8 +51,8 @@ class PriceHiddenTest extends TestCase
         Car::factory()->create(['name' => 'Hidden Car', 'daily_price' => 70000, 'is_active' => false]);
 
         Livewire::test(CarsHome::class)
-            ->assertSee('Rent a Lexus GX460 for ₦150,000', false)
-            ->assertSee('Rent a Toyota Prado for ₦90,000', false)
+            ->assertSeeInOrder(['Rent a Lexus GX460', '₦150,000'])
+            ->assertSeeInOrder(['Rent a Toyota Prado', '₦90,000'])
             ->assertSee('T&amp;Cs Apply', false)
             ->assertDontSee('₦70,000');
     }

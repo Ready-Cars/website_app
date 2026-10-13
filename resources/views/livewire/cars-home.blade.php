@@ -35,7 +35,7 @@
         }
     }" x-init="initFlatpickr">
                 <div data-dropdown-boundary
-                    class="relative h-[44vh] min-h-[320px] md:h-[44vh] md:min-h-[340px] w-full rounded-none sm:rounded-2xl overflow-hidden shadow-xl">
+                    class="relative {{ $offers->isNotEmpty() ? 'h-[500px] sm:h-[540px] md:h-[400px] lg:h-[460px]' : 'h-[44vh] min-h-[320px] md:h-[44vh] md:min-h-[340px]' }} w-full rounded-none sm:rounded-2xl overflow-hidden shadow-xl bg-[#0e1133]">
                     @if ($offers->isNotEmpty())
                         <!-- Offer Slideshow -->
                         <div wire:ignore x-data="{
@@ -45,47 +45,82 @@
                                 start() {
                                     if (this.count < 2) return;
                                     clearInterval(this.timer);
-                                    this.timer = setInterval(() => this.active = (this.active + 1) % this.count, 5000);
+                                    this.timer = setInterval(() => this.next(), 6000);
                                 },
+                                stop() { clearInterval(this.timer); },
+                                next() { this.active = (this.active + 1) % this.count; },
+                                prev() { this.active = (this.active - 1 + this.count) % this.count; },
                                 go(i) { this.active = i; this.start(); }
-                            }" x-init="start()" class="absolute inset-0">
+                            }" x-init="start()" @mouseenter="stop()" @mouseleave="start()"
+                            class="absolute inset-0">
+                            <!-- Brand backdrop -->
+                            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#1d4ed8_0%,transparent_55%),radial-gradient(ellipse_at_bottom_left,#dc2626_0%,transparent_50%)] opacity-40"></div>
+
                             @foreach ($offers as $offer)
+                                @php $offerImage = $offer->image_url ?: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2000&auto=format&fit=crop'; @endphp
                                 <div x-show="active === {{ $loop->index }}"
-                                    x-transition:enter="transition-opacity duration-700"
-                                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                                    x-transition:leave="transition-opacity duration-700 absolute inset-0"
+                                    x-transition:enter="transition ease-out duration-700"
+                                    x-transition:enter-start="opacity-0 translate-x-6" x-transition:enter-end="opacity-100 translate-x-0"
+                                    x-transition:leave="transition ease-in duration-500 absolute inset-0"
                                     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                                     @if (! $loop->first) style="display: none;" @endif
-                                    class="absolute inset-0">
-                                    <div class="absolute inset-0 bg-center bg-no-repeat bg-cover"
-                                        style="background-image: url('{{ $offer->image_url ?: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2000&auto=format&fit=crop' }}'); background-position: center 42%;">
-                                    </div>
-                                    <div class="absolute inset-0 bg-gradient-to-br from-[#0e1133]/60 via-[#1d4ed8]/30 to-[#dc2626]/50"></div>
-                                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-5 pb-24 md:pb-28">
-                                        <h2
-                                            class="text-3xl sm:text-4xl md:text-5xl font-semibold uppercase text-white leading-tight tracking-tight max-w-4xl drop-shadow-[0_4px_6px_rgba(0,0,0,0.45)]">
-                                            Rent a {{ $offer->name }} for ₦{{ number_format($offer->daily_price, 0) }}<span class="text-xl md:text-3xl">/day</span>
+                                    class="absolute inset-0 grid grid-rows-[auto_1fr] md:grid-rows-1 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-center gap-5 md:gap-10 px-5 pt-12 pb-12 md:px-12 lg:px-16 md:py-10">
+                                    <!-- Copy -->
+                                    <div class="text-center md:text-left">
+                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/90 ring-1 ring-inset ring-white/20">
+                                            <span class="material-symbols-outlined text-[14px] text-amber-300">local_offer</span>
+                                            Special offer
+                                        </span>
+                                        <h2 class="mt-3 md:mt-4 text-2xl sm:text-3xl lg:text-[2.6rem] font-semibold uppercase leading-[1.1] tracking-tight text-white">
+                                            Rent a {{ $offer->name }}
                                         </h2>
-                                        <div class="mt-4 flex items-center gap-4">
+                                        <p class="mt-2 md:mt-3 text-white/80 text-sm md:text-base">
+                                            for only
+                                            <span class="block mt-0.5 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white">
+                                                ₦{{ number_format($offer->daily_price, 0) }}<span class="text-base lg:text-lg font-medium text-white/70"> / day</span>
+                                            </span>
+                                        </p>
+                                        <div class="mt-4 md:mt-6 flex items-center justify-center md:justify-start gap-4">
                                             <a href="{{ route('rent.show', $offer) }}" wire:navigate
-                                                class="inline-flex items-center rounded-full bg-white px-5 py-2 text-sm font-semibold text-[#0e1133] shadow hover:bg-slate-100 transition-colors">
+                                                class="inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#0e1133] shadow-lg shadow-black/20 hover:bg-slate-100 transition-colors">
                                                 Book now
+                                                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                                             </a>
                                             <a href="{{ route('terms.index') }}" wire:navigate
-                                                class="text-sm font-medium text-white/90 underline underline-offset-2 drop-shadow hover:text-white">
+                                                class="text-xs font-medium text-white/70 underline underline-offset-2 hover:text-white">
                                                 T&amp;Cs Apply
                                             </a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Car photo: framed card, full image always visible -->
+                                    <div class="relative h-full min-h-0 w-full">
+                                        <div class="absolute inset-0 m-auto aspect-video max-h-full max-w-full overflow-hidden rounded-2xl bg-slate-900 shadow-2xl shadow-black/40 ring-1 ring-white/15">
+                                            <div class="absolute inset-0 scale-110 bg-cover bg-center blur-xl opacity-50"
+                                                style="background-image: url('{{ $offerImage }}');"></div>
+                                            <img src="{{ $offerImage }}" alt="{{ $offer->name }}"
+                                                class="relative h-full w-full object-contain"
+                                                loading="{{ $loop->first ? 'eager' : 'lazy' }}">
                                         </div>
                                     </div>
                                 </div>
                             @endforeach
 
                             @if ($offers->count() > 1)
-                                <div class="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2">
+                                <!-- Controls -->
+                                <button type="button" @click="prev(); start()" aria-label="Previous offer"
+                                    class="hidden md:inline-flex absolute left-3 top-1/2 -translate-y-1/2 h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/20 transition-colors">
+                                    <span class="material-symbols-outlined">chevron_left</span>
+                                </button>
+                                <button type="button" @click="next(); start()" aria-label="Next offer"
+                                    class="hidden md:inline-flex absolute right-3 top-1/2 -translate-y-1/2 h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/20 backdrop-blur hover:bg-white/20 transition-colors">
+                                    <span class="material-symbols-outlined">chevron_right</span>
+                                </button>
+                                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                                     @foreach ($offers as $offer)
                                         <button type="button" @click="go({{ $loop->index }})"
-                                            class="h-2 rounded-full transition-all"
-                                            :class="active === {{ $loop->index }} ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'"
+                                            class="h-1.5 rounded-full transition-all duration-300"
+                                            :class="active === {{ $loop->index }} ? 'w-7 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/70'"
                                             aria-label="Show offer {{ $loop->iteration }}"></button>
                                     @endforeach
                                 </div>
@@ -127,9 +162,10 @@
                             </p>
                         </div>
                     @endif
+                </div>
 
-                    <!-- Search Bar Overlay (Desktop) -->
-                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-[94%] max-w-[980px] hidden md:block">
+                <!-- Search Bar (Desktop): below the offer banner, or overlaid on the static hero -->
+                    <div class="{{ $offers->isNotEmpty() ? 'relative mx-auto mt-5 w-full max-w-[980px]' : 'absolute bottom-6 left-1/2 -translate-x-1/2 w-[94%] max-w-[980px]' }} hidden md:block">
                         <div
                             class="bg-white/95 rounded-2xl shadow-xl p-2 md:p-2.5 flex flex-col md:flex-row items-stretch md:items-center md:gap-0 border border-slate-200/80 backdrop-blur-sm">
                             <!-- Where (Location Dropdown) -->
@@ -233,7 +269,7 @@
                     </div>
 
                     <!-- Search Bar Overlay (Mobile) -->
-                    <div class="absolute inset-x-4 bottom-3 md:hidden" x-data="{
+                    <div class="{{ $offers->isNotEmpty() ? 'relative mx-4 mt-4' : 'absolute inset-x-4 bottom-3' }} md:hidden" x-data="{
                         mobileSearchOpen: false,
                         openMobileSearch() {
                             this.mobileSearchOpen = true;
@@ -349,7 +385,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
             </section>
 
             <!-- Flatpickr CSS & JS -->
