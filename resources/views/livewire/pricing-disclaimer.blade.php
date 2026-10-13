@@ -23,7 +23,7 @@
 
                         <ul class="space-y-2 text-sm list-disc list-inside">
                             <li>
-                                <strong>Indicative Pricing:</strong> All prices displayed on this website are for indication purposes only and do not represent the final booking price.
+                                <strong>Promotional Offers:</strong> Advertised offers are starting prices for indication only, subject to our Terms &amp; Conditions, and do not represent the final booking price.
                             </li>
                             <li>
                                 <strong>Price Negotiation:</strong> Our support staff will reach out to you after your booking to discuss and negotiate the final pricing based on your specific requirements.

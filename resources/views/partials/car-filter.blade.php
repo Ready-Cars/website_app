@@ -47,8 +47,6 @@
             @endforeach
         </select>
         <div class="md:col-span-6 grid grid-cols-2 md:grid-cols-3 gap-3">
-            <input wire:model.debounce.400ms="minPrice" type="number" min="0" placeholder="Min ₦/day" class="form-input rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" />
-            <input wire:model.debounce.400ms="maxPrice" type="number" min="0" placeholder="Max ₦/day" class="form-input rounded-md border-slate-300 focus:border-sky-600 focus:ring-sky-600" />
             <button wire:click="resetFilters" type="button" class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Reset</button>
         </div>
     </div>

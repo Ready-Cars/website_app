@@ -51,14 +51,9 @@
                                 </div>
                                 @endif
                                 <div class="p-4">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h2 class="text-xl font-semibold text-slate-900">{{ $car->name }}</h2>
-                                            <p class="text-slate-600 text-sm">{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats • {{ $car->fuel_type }}</p>
-                                        </div>
-                                        <div class="text-right">
-                                            <p class="text-lg font-bold text-slate-900">From ₦{{ number_format($car->daily_price, 0) }}<span class="text-sm font-normal text-slate-500">/day</span></p>
-                                        </div>
+                                    <div>
+                                        <h2 class="text-xl font-semibold text-slate-900">{{ $car->name }}</h2>
+                                        <p class="text-slate-600 text-sm">{{ $car->category }} • {{ $car->transmission }} • {{ $car->seats }} seats • {{ $car->fuel_type }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -94,7 +89,7 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 mb-1">Service type</label>
-                                    <select data-field="serviceTypeId" class="form-select w-full rounded-md border-slate-300 focus:border-[#1173d4] focus:ring-[#1173d4]" wire:model.defer="serviceTypeId" wire:change="getIsNegotiableServiceProperty">
+                                    <select data-field="serviceTypeId" class="form-select w-full rounded-md border-slate-300 focus:border-[#1173d4] focus:ring-[#1173d4]" wire:model.defer="serviceTypeId">
                                         <option value="0" >Select a service type</option>
                                         @foreach($serviceTypeOptions as $st)
                                             <option value="{{ $st['id'] }}">{{ $st['name'] }}</option>
@@ -121,7 +116,7 @@
                                             @php $name = $ex['name']; $key = $ex['key']; @endphp
                                             <label class="flex items-center gap-2 text-sm text-slate-700">
                                                 <input type="checkbox" class="rounded border-slate-300 text-[#1173d4] focus:ring-[#1173d4]" wire:model.live="extras.{{ $key }}">
-                                                {{ $name }} (+₦{{ number_format($ex['price_per_day'], 2) }}/day)
+                                                {{ $name }}
                                             </label>
                                         @endforeach
                                     </div>
@@ -134,16 +129,9 @@
                                     <textarea rows="3" data-field="notes" class="form-textarea w-full rounded-md border-slate-300 focus:border-[#1173d4] focus:ring-[#1173d4]" placeholder="Any special requests?" wire:model.defer="notes"></textarea>
                                     @error('notes') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                                 </div>
-                                <!-- Desktop-only total + confirm at bottom of form -->
+                                <!-- Desktop-only confirm at bottom of form -->
                                 <div class="hidden lg:flex items-center justify-between pt-3 border-t border-slate-200">
-                                    <div class="text-base">
-                                        <span class="text-slate-600">Total (Tax Incl)</span>
-                                        @if($this->isNegotiableService)
-                                            <span class="ml-2 text-xl font-bold text-slate-900">To be Determined</span>
-                                        @else
-                                            <span class="ml-2 text-xl font-bold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
-                                        @endif
-                                    </div>
+                                    <p class="text-sm text-slate-600">Our team will contact you to confirm your price.</p>
                                     <button wire:click="openConfirm" class="inline-flex items-center justify-center rounded-md h-11 px-5 bg-[#1173d4] text-white text-sm font-bold tracking-wide hover:bg-[#0f63b9] transition-colors">
                                         Confirm reservation
                                     </button>
@@ -155,45 +143,21 @@
                         <!-- Summary card -->
                         <aside class="space-y-6">
                             <div class="rounded-lg bg-white shadow-sm border border-slate-200 p-5">
-                                <h3 class="text-lg font-semibold text-slate-900 mb-4">Price summary</h3>
+                                <h3 class="text-lg font-semibold text-slate-900 mb-4">Booking summary</h3>
                                 <ul class="space-y-2 text-sm text-slate-700">
                                     @php
                                         $sel = null;
                                         foreach ($serviceTypeOptions as $opt) { if ((int)($opt['id'] ?? 0) === (int)($serviceTypeId ?? 0)) { $sel = $opt; break; } }
+                                        $selectedExtras = collect($availableExtras)->filter(fn ($ex) => $extras[$ex['key']] ?? false)->pluck('name');
                                     @endphp
                                     @if($sel)
-                                        <li class="flex justify-between"><span>Service type</span> <span>{{ $sel['name'] }} ({{ ucfirst($sel['pricing_type']) }})</span></li>
+                                        <li class="flex justify-between gap-3"><span>Service type</span> <span class="text-right">{{ $sel['name'] }}</span></li>
                                     @endif
                                     <li class="flex justify-between"><span>Days</span> <span>{{ $this->days }}</span></li>
-                                    <li class="flex justify-between"><span>Daily rate</span>
-                                        @if($this->isNegotiableService)
-                                            <span>To be Determined</span>
-                                        @else
-                                            <span>₦{{ number_format($car->daily_price, 2) }}</span>
-                                        @endif
-                                    </li>
-                                    <li class="flex justify-between"><span>Extras</span>
-                                        @if($this->isNegotiableService)
-                                            <span>To be Determined</span>
-                                        @else
-                                            <span>₦{{ number_format($this->extrasCost, 2) }}</span>
-                                        @endif
-                                    </li>
-                                    <li class="flex justify-between"><span>Subtotal</span>
-                                        @if($this->isNegotiableService)
-                                            <span>To be Determined</span>
-                                        @else
-                                            <span>₦{{ number_format($this->subtotal, 2) }}</span>
-                                        @endif
-                                    </li>
+                                    <li class="flex justify-between gap-3"><span>Extras</span> <span class="text-right">{{ $selectedExtras->isNotEmpty() ? $selectedExtras->join(', ') : 'None' }}</span></li>
                                 </ul>
-                                <div class="mt-3 border-t pt-3 flex justify-between items-center">
-                                    <span class="text-base font-semibold text-slate-900">Total (Tax Incl)</span>
-                                    @if($this->isNegotiableService)
-                                        <span class="text-xl font-bold text-slate-900">To be Determined</span>
-                                    @else
-                                        <span class="text-xl font-bold text-slate-900">₦{{ number_format($this->total, 2) }}</span>
-                                    @endif
+                                <div class="mt-3 border-t pt-3 text-sm text-slate-600">
+                                    No payment is taken now. Our team will contact you to confirm the price for your trip.
                                 </div>
                                 <div class="mt-5">
                                     <button wire:click="openConfirm" class="w-full inline-flex items-center justify-center rounded-md h-11 px-4 bg-[#1173d4] text-white text-sm font-bold tracking-wide hover:bg-[#0f63b9] transition-colors">
@@ -253,12 +217,7 @@
                         foreach ($serviceTypeOptions as $opt) { if ((int)($opt['id'] ?? 0) === (int)($serviceTypeId ?? 0)) { $sel = $opt; break; } }
                     @endphp
                     @if($sel)
-                        <li class="flex justify-between"><span class="text-slate-500">Service type</span><span class="font-medium text-slate-900">{{ $sel['name'] }} ({{ ucfirst($sel['pricing_type']) }})</span></li>
-                    @endif
-                    @if($this->isNegotiableService)
-                        <li class="flex justify-between"><span class="text-slate-500">Total (Tax Incl)</span><span class="font-bold text-slate-900">To Be Determined</span></li>
-                    @else
-                    <li class="flex justify-between"><span class="text-slate-500">Total (Tax Incl)</span><span class="font-bold text-slate-900">₦{{ number_format($this->total, 2) }}</span></li>
+                        <li class="flex justify-between"><span class="text-slate-500">Service type</span><span class="font-medium text-slate-900">{{ $sel['name'] }}</span></li>
                     @endif
                 </ul>
 
@@ -271,8 +230,8 @@
                     <div class="text-[13px] text-slate-600 space-y-2">
                         <p>Please note the following before proceeding:</p>
                         <ul class="list-disc list-inside space-y-1 pl-1">
-                            <li><strong>Indicative Pricing:</strong> All prices displayed on this website are for indication purposes only and do not represent the final booking price.</li>
-                            <li><strong>Price Negotiation:</strong> Our support staff will reach out to you after your booking to discuss and negotiate the final pricing based on your specific requirements.</li>
+                            <li><strong>No Payment Now:</strong> Submitting this request does not charge your wallet or card.</li>
+                            <li><strong>Price Negotiation:</strong> Our support staff will reach out to you after your booking to discuss and agree the final pricing based on your specific requirements.</li>
                             <li><strong>Final Confirmation:</strong> The actual rental price will be confirmed during our consultation call with you.</li>
                         </ul>
                     </div>

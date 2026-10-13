@@ -51,6 +51,20 @@ class CarSearchService
         return Car::query()->where('is_active', true)->where('featured', true)->latest('id')->limit($limit)->get();
     }
 
+    /**
+     * Active cars with a price, used for the homepage offer banner.
+     */
+    public function offers(int $limit = 8)
+    {
+        return Car::query()
+            ->where('is_active', true)
+            ->where('daily_price', '>', 0)
+            ->orderByDesc('featured')
+            ->latest('id')
+            ->limit($limit)
+            ->get();
+    }
+
     public function options(): array
     {
         // Prefer admin-managed options when available, falling back to data derived from cars
@@ -67,8 +81,6 @@ class CarSearchService
                 : Car::query()->whereNotNull('location')->distinct()->orderBy('location')->pluck('location')->filter()->values()->all(),
             'sorts' => [
                 'newest' => 'Newest',
-                'price_asc' => 'Price: Low to High',
-                'price_desc' => 'Price: High to Low',
             ],
         ];
     }

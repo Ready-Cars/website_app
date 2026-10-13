@@ -36,40 +36,97 @@
     }" x-init="initFlatpickr">
                 <div data-dropdown-boundary
                     class="relative h-[44vh] min-h-[320px] md:h-[44vh] md:min-h-[340px] w-full rounded-none sm:rounded-2xl overflow-hidden shadow-xl">
-                    <!-- Hero Image -->
-                    <div class="absolute inset-0 bg-center bg-no-repeat bg-cover"
-                        style="background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2000&auto=format&fit=crop'); background-position: center 42%;">
-                    </div>
+                    @if ($offers->isNotEmpty())
+                        <!-- Offer Slideshow -->
+                        <div wire:ignore x-data="{
+                                active: 0,
+                                count: {{ $offers->count() }},
+                                timer: null,
+                                start() {
+                                    if (this.count < 2) return;
+                                    clearInterval(this.timer);
+                                    this.timer = setInterval(() => this.active = (this.active + 1) % this.count, 5000);
+                                },
+                                go(i) { this.active = i; this.start(); }
+                            }" x-init="start()" class="absolute inset-0">
+                            @foreach ($offers as $offer)
+                                <div x-show="active === {{ $loop->index }}"
+                                    x-transition:enter="transition-opacity duration-700"
+                                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                    x-transition:leave="transition-opacity duration-700 absolute inset-0"
+                                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                                    @if (! $loop->first) style="display: none;" @endif
+                                    class="absolute inset-0">
+                                    <div class="absolute inset-0 bg-center bg-no-repeat bg-cover"
+                                        style="background-image: url('{{ $offer->image_url ?: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2000&auto=format&fit=crop' }}'); background-position: center 42%;">
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-br from-[#0e1133]/60 via-[#1d4ed8]/30 to-[#dc2626]/50"></div>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-5 pb-24 md:pb-28">
+                                        <h2
+                                            class="text-3xl sm:text-4xl md:text-5xl font-semibold uppercase text-white leading-tight tracking-tight max-w-4xl drop-shadow-[0_4px_6px_rgba(0,0,0,0.45)]">
+                                            Rent a {{ $offer->name }} for ₦{{ number_format($offer->daily_price, 0) }}<span class="text-xl md:text-3xl">/day</span>
+                                        </h2>
+                                        <div class="mt-4 flex items-center gap-4">
+                                            <a href="{{ route('rent.show', $offer) }}" wire:navigate
+                                                class="inline-flex items-center rounded-full bg-white px-5 py-2 text-sm font-semibold text-[#0e1133] shadow hover:bg-slate-100 transition-colors">
+                                                Book now
+                                            </a>
+                                            <a href="{{ route('terms.index') }}" wire:navigate
+                                                class="text-sm font-medium text-white/90 underline underline-offset-2 drop-shadow hover:text-white">
+                                                T&amp;Cs Apply
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
 
-                    <!-- Overlay for Legibility -->
-                    <div class="absolute inset-0 bg-gradient-to-br from-[#0e1133]/24 via-[#1d4ed8]/16 to-[#dc2626]/44">
-                    </div>
+                            @if ($offers->count() > 1)
+                                <div class="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2">
+                                    @foreach ($offers as $offer)
+                                        <button type="button" @click="go({{ $loop->index }})"
+                                            class="h-2 rounded-full transition-all"
+                                            :class="active === {{ $loop->index }} ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'"
+                                            aria-label="Show offer {{ $loop->iteration }}"></button>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    @else
+                        <!-- Hero Image -->
+                        <div class="absolute inset-0 bg-center bg-no-repeat bg-cover"
+                            style="background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2000&auto=format&fit=crop'); background-position: center 42%;">
+                        </div>
 
-                    <!-- Hero Content (Desktop) -->
-                    <div
-                        class="absolute inset-0 hidden md:flex flex-col items-center justify-center text-center px-4 pb-24 md:pb-28">
-                        <h1
-                            class="text-4xl sm:text-5xl md:text-6xl font-semibold text-white mb-3 tracking-tight drop-shadow-[0_4px_4px_rgba(0,0,0,0.45)]">
-                            Ready. Set. Go.
-                        </h1>
-                        <p
-                            class="text-sm md:text-lg text-white/95 font-medium max-w-2xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]">
-                            Premium rentals for your next adventure
-                        </p>
-                    </div>
+                        <!-- Overlay for Legibility -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-[#0e1133]/24 via-[#1d4ed8]/16 to-[#dc2626]/44">
+                        </div>
 
-                    <!-- Hero Content (Mobile) -->
-                    <div
-                        class="absolute inset-0 md:hidden flex flex-col items-center justify-center text-center px-5 pb-24">
-                        <h1
-                            class="text-5xl font-semibold text-white leading-[0.96] tracking-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.45)]">
-                            Ready. Set. Go.
-                        </h1>
-                        <p
-                            class="mt-3 text-base text-white/95 leading-snug max-w-[19rem] drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]">
-                            Premium rentals for your next adventure
-                        </p>
-                    </div>
+                        <!-- Hero Content (Desktop) -->
+                        <div
+                            class="absolute inset-0 hidden md:flex flex-col items-center justify-center text-center px-4 pb-24 md:pb-28">
+                            <h1
+                                class="text-4xl sm:text-5xl md:text-6xl font-semibold text-white mb-3 tracking-tight drop-shadow-[0_4px_4px_rgba(0,0,0,0.45)]">
+                                Ready. Set. Go.
+                            </h1>
+                            <p
+                                class="text-sm md:text-lg text-white/95 font-medium max-w-2xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.45)]">
+                                Premium rentals for your next adventure
+                            </p>
+                        </div>
+
+                        <!-- Hero Content (Mobile) -->
+                        <div
+                            class="absolute inset-0 md:hidden flex flex-col items-center justify-center text-center px-5 pb-24">
+                            <h1
+                                class="text-5xl font-semibold text-white leading-[0.96] tracking-tight drop-shadow-[0_4px_6px_rgba(0,0,0,0.45)]">
+                                Ready. Set. Go.
+                            </h1>
+                            <p
+                                class="mt-3 text-base text-white/95 leading-snug max-w-[19rem] drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]">
+                                Premium rentals for your next adventure
+                            </p>
+                        </div>
+                    @endif
 
                     <!-- Search Bar Overlay (Desktop) -->
                     <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-[94%] max-w-[980px] hidden md:block">
@@ -435,11 +492,6 @@
                                                     <span class="ml-0.5 text-slate-400 font-normal">(12)</span>
                                                 </div>
                                             </div>
-                                            <div class="mt-2">
-                                                <span
-                                                    class="text-xl font-semibold text-[#0e1133] tracking-tight">From ₦{{ number_format($car->daily_price, 0) }}</span>
-                                                <span class="text-sm font-medium text-slate-500">/day</span>
-                                            </div>
                                         </a>
                                     @empty
                                         <p class="text-slate-400">No deals available right now.</p>
@@ -522,15 +574,6 @@
                                                 class="text-[1.12rem] font-semibold leading-snug tracking-tight text-slate-900">
                                                 {{ $car->name }}
                                             </h3>
-                                            <div class="text-right">
-                                                <p
-                                                    class="text-[1.35rem] font-semibold leading-none tracking-tight text-slate-900">
-                                                    From ₦{{ number_format($car->daily_price, 0) }}
-                                                </p>
-                                                <p
-                                                    class="mt-1 text-[0.7rem] font-medium uppercase tracking-wide leading-none text-slate-500">
-                                                    per day</p>
-                                            </div>
                                         </div>
 
                                         <div class="grid grid-cols-3 gap-2 text-[0.83rem] text-slate-600">

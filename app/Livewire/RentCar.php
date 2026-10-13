@@ -7,7 +7,6 @@ use App\Models\Car;
 use App\Models\Extra;
 use App\Models\ServiceType;
 use App\Models\Setting;
-use App\Services\PaystackService;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -241,13 +240,6 @@ class RentCar extends Component
         return $rate;
     }
 
-    public function getIsNegotiableServiceProperty(): bool
-    {
-        $serviceType = ServiceType::find($this->serviceTypeId);
-
-        return $serviceType && strtolower((string) $serviceType->pricing_type) === 'negotiable';
-    }
-
     protected function resetRentalForm(): void
     {
         // Reset all form fields to their defaults after a successful confirmation
@@ -324,35 +316,23 @@ class RentCar extends Component
                 ->first();
         }
 
-        // Determine service type and charge behavior
-        $serviceType = ServiceType::find($this->serviceTypeId);
-        $isNegotiable = $serviceType && strtolower((string) $serviceType->pricing_type) === 'negotiable';
-        $newStatus = $isNegotiable ? 'pending' : 'confirmed';
-
-        // Determine amount to charge (or refund) based on editing state
-        $charge = 0.0;
+        // Prices are not shown on the website, so every booking is a request that
+        // an admin prices and confirms (wallet charge or Paystack payment link).
+        // The computed totals are stored as an indicative estimate for the admin.
         $refund = 0.0;
-        if (! $isNegotiable) {
-            if ($editing && $editing->status !== 'cancelled') {
-                $diff = round($this->total - (float) $editing->total, 2);
-                if ($diff > 0) {
-                    $charge = $diff;
-                }
-                if ($diff < 0) {
-                    $refund = abs($diff);
-                }
-            } else {
-                $charge = round($this->total, 2);
-            }
+        if ($editing && $editing->status === 'confirmed') {
+            // Return the amount already paid; the admin charges the re-confirmed price
+            $refund = round((float) $editing->total, 2);
         }
 
-        // If charge required and insufficient balance, redirect to Paystack payment
-        if ($charge > 0 && $user->wallet_balance < $charge) {
+        $booking = null;
+        \Illuminate\Support\Facades\DB::transaction(function () use ($user, $editing, $refund, &$booking) {
+            if ($refund > 0) {
+                $user->wallet_balance = round($user->wallet_balance + $refund, 2);
+                $user->save();
+            }
 
-            // Create booking with "pending payment" status first
-            $booking = \App\Models\Booking::create([
-                'user_id' => $user->id,
-                'car_id' => $this->car->id,
+            $attributes = [
                 'pickup_location' => $this->pickupLocation,
                 'dropoff_location' => $this->dropoffLocation,
                 'start_date' => $this->startDate,
@@ -363,94 +343,18 @@ class RentCar extends Component
                 'taxes' => $this->taxes,
                 'total' => $this->total,
                 'service_type_id' => $this->serviceTypeId,
-                'status' => 'pending payment',
-            ]);
-
-            // Initialize Paystack payment
-            $paystackService = app(PaystackService::class);
-            $amountKobo = (int) ($charge * 100);
-            $callbackUrl = route('booking.payment.callback');
-            $reference = 'BOOKING_'.$booking->id.'_'.time();
-
-            $paymentInit = $paystackService->initialize(
-                $amountKobo,
-                $user->email,
-                $callbackUrl,
-                $reference
-            );
-
-            if (! $paymentInit['status']) {
-
-                // If payment initialization fails, delete the booking and show error
-                $booking->delete();
-                session()->flash('error', 'Failed to initialize payment. Please try again.');
-
-                return;
-            }
-
-            // Store payment reference in booking
-            $booking->update(['payment_reference' => $reference]);
-
-            // Redirect to Paystack payment page
-            $this->redirect($paymentInit['authorization_url']);
-
-            return;
-        }
-
-        $booking = null;
-        \Illuminate\Support\Facades\DB::transaction(function () use ($user, $editing, $charge, $refund, $newStatus, &$booking) {
-            // Update wallet balance
-            if ($charge > 0) {
-                $user->wallet_balance = round($user->wallet_balance - $charge, 2);
-            }
-            if ($refund > 0) {
-                $user->wallet_balance = round($user->wallet_balance + $refund, 2);
-            }
-            $user->save();
+                'status' => 'pending',
+            ];
 
             if ($editing && $editing->status !== 'cancelled') {
-                $editing->update([
-                    'pickup_location' => $this->pickupLocation,
-                    'dropoff_location' => $this->dropoffLocation,
-                    'start_date' => $this->startDate,
-                    'end_date' => $this->endDate,
-                    'extras' => $this->extras,
-                    'notes' => $this->notes,
-                    'subtotal' => $this->subtotal,
-                    'taxes' => $this->taxes,
-                    'total' => $this->total,
-                    'service_type_id' => $this->serviceTypeId,
-                    'status' => $newStatus,
-                ]);
+                $editing->update($attributes);
             } else {
-                $booking = \App\Models\Booking::create([
+                $booking = \App\Models\Booking::create($attributes + [
                     'user_id' => $user->id,
                     'car_id' => $this->car->id,
-                    'pickup_location' => $this->pickupLocation,
-                    'dropoff_location' => $this->dropoffLocation,
-                    'start_date' => $this->startDate,
-                    'end_date' => $this->endDate,
-                    'extras' => $this->extras,
-                    'notes' => $this->notes,
-                    'subtotal' => $this->subtotal,
-                    'taxes' => $this->taxes,
-                    'total' => $this->total,
-                    'service_type_id' => $this->serviceTypeId,
-                    'status' => $newStatus,
                 ]);
             }
 
-            // Log wallet transactions for charge/refund (if any)
-            if ($charge > 0) {
-                \App\Models\WalletTransaction::create([
-                    'user_id' => $user->id,
-                    'type' => 'debit',
-                    'amount' => $charge,
-                    'balance_after' => $user->wallet_balance,
-                    'description' => 'Booking charge',
-                    'meta' => ['car_id' => $this->car->id, 'booking_id' => $booking?->id ?? $editing?->id],
-                ]);
-            }
             if ($refund > 0) {
                 \App\Models\WalletTransaction::create([
                     'user_id' => $user->id,
@@ -458,76 +362,16 @@ class RentCar extends Component
                     'amount' => $refund,
                     'balance_after' => $user->wallet_balance,
                     'description' => 'Booking refund',
-                    'meta' => ['car_id' => $this->car->id, 'booking_id' => $booking?->id ?? $editing?->id],
+                    'meta' => ['car_id' => $this->car->id, 'booking_id' => $editing->id],
                 ]);
             }
         });
 
-        NotifyAdminOfNewBooking::dispatch($user, $editing, $booking);
         // Send admin notification for new bookings (regardless of status)
+        NotifyAdminOfNewBooking::dispatch($user, $editing, $booking);
 
-        // Success message and redirect to My Trips
-        $message = $newStatus === 'pending'
-            ? "Your reservation request has been received. No payment has been taken yet. We'll contact you to confirm the price."
-            : 'Your reservation request has been received!';
-        RateLimiter::clear($this->throttleKey());
-        Session::regenerate();
-
-        // Process any pending bookings cached from a guest session
-        if ($pending = Session::pull('pending_booking')) {
-            $this->processPendingBooking($pending);
-            // After processing a pending booking, redirect specifically to the car page
-            $this->redirect(route('rent.show', ['car' => $pending['car_id']]), navigate: true);
-            return;
-        }
-
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
-    }
-
-    /**
-     * Process a pending booking cached in the session during a guest interaction.
-     */
-    protected function processPendingBooking(array $data): void
-    {
-        try {
-            $user = Auth::user();
-            $car = \App\Models\Car::findOrFail($data['car_id']);
-            $serviceType = \App\Models\ServiceType::findOrFail($data['service_type_id']);
-
-            // Calculate totals (similar to RentCar logic)
-            $start = \Carbon\Carbon::parse($data['start_date'])->startOfDay();
-            $end = \Carbon\Carbon::parse($data['end_date'])->startOfDay();
-            $days = max(1, $start->diffInDays($end));
-
-            $subtotal = ((float) $car->daily_price) * $days;
-            // Note: Simplification here for extras; in a full implementation, we'd recalc from the 'extras' array
-            $taxes = round($subtotal * (float) \App\Models\Setting::get('tax_rate', '0.08'), 2);
-            $total = round($subtotal + $taxes, 2);
-
-            $isNegotiable = strtolower((string) $serviceType->pricing_type) === 'negotiable';
-            $status = $isNegotiable ? 'pending' : 'confirmed';
-
-            // Create the booking automatically
-            \App\Models\Booking::create([
-                'user_id' => $user->id,
-                'car_id' => $car->id,
-                'pickup_location' => $data['pickup_location'],
-                'dropoff_location' => $data['dropoff_location'],
-                'start_date' => $data['start_date'],
-                'end_date' => $data['end_date'],
-                'extras' => $data['extras'],
-                'notes' => $data['notes'],
-                'subtotal' => $subtotal,
-                'taxes' => $taxes,
-                'total' => $total,
-                'service_type_id' => $data['service_type_id'],
-                'status' => $status,
-            ]);
-
-            session()->flash('rent_success', 'Welcome back! Your pending booking was processed successfully.');
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to process pending booking: ' . $e->getMessage());
-        }
+        session()->flash('rent_success', "Your reservation request has been received. No payment has been taken yet. We'll contact you to confirm the price.");
+        $this->redirect(route('trips.index'), navigate: true);
     }
 
     protected function loadAvailableExtras(bool $resetSelection = false): void

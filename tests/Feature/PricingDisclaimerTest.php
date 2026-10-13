@@ -20,7 +20,7 @@ class PricingDisclaimerTest extends TestCase
         Livewire::test('pricing-disclaimer')
             ->assertSet('showDisclaimer', true)
             ->assertSee('Important Pricing Information')
-            ->assertSee('All prices displayed on this website are for indication purposes only')
+            ->assertSee('Advertised offers are starting prices for indication only')
             ->assertSee('Our support staff will reach out to you after your booking');
     }
 

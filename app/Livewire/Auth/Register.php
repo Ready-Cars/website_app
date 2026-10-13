@@ -71,8 +71,8 @@ class Register extends Component
             $taxes = round($subtotal * (float) \App\Models\Setting::get('tax_rate', '0.08'), 2);
             $total = round($subtotal + $taxes, 2);
 
-            $isNegotiable = strtolower((string) $serviceType->pricing_type) === 'negotiable';
-            $status = $isNegotiable ? 'pending' : 'confirmed';
+            // Prices are not shown on the website, so every booking awaits admin price confirmation
+            $status = 'pending';
 
             \App\Models\Booking::create([
                 'user_id' => $user->id,
@@ -90,7 +90,7 @@ class Register extends Component
                 'status' => $status,
             ]);
 
-            session()->flash('rent_success', 'Welcome! Your pending booking was processed successfully.');
+            session()->flash('rent_success', 'Welcome! Your reservation request has been received. We will contact you to confirm the price.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to process pending registration booking: ' . $e->getMessage());
         }

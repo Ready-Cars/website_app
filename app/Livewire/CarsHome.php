@@ -187,6 +187,7 @@ class CarsHome extends Component
 
         return view('livewire.cars-home', [
             'featured' => $showFeatured ? $this->service()->featured(3) : collect(),
+            'offers' => $this->service()->offers(),
             'catalog' => $this->service()->paginate($this->params(), $this->perPage),
             'options' => $options,
             'showFeatured' => $showFeatured,
