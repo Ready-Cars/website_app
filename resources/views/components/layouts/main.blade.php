@@ -73,6 +73,8 @@
         {{ $slot }}
     </main>
 
+    @include('partials.whatsapp-button')
+
     @livewireScripts
 </body>
 </html>
