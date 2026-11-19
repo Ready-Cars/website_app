@@ -704,7 +704,7 @@
                 window.addEventListener('scroll', () => this.updateScrollTopVisibility());
                 window.addEventListener('resize', () => this.updateScrollTopVisibility());
             }
-        }" class="pointer-events-none fixed bottom-8 right-8 z-50 hidden lg:block">
+        }" class="pointer-events-none fixed bottom-8 left-8 z-50 hidden lg:block">
         <button type="button" x-show="showScrollTop" x-transition.opacity.scale
             @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
             class="pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#0e1133] text-white shadow-lg transition hover:bg-black focus:outline-none focus:ring-2 focus:ring-[#0e1133]/30"
